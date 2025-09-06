@@ -9,6 +9,7 @@ import fontConfig from 'themes/fontConfig';
 import { useFonts, Inter_900Black } from '@expo-google-fonts/inter';
 import { navigationGlobal } from 'helpers/navigator/navigationScreens';
 import globalState from 'helpers/states/globalState';
+import LoadingScreen from 'components/Screens/LoadingScreen';
 
 const Stack = createStackNavigator()
 
@@ -32,6 +33,7 @@ export default function App() {
   return (
     <PaperProvider theme={theme}>
       <NavigationContainer ref={navigationGlobal}>
+        <LoadingScreen/>
         <Stack.Navigator 
             initialRouteName={initialRouteName} 
             screenOptions={{ 

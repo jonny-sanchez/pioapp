@@ -7,6 +7,9 @@ type GlobalState = {
   drawer: boolean;
   setOpenDrawer: () => void;
   setCloseDrawer: () => void;
+  screenLoading: boolean;
+  setOpenScreenLoading: () => void;
+  setCloseScreenLoading: () => void;
 };
 
 const globalState = create<GlobalState>((set)=>({
@@ -19,7 +22,10 @@ const globalState = create<GlobalState>((set)=>({
     }),
     drawer: false,
     setOpenDrawer: () => set({ drawer: true }),
-    setCloseDrawer: () => set({ drawer: false })
+    setCloseDrawer: () => set({ drawer: false }),
+    screenLoading: false,
+    setOpenScreenLoading: () => set({ screenLoading: true }),
+    setCloseScreenLoading: () => set({ screenLoading: false }),
 }))
 
 export default globalState

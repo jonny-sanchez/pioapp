@@ -3,14 +3,16 @@ import { ReactNode } from "react"
 
 type ScrollViewContainerProps = {
     children?: ReactNode; 
+    paddingHorizontal?: number;
 }
 
 export default function ScrollViewContainer({
-    children
+    children,
+    paddingHorizontal = 35
 } : ScrollViewContainerProps){
 
     return (
-        <ScrollView style={{ flex: 1, paddingHorizontal: 35, width: '100%'  }}>
+        <ScrollView style={{ flex: 1, paddingHorizontal: paddingHorizontal, width: '100%'  }}>
             { children }
         </ScrollView>
         

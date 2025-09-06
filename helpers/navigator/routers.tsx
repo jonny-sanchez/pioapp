@@ -6,7 +6,7 @@ const routers = [
     {
         name: 'Login',
         component: Login,
-        default: false
+        default: true
     },
     {
         name: 'Home',
@@ -16,7 +16,7 @@ const routers = [
     {
         name: 'SaveVisitas',
         component: SaveVisitas,
-        default: true
+        default: false
     }
 ]
 

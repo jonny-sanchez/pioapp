@@ -10,11 +10,11 @@ import ButtonForm from "components/form/ButtonForm"
 import { yupResolver } from '@hookform/resolvers/yup'
 import schemaNwVisitaFormValidate from "helpers/validatesForm/schemaNwVisitaFormValidate"
 import { useState } from "react"
+import PickerFile from "components/container/PickerFile"
 
 export default function SaveVisitas(){
 
     const [ tiendas, setTiendas ] = useState([ 
-        // { label: '-- Seleccionar --', value: '' },
         { label: 'Manzana', value: 'apple' },
         { label: 'Banana', value: 'banana' },
     ])
@@ -43,6 +43,8 @@ export default function SaveVisitas(){
                 <FormAdaptiveKeyBoard>
 
                     <View className="w-full flex-col gap-3.5 mt-8">
+
+                        <PickerFile/>
 
                         <DropdownForm
                             label="Tienda"

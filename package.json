@@ -1,5 +1,5 @@
 {
-  "name": "my-expo-app",
+  "name": "pioapp",
   "version": "1.0.0",
   "scripts": {
     "android": "expo run:android",
@@ -36,7 +36,9 @@
     "react-native-screens": "^4.15.4",
     "react-native-web": "^0.20.0",
     "yup": "^1.7.0",
-    "zustand": "^5.0.8"
+    "zustand": "^5.0.8",
+    "expo-image-picker": "~16.1.4",
+    "expo-location": "~18.1.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
