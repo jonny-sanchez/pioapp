@@ -1,13 +1,28 @@
-import { Avatar, Card, IconButton } from 'react-native-paper';
+import { Avatar, Card, IconButton, useTheme } from 'react-native-paper';
 
-export default function CardTitle(){
+type CardTitleProps = {
+  title?: string;
+  subtitle?: string;
+  size?: number;
+  icon?: string;
+}
+
+export default function CardTitle({ 
+  title = '',
+  subtitle = '',
+  size = 45,
+  icon = ''
+} : CardTitleProps){
+
+    const theme = useTheme()
 
     return (
         <Card.Title
-          title="Card Title"
-          subtitle="Card Subtitle"
-          left={() => <Avatar.Icon  icon="folder" />}
-          right={() => <IconButton  icon="dots-vertical"/>}
+          style={{ borderColor: theme.colors.surfaceVariant, borderWidth: 1, borderRadius: 4 }}
+          title={title}
+          subtitle={subtitle}
+          left={(props) => <Avatar.Icon { ...props } size={size}  icon={icon} />}
+          // right={() => <IconButton  icon="dots-vertical"/>}
         />
     )
 

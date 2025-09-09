@@ -17,7 +17,7 @@ export default function App() {
 
   let [fontsLoaded] = useFonts({ Inter_900Black })
 
-  // if (!fontsLoaded) return null;
+  if (!fontsLoaded) (<>cargando...</>);
 
   const { dark } = globalState()
 

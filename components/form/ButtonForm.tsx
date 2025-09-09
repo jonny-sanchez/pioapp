@@ -1,4 +1,4 @@
-import { GestureResponderEvent } from 'react-native';
+import { GestureResponderEvent, StyleProp, ViewStyle } from 'react-native';
 import { Button } from 'react-native-paper';
 
 type ButtonFormProps = {
@@ -7,6 +7,7 @@ type ButtonFormProps = {
     onPress?: ((e: GestureResponderEvent) => void);
     loading?: boolean;
     disabled?: boolean;
+    style?: StyleProp<ViewStyle>;
 }
 
 export default function ButtonForm({
@@ -14,7 +15,8 @@ export default function ButtonForm({
     onPress = () => {},
     icon = '',
     loading = false,
-    disabled = false
+    disabled = false,
+    style = { paddingVertical: 8, borderRadius: 5 }
 } : ButtonFormProps){
 
     return (
@@ -24,7 +26,7 @@ export default function ButtonForm({
             mode='contained' 
             icon={`${icon}`} 
             onPress={onPress} 
-            style={{ paddingVertical: 8, borderRadius: 5 }}
+            style={[ style ]}
         > 
             { label } 
         </Button>

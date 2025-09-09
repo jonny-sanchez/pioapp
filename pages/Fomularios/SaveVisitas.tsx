@@ -11,10 +11,16 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import schemaNwVisitaFormValidate from "helpers/validatesForm/schemaNwVisitaFormValidate"
 import { useState } from "react"
 import PickerFile from "components/container/PickerFile"
+import { Text } from "react-native-paper"
+import { useRoute } from "@react-navigation/native"
 
 export default function SaveVisitas(){
 
-    const [ tiendas, setTiendas ] = useState([ 
+    const route = useRoute()
+
+    const { nombre_tienda } = route.params as any
+
+    const [ tipoEntrega, setTipoEntrega ] = useState([ 
         { label: 'Manzana', value: 'apple' },
         { label: 'Banana', value: 'banana' },
     ])
@@ -42,15 +48,17 @@ export default function SaveVisitas(){
 
                 <FormAdaptiveKeyBoard>
 
-                    <View className="w-full flex-col gap-3.5 mt-8">
+                    <View className="w-full flex-col gap-3.5 mt-5">
+
+                        <Text style={{ textAlign: 'right' }} variant="bodySmall">Tienda: { nombre_tienda || '' }</Text>
 
                         <PickerFile/>
 
                         <DropdownForm
-                            label="Tienda"
-                            data={tiendas}
+                            label="Tipo Entrega"
+                            data={tipoEntrega}
                             control={control}
-                            name="tienda"
+                            name="tipo_entrega"
                             errors={errors}
                         />
 

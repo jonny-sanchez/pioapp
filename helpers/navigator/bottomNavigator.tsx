@@ -1,6 +1,6 @@
 import Home from 'pages/dashboard/Home';
 import Visitas from 'pages/dashboard/Visitas';
-
+import Rutas from 'pages/dashboard/Rutas';
 
 const bottomNavigation = [
     { 
@@ -11,6 +11,14 @@ const bottomNavigation = [
         appBarTitle: 'Pinulito',
         element: Home
     },  
+    {
+        key: 'rutas', 
+        title: 'Rutas',
+        focusedIcon: 'truck', 
+        unfocusedIcon: 'truck-outline', 
+        appBarTitle: 'Rutas',
+        element: Rutas
+    },
     { 
         key: 'visitas', 
         title: 'Visitas', 

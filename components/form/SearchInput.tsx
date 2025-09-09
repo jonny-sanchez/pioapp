@@ -1,13 +1,13 @@
 import { Searchbar, useTheme } from 'react-native-paper';
 
 type SearchInputProps = {
-    setSearchQuery?: (((text: string) => void) & ((query: string) => void));
+    onChangeText?: (((text: string) => void) & ((query: string) => void));
     valueSearch?: any;
 
 }
 
 export default function SearchInput({
-    setSearchQuery,
+    onChangeText,
     valueSearch
 } : SearchInputProps){
 
@@ -17,7 +17,7 @@ export default function SearchInput({
         <Searchbar
           mode='view'
           placeholder="Buscar"
-          onChangeText={setSearchQuery}
+          onChangeText={onChangeText}
           value={valueSearch}
           style={{ 
                 // marginHorizontal: 15, 

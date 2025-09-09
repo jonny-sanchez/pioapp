@@ -26,7 +26,7 @@ export default function Login() {
   return (
     <FormAdaptiveKeyBoard>
       <View className='flex-1 items-center justify-center px-8'>
-        <BoxImage width={70} height={80} img={require('assets/images/LOGOPINULITO.png')}/>
+        <BoxImage width={70} height={80} img={require('assets/images/LOGOPINULITOORIGINAL.png')}/>
         
         <View className='flex flex-col justify-center items-center gap-1 mt-10'>
           <Title>Login</Title>

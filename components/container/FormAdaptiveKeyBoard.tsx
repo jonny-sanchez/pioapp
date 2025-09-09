@@ -14,7 +14,7 @@ export default function FormAdaptiveKeyBoard({
             contentContainerStyle={{ flex: 1 }}
             // enableOnAndroid={true}    
             keyboardShouldPersistTaps="handled" 
-            // extraScrollHeight={20}        
+            // extraScrollHeight={60}        
             enableAutomaticScroll={true} 
         >
             { children }
