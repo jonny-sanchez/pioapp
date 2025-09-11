@@ -19,9 +19,11 @@ export default function Home(){
                     
                     <View className='flex flex-col w-full flex-wrap gap-2'>
 
-                        <CardTitle icon='truck' title='Rutas'/>
-                        <CardTitle icon='crosshairs-gps' title='Visitas Tienda'/>
-                        <CardTitle icon='file-document' title='Boleta de pago'/>
+                        <CardTitle style={{ width: '100%' }} icon='truck' title='Rutas'/>
+
+                        <CardTitle style={{ width: '100%' }} icon='storefront' title='Visitas Tienda'/>
+                        
+                        <CardTitle style={{ width: '100%' }} icon='file-sign' title='Boleta de pago'/>
                         
                     </View>
                 </View>

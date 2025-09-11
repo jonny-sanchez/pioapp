@@ -1,6 +1,7 @@
 import Home from 'pages/dashboard/Home';
 import Visitas from 'pages/dashboard/Visitas';
 import Rutas from 'pages/dashboard/Rutas';
+import Boleta from 'pages/dashboard/Boleta';
 
 const bottomNavigation = [
     { 
@@ -26,6 +27,14 @@ const bottomNavigation = [
         unfocusedIcon: 'storefront-outline',
         appBarTitle: 'Visitas',
         element: Visitas 
+    },
+    { 
+        key: 'boleta', 
+        title: 'Boleta', 
+        focusedIcon: 'file-sign',
+        // unfocusedIcon: 'storefront-outline',
+        appBarTitle: 'Boleta',
+        element: Boleta 
     },
 ]
 

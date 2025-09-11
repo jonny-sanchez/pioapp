@@ -22,6 +22,7 @@ export default function SearchInput({
           style={{ 
                 // marginHorizontal: 15, 
                 // marginBottom: 15, 
+                width: '100%',
                 backgroundColor: theme.colors.surfaceVariant,
             }}
         />

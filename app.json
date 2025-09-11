@@ -33,6 +33,11 @@
         "backgroundColor": "#fcb900"
       },
       "package": "com.anonymous.pioapp"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d10fa382-0583-4d8e-a439-c1e3fb01ab7d"
+      }
     }
   }
 }
