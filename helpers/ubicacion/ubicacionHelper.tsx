@@ -12,8 +12,15 @@ export const locationPermission = async () => {
 
 export const getLocation = async () => {
 
-    const location = await getCurrentPositionAsync()
+    try {
+        const location = await getCurrentPositionAsync()
 
-    return location
+        return location
+        
+    } catch (error) {
+
+        return null
+
+    }
     
 }
