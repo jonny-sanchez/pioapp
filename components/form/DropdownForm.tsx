@@ -39,7 +39,7 @@ export default function DropdownForm({
                     <Dropdown 
                         mode='modal'
                         data={data}
-                        value={value}
+                        value={value ?? ""}
                         valueField='value'
                         placeholder={label}
                         labelField='label'
@@ -75,7 +75,8 @@ export default function DropdownForm({
                     />
                 )}
             />
-            <HelperText type="error" style={{ display: errorMessage ? 'flex' : 'none' }} visible={errorMessage ? true : false}>{ errorMessage }</HelperText>
+
+            { errorMessage && <HelperText type="error" visible={errorMessage ? true : false}>{ errorMessage }</HelperText> }
         </View>
     )
 

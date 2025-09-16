@@ -30,9 +30,9 @@ export default function InputFormHook({
 
     const [viewPassword, setViewPassword] = useState(isPassword)
 
-    const maxLengthComponent = (value: any) => { return (<TextInput.Affix text={`${value?.length || 0 }/${maxLength}`}/>) }
+    // const maxLengthComponent = (value: any) => { return (<TextInput.Affix text={`${value?.length || 0 }/${maxLength}`}/>) }
 
-    const passwordViewComponent = (<TextInput.Icon onPress={ () => setViewPassword(!viewPassword) } icon={ viewPassword ? 'eye-off' : 'eye' } />)
+    // const passwordViewComponent = (<TextInput.Icon onPress={ () => setViewPassword(!viewPassword) } icon={ viewPassword ? 'eye-off' : 'eye' } />)
 
     const errorMessage = errors[name || ""]?.message || ""
 
@@ -46,18 +46,23 @@ export default function InputFormHook({
                       mode="flat"
                       label={label}
                       placeholder={placeholder}
-                      value={value}
+                      value={value ?? ""}
                       onChangeText={onChange}
                       onBlur={onBlur}
                       secureTextEntry={viewPassword}
-                      right={isPassword ? passwordViewComponent : maxLengthComponent(value)}
+                    //   right={isPassword ? passwordViewComponent : maxLengthComponent(value)}
+                      right={
+                        isPassword ?
+                            <TextInput.Icon onPress={ () => setViewPassword(!viewPassword) } icon={ viewPassword ? 'eye-off' : 'eye' } /> 
+                            : <TextInput.Affix text={`${(value ?? "")?.length || 0 }/${maxLength}`}/>
+                      }
                       maxLength={maxLength}
                       error={errorMessage ? true : false}
                     />
                 )}
             />
-            
-            <HelperText type="error" style={{ display: errorMessage ? 'flex' : 'none' }} visible={errorMessage ? true : false}>{ errorMessage }</HelperText>
+
+            { errorMessage && <HelperText type="error" visible={errorMessage ? true : false}>{ errorMessage }</HelperText> }
         </View>
     );
 }

@@ -6,12 +6,12 @@ const routers = [
     {
         name: 'Login',
         component: Login,
-        default: false
+        default: true
     },
     {
         name: 'Home',
         component: Inicio,
-        default: true
+        default: false
     },
     {
         name: 'SaveVisitas',

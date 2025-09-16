@@ -10,6 +10,7 @@ import { useFonts, Inter_900Black } from '@expo-google-fonts/inter';
 import { navigationGlobal } from 'helpers/navigator/navigationScreens';
 import globalState from 'helpers/states/globalState';
 import LoadingScreen from 'components/Screens/LoadingScreen';
+import PageLoadingInit from 'components/Screens/PageLoadingInit';
 
 const Stack = createStackNavigator()
 
@@ -17,7 +18,7 @@ export default function App() {
 
   let [fontsLoaded] = useFonts({ Inter_900Black })
 
-  if (!fontsLoaded) (<>cargando...</>);
+  // if (!fontsLoaded) return <PageLoadingInit/>;
 
   const { dark } = globalState()
 
@@ -32,29 +33,34 @@ export default function App() {
 
   return (
     <PaperProvider theme={theme}>
-      <NavigationContainer ref={navigationGlobal}>
-        <LoadingScreen/>
-        <Stack.Navigator 
-            initialRouteName={initialRouteName} 
-            screenOptions={{ 
-              headerShown: false, 
-              cardStyle: { backgroundColor: theme.colors.background },
-              gestureEnabled: true,
-              gestureDirection: 'horizontal',
-              animation: 'slide_from_right' 
-            }}
-        >
-          { 
-            routers.map((el, index) => 
-              <Stack.Screen 
-                key={index}
-                name={el?.name || ""} 
-                component={el?.component || null}
-              />
-            ) 
-          }
-        </Stack.Navigator>
-      </NavigationContainer>
+      {
+        !fontsLoaded ?
+        <PageLoadingInit/>
+         :
+        <NavigationContainer ref={navigationGlobal}>
+          <LoadingScreen/>
+          <Stack.Navigator 
+              initialRouteName={initialRouteName} 
+              screenOptions={{ 
+                headerShown: false, 
+                cardStyle: { backgroundColor: theme.colors.background },
+                gestureEnabled: true,
+                gestureDirection: 'horizontal',
+                animation: 'slide_from_right' 
+              }}
+          >
+            { 
+              routers.map((el, index) => 
+                <Stack.Screen 
+                  key={index}
+                  name={el?.name || ""} 
+                  component={el?.component || null}
+                />
+              ) 
+            }
+          </Stack.Navigator>
+        </NavigationContainer>
+      }
     </PaperProvider>
   );
 }
