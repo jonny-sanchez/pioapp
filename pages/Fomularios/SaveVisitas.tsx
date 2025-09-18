@@ -11,14 +11,15 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import schemaNwVisitaFormValidate from "helpers/validatesForm/schemaNwVisitaFormValidate"
 import { useState } from "react"
 import PickerFile from "components/container/PickerFile"
-import { Text } from "react-native-paper"
+import { Icon, Text } from "react-native-paper"
 import { useRoute } from "@react-navigation/native"
+import { NavigationService } from "helpers/navigator/navigationScreens"
 
 export default function SaveVisitas(){
 
     const route = useRoute()
 
-    const { nombre_tienda } = route.params as any
+    // const { nombre_tienda } = route.params as any
 
     const [ tipoEntrega, setTipoEntrega ] = useState([ 
         { label: 'Manzana', value: 'apple' },
@@ -33,16 +34,18 @@ export default function SaveVisitas(){
     const submitFormNwVisita = async(data: any) => {
         alert(JSON.stringify(data))
         // NavigationService.reset('Home')
+        // NavigationService.navigate('Home', { keyIndex: 'rutas' })
+
     }
 
     return (
 
         <>
-            <AppBarHome title="Nueva Visita" goBack={true}/>
+            {/* <AppBarHome title="Nueva Visita" goBack={true}/> */}
 
             <ScrollViewContainer>
                 
-                <View className="w-full mt-14">
+                <View className="w-full mt-6">
                     <TextInfo style={{ textAlign: "justify" }}>Fomulario para ingreso de una nueva visita a una tienda porfavor completa los campos solicitados de manera correcta.</TextInfo>
                 </View>
 
@@ -50,15 +53,22 @@ export default function SaveVisitas(){
 
                     <View className="w-full flex-col gap-3.5 mt-5">
 
-                        <Text style={{ textAlign: 'right' }} variant="bodySmall">Tienda: { nombre_tienda || '' }</Text>
-
-                        <PickerFile/>
+                        {/* <Text style={{ textAlign: 'right' }} variant="bodySmall">Tienda: { nombre_tienda || '' }</Text> */}
+                        {/* <></> */}
 
                         <DropdownForm
-                            label="Tipo Entrega"
+                            label="Tienda"
                             data={tipoEntrega}
                             control={control}
-                            name="tipo_entrega"
+                            name="tienda"
+                            errors={errors}
+                        />
+
+                        <DropdownForm
+                            label="Tipo Visita"
+                            data={tipoEntrega}
+                            control={control}
+                            name="tipo_visita"
                             errors={errors}
                         />
 
@@ -70,6 +80,8 @@ export default function SaveVisitas(){
                             label="Comentario"
                             errors={errors}
                         />
+
+                        <PickerFile/>
 
                         <View className="w-full mt-3"><ButtonForm onPress={handleSubmit(submitFormNwVisita)} label="Guardar"/></View>
 

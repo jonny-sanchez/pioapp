@@ -4,6 +4,8 @@ import FabFloating from "components/container/FabFloating"
 import { NavigationService } from "helpers/navigator/navigationScreens" 
 import TextInfo from "components/typografy/TextInfo"
 import CardTitle from 'components/Cards/CardTitle'
+// import { BottomNavKey from 'helpers/navigator/bottomNavigator'
+import bottomNavigation from 'helpers/navigator/bottomNavigator'
 
 export default function Home(){
 
@@ -19,11 +21,17 @@ export default function Home(){
                     
                     <View className='flex flex-col w-full flex-wrap gap-2'>
 
-                        <CardTitle style={{ width: '100%' }} icon='truck' title='Rutas'/>
-
-                        <CardTitle style={{ width: '100%' }} icon='storefront' title='Visitas Tienda'/>
-                        
-                        <CardTitle style={{ width: '100%' }} icon='file-sign' title='Boleta de pago'/>
+                        { 
+                            (bottomNavigation.slice(1, 4) ?? []).map( (el, i) => (
+                                <CardTitle 
+                                    key={i} 
+                                    style={{ width:'100%' }} 
+                                    icon={el.focusedIcon} 
+                                    title={el.title}
+                                    onPress={ () => NavigationService.reset('Home', { keyIndex: el.key }) }
+                                />
+                            )) 
+                        }
                         
                     </View>
                 </View>

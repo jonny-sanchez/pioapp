@@ -8,6 +8,6 @@ export const NavigationService = {
 
   goBack: () => (navigationGlobal.isReady() && navigationGlobal.canGoBack()) && navigationGlobal.goBack(),
 
-  reset: (name: string) => navigationGlobal.isReady() && navigationGlobal.reset({ index: 0, routes: [{ name }] })
+  reset: (name: string, params: object | null | undefined = null) => navigationGlobal.isReady() && navigationGlobal.reset({ index: 0, routes: [{ name, params }] })
   
 }

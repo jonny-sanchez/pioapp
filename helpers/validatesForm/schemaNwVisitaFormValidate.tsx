@@ -1,7 +1,8 @@
 import * as Yup from 'yup'
 
 const schemaNwVisitaFormValidate = Yup.object({
-    tipo_entrega: Yup.string().required("El tipo entrega es un campo requerido")
+    tienda: Yup.string().required("La tienda es un campo requerido"),
+    tipo_visita: Yup.string().required("El tipo visita es un campo requerido")
 }).required()
 
 export default schemaNwVisitaFormValidate

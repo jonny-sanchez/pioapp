@@ -1,7 +1,6 @@
 import ButtonForm from "components/form/ButtonForm"
 import { NavigationService } from "helpers/navigator/navigationScreens"
 
-
 const configTableRutas = [
     {
         data: 'nombre_tienda',
@@ -18,9 +17,10 @@ const configTableRutas = [
         render: (data:any) => ( 
             <ButtonForm 
                 label="Validar" 
-                icon="camera" 
+                // qrcode
+                icon="qrcode-scan" 
                 style={{ marginVertical: 8 }}
-                onPress={ () => NavigationService.navigate('SaveVisitas', data) }
+                
             /> 
         )
     }

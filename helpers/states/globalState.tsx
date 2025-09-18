@@ -10,6 +10,8 @@ type GlobalState = {
   screenLoading: boolean;
   setOpenScreenLoading: () => void;
   setCloseScreenLoading: () => void;
+  indexNavigation?: any;
+  setIndexNavigation: (newIndex:number) => void;
 };
 
 const globalState = create<GlobalState>((set)=>({
@@ -26,6 +28,8 @@ const globalState = create<GlobalState>((set)=>({
     screenLoading: false,
     setOpenScreenLoading: () => set({ screenLoading: true }),
     setCloseScreenLoading: () => set({ screenLoading: false }),
+    indexNavigation: 0,
+    setIndexNavigation: (newIndex:number = 0) => set({ indexNavigation: newIndex })
 }))
 
 export default globalState
