@@ -1,6 +1,6 @@
 import { DataTable, Searchbar, useTheme, IconButton, Text } from 'react-native-paper';
 import React, { useState, useEffect } from 'react';
-import { GestureResponderEvent, View } from 'react-native'
+import { GestureResponderEvent, View, ScrollView } from 'react-native'
 import SearchInput from 'components/form/SearchInput';
 
 interface ConfigFile {
@@ -32,7 +32,7 @@ export default function DataTableInfo({
 
     const [page, setPage] = useState<number>(0)
 
-    const [numberOfItemsPerPageList] = useState([2, 3, 4])
+    const [numberOfItemsPerPageList] = useState([5, 10, 15])
 
     const [itemsPerPage, onItemsPerPageChange] = useState(numberOfItemsPerPageList[0])
 
@@ -70,19 +70,21 @@ export default function DataTableInfo({
     useEffect(() => setPage(0), [itemsPerPage])
 
     return (
-        <View>
-            <View className='w-full flex flex-col items-end px-5 gap-2'>
-                { search && <SearchInput onChangeText={onChangeSetSearch} valueSearch={searchQuery}/> }
-                <View>
-                  { filter && <IconButton
-                      mode='outlined'
-                      icon="filter"
-                      iconColor={theme.colors.primary}
-                      style={{ width: 60, height: 60, }}
-                      onPress={onPressFilter}
-                    /> 
-                  }
-                </View>
+        <View className='w-full'>
+            <View className='flex w-full flex-row items-center gap-2 px-5 mb-5'>
+                { search && <SearchInput 
+                  style={{ flex: 1 }}
+                  onChangeText={onChangeSetSearch} 
+                  valueSearch={searchQuery}/> 
+                }
+                { filter && <IconButton
+                    mode='outlined'
+                    icon="filter"
+                    iconColor={theme.colors.primary}
+                    style={{ width: 50, height: 50, }}
+                    onPress={onPressFilter}
+                  /> 
+                }
             </View>
             <DataTable>
               <DataTable.Header>
@@ -93,13 +95,12 @@ export default function DataTableInfo({
                   )) 
                 }
               </DataTable.Header>
-
               {
-                dataSearch.length > 0 ? dataSearch.slice(from, to).map((item:any, index:any) => (
+                dataSearch.length > 0 ? (pagination ? dataSearch.slice(from, to) : dataSearch).map((item:any, index:any) => (
                   <DataTable.Row key={index}>
                     {
                       configTable.map(({ data:field, render }, i)=>(
-                        <DataTable.Cell key={i} numeric={false}>{ 
+                        <DataTable.Cell style={{ paddingVertical: 4, paddingHorizontal: 4 }} key={i} numeric={false}>{ 
                           render ? 
                             render(
                               (field || '') ? 
@@ -112,28 +113,29 @@ export default function DataTableInfo({
                       ))
                     }
                   </DataTable.Row>
-                )) : 
+                )) :
                 <DataTable.Row>
                   <DataTable.Cell style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>No hay resultados</DataTable.Cell>
                 </DataTable.Row>
               }
-
-              { 
-                pagination && <DataTable.Pagination
-                  page={page}
-                  numberOfPages={Math.ceil(dataSearch.length / itemsPerPage)}
-                  onPageChange={(page) => setPage(page)}
-                  label={`${from + 1}-${to} de ${dataSearch.length}`}
-                  numberOfItemsPerPageList={numberOfItemsPerPageList}
-                  numberOfItemsPerPage={itemsPerPage}
-                  onItemsPerPageChange={onItemsPerPageChange}
-                  showFastPaginationControls
-                  selectPageDropdownLabel={'Filas por página'}
-                  // style={{ transform: [{ scale: 0.8 }], display: 'flex', flexDirection: 'row', paddingVertical: 0 }}
-                  style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 6 }}
-                /> 
-              }
+              
             </DataTable>
+            {/* Paginacion */}
+            { 
+              pagination && <DataTable.Pagination
+                page={page}
+                numberOfPages={Math.ceil(dataSearch.length / itemsPerPage)}
+                onPageChange={(page) => setPage(page)}
+                label={`${from + 1}-${to} de ${dataSearch.length}`}
+                numberOfItemsPerPageList={numberOfItemsPerPageList}
+                numberOfItemsPerPage={itemsPerPage}
+                onItemsPerPageChange={onItemsPerPageChange}
+                showFastPaginationControls
+                selectPageDropdownLabel={'Filas por página'}
+                // style={{ transform: [{ scale: 0.8 }], display: 'flex', flexDirection: 'row', paddingVertical: 0 }}
+                style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 6 }}
+              /> 
+            }
         </View>
     )
 

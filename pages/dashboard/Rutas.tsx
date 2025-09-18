@@ -10,7 +10,35 @@ export default function Rutas() {
         {
             nombre_tienda: 'PANAJACHEL 1',
             status_ruta: 1
-        }
+        },
+        {
+            nombre_tienda: 'VILLA LOBOS 1',
+            status_ruta: 1
+        },
+        {
+            nombre_tienda: 'fds LOBOS 1',
+            status_ruta: 1
+        },
+        {
+            nombre_tienda: 'VILLA LOBOS 1',
+            status_ruta: 1
+        },
+        {
+            nombre_tienda: 'gfdgf',
+            status_ruta: 1
+        },
+        {
+            nombre_tienda: 'VILLA LOBOS 1',
+            status_ruta: 1
+        },
+        {
+            nombre_tienda: 'VILLA LOBOS 1',
+            status_ruta: 1
+        },
+        {
+            nombre_tienda: 'VILLA LOBOS 1',
+            status_ruta: 1
+        },
     ])
 
     return (
@@ -20,7 +48,7 @@ export default function Rutas() {
                     <DataTableInfo
                         search={true}
                         filter={true}
-                        pagination={true}
+                        pagination={false}
                         configTable={configTableRutas}
                         data={rutas}
                     />

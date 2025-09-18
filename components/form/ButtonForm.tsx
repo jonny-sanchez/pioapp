@@ -1,5 +1,5 @@
 import { GestureResponderEvent, StyleProp, ViewStyle } from 'react-native';
-import { Button } from 'react-native-paper';
+import { Button, Icon, useTheme, IconButton } from 'react-native-paper';
 
 type ButtonFormProps = {
     label?: string;
@@ -16,8 +16,10 @@ export default function ButtonForm({
     icon = '',
     loading = false,
     disabled = false,
-    style = { paddingVertical: 8, borderRadius: 5 }
+    style = { }
 } : ButtonFormProps){
+
+    const theme = useTheme()
 
     return (
         <Button 
@@ -26,9 +28,11 @@ export default function ButtonForm({
             mode='contained' 
             icon={`${icon}`} 
             onPress={onPress} 
-            style={[ style ]}
+            style={[ style, { borderRadius: 5, paddingVertical: 8 } ]}
         > 
-            { label } 
-        </Button>
+            { label }
+            {/* { marginVertical: 8, marginHorizontal: 8, padding: 0 } */}
+            {/* { label ? label : <Icon source={icon} size={18} color={theme.colors.onPrimary}/> }  */}
+        </Button> 
     );
 }
