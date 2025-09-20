@@ -13,6 +13,7 @@ type InputProps = {
     control: any; 
     name: string;
     errors?: any;  
+    disabled?: boolean;
 }
 
 export default function InputFormHook({
@@ -23,7 +24,8 @@ export default function InputFormHook({
     isPassword = false,
     control,
     name,
-    errors = {}
+    errors = {},
+    disabled = false
 } : InputProps){
 
     // const theme = useTheme()
@@ -43,6 +45,7 @@ export default function InputFormHook({
                 name={name}
                 render={({ field: { onChange, onBlur, value } }) => (
                     <TextInput
+                      disabled={disabled}
                       mode="flat"
                       label={label}
                       placeholder={placeholder}

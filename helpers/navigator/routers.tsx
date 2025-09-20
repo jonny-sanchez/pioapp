@@ -18,6 +18,8 @@ const routers = [
         component: SaveVisitas,
         default: false
     }
-]
+] as const
+
+export type RouterName = typeof routers[number]['name']
 
 export default routers

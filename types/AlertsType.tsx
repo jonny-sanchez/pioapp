@@ -1,0 +1,1 @@
+export type OptionsTypeAlert = "error" | "success" | "warning" | "normal"

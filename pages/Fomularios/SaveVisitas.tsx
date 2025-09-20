@@ -8,35 +8,78 @@ import InputFormHook from "components/form/InputFormHook"
 import { useForm } from "react-hook-form"
 import ButtonForm from "components/form/ButtonForm"
 import { yupResolver } from '@hookform/resolvers/yup'
-import schemaNwVisitaFormValidate from "helpers/validatesForm/schemaNwVisitaFormValidate"
-import { useState } from "react"
+import schemaNwVisitaFormValidate, { schemaNwVisitaFormValidateType } from "helpers/validatesForm/schemaNwVisitaFormValidate"
+import { useEffect, useState } from "react"
 import PickerFile from "components/container/PickerFile"
-import { Icon, Text } from "react-native-paper"
-import { useRoute } from "@react-navigation/native"
-import { NavigationService } from "helpers/navigator/navigationScreens"
+import globalState from "helpers/states/globalState"
+import { ResponseService, generateJsonError } from "types/RequestType"
+import { AJAX, URLPIOAPP } from "helpers/http/ajax"
+import alertsState from "helpers/states/alertsState"
+import fotografyState from "helpers/states/fotografyState"
 
 export default function SaveVisitas(){
 
-    const route = useRoute()
-
+    // const route = useRoute()
     // const { nombre_tienda } = route.params as any
+    const { openVisibleSnackBar } = alertsState()
+    const { metadatosPicture } = fotografyState()
 
-    const [ tipoEntrega, setTipoEntrega ] = useState([ 
-        { label: 'Manzana', value: 'apple' },
-        { label: 'Banana', value: 'banana' },
-    ])
+    const getTiendas = async():Promise<ResponseService<any[]>> => {
+        try {
+            const result:ResponseService = await AJAX(`${URLPIOAPP}/tiendas/modulo/all`)
+            return result
+        } catch (error) {
+            openVisibleSnackBar(`${error}`, 'error')
+            return generateJsonError(`${error}`, "array")
+        }
+    }
+
+    const getTiposVisitas = async():Promise<ResponseService<any[]>> => {
+        try {
+            const result:ResponseService = await AJAX(`${URLPIOAPP}/tipo/visitas/all`)
+            return result
+        } catch (error) {
+            openVisibleSnackBar(`${error}`, 'error')
+            return generateJsonError(`${error}`, 'array')
+        }
+    }
+
+    const { setOpenScreenLoading, setCloseScreenLoading } = globalState()
+
+    const [ tipoVisitas, setTipoVisitas ] = useState([])
+
+    const [ tiendas, setTiendas ] = useState([])
 
     const { control, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(schemaNwVisitaFormValidate),
         mode: 'all'
     })
 
-    const submitFormNwVisita = async(data: any) => {
-        alert(JSON.stringify(data))
+    const submitFormNwVisita = async(data: schemaNwVisitaFormValidateType) => {
+        const { imgUri, coords, mimeType, nameImg } = metadatosPicture
+
+        if(!imgUri) return openVisibleSnackBar('Imagen no encontrada.', "warning")
+
+        if(!coords || !mimeType || !nameImg) return openVisibleSnackBar('Error en la imagen porfavor intentelo de nuevo.', "warning")
+        // alert(JSON.stringify(data))
+        alert(JSON.stringify(nameImg))
         // NavigationService.reset('Home')
         // NavigationService.navigate('Home', { keyIndex: 'rutas' })
 
     }
+
+    const renderAll = async () => {
+        setOpenScreenLoading()
+        const listTiendas = await getTiendas()
+        const listTipoVisita = await getTiposVisitas()
+        const flatTiendas:any = listTiendas.data?.flatMap(el => ({ label: el.nombre_tienda, value: `${el.codigo_empresa}-${el.codigo_tienda}` }))
+        const flatTipoVisitas:any = listTipoVisita.data?.flatMap(el => ({ label: el.name, value: el.id_tipo_visita }))
+        setTiendas(flatTiendas)
+        setTipoVisitas(flatTipoVisitas)
+        setCloseScreenLoading()
+    }
+
+    useEffect(() => { renderAll() }, [])
 
     return (
 
@@ -53,12 +96,9 @@ export default function SaveVisitas(){
 
                     <View className="w-full flex-col gap-3.5 mt-5">
 
-                        {/* <Text style={{ textAlign: 'right' }} variant="bodySmall">Tienda: { nombre_tienda || '' }</Text> */}
-                        {/* <></> */}
-
                         <DropdownForm
                             label="Tienda"
-                            data={tipoEntrega}
+                            data={tiendas}
                             control={control}
                             name="tienda"
                             errors={errors}
@@ -66,10 +106,11 @@ export default function SaveVisitas(){
 
                         <DropdownForm
                             label="Tipo Visita"
-                            data={tipoEntrega}
+                            data={tipoVisitas}
                             control={control}
                             name="tipo_visita"
                             errors={errors}
+                            // disable={true}
                         />
 
                         <InputFormHook 
@@ -79,11 +120,12 @@ export default function SaveVisitas(){
                             placeholder="Ingrese un comentario" 
                             label="Comentario"
                             errors={errors}
+                            
                         />
 
                         <PickerFile/>
 
-                        <View className="w-full mt-3"><ButtonForm onPress={handleSubmit(submitFormNwVisita)} label="Guardar"/></View>
+                        <View className="w-full mt-3 mb-6"><ButtonForm onPress={handleSubmit(submitFormNwVisita)} label="Guardar"/></View>
 
                     </View>
 

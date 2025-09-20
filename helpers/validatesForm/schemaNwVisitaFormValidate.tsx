@@ -5,4 +5,6 @@ const schemaNwVisitaFormValidate = Yup.object({
     tipo_visita: Yup.string().required("El tipo visita es un campo requerido")
 }).required()
 
+export type schemaNwVisitaFormValidateType = Yup.InferType<typeof schemaNwVisitaFormValidate>;
+
 export default schemaNwVisitaFormValidate

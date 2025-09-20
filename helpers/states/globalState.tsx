@@ -19,7 +19,7 @@ const globalState = create<GlobalState>((set)=>({
     // setDark: () => set((state) => ({ dark: !state.dark }))
     setDark: () => set((state) => {
         const newDark = !state.dark
-        setValueStorage('theme', JSON.stringify({ dark: newDark }))
+        setValueStorage('theme',{ dark: newDark })
         return { dark: newDark }
     }),
     drawer: false,

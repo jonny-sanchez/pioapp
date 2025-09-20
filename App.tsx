@@ -11,6 +11,7 @@ import { navigationGlobal } from 'helpers/navigator/navigationScreens';
 import globalState from 'helpers/states/globalState';
 import LoadingScreen from 'components/Screens/LoadingScreen';
 import PageLoadingInit from 'components/Screens/PageLoadingInit';
+import SnackBarAlert from 'components/Alerts/SnackBarAlert';
 
 const Stack = createStackNavigator()
 
@@ -39,6 +40,7 @@ export default function App() {
          :
         <NavigationContainer ref={navigationGlobal}>
           <LoadingScreen/>
+          <SnackBarAlert/>
           <Stack.Navigator 
               initialRouteName={initialRouteName} 
               screenOptions={{ 

@@ -41,7 +41,9 @@ export default function PickerFile(){
             //para ubicacion usar {GPSLongitude} y {GPSLatitude}
             resultImg?.exif || null,
             //para mostrar ubicacion usar {longitude} y {latitude}
-            resultLocation?.coords || null
+            resultLocation?.coords || null,
+            resultImg?.mimeType || '',
+            resultImg?.uri?.split('/').pop() || ''
         )
 
     }

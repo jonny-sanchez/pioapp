@@ -1,14 +1,19 @@
 import { MMKV } from "react-native-mmkv";
-const storage = new MMKV();
+const storage = new MMKV({ id: 'myStorageApp' });
 // import AsyncStorage from "@react-native-async-storage/async-storage"
 
 const optionsStorage = {
     theme: {
         nameStorage: 'theme',
         valueDefault: { dark: false },
+    },
+    user: {
+        nameStorage: 'user',
+        valueDefault: null,
     }
 }
 
+//devuelve el valor
 export function getValueStorage(key: keyof typeof optionsStorage) {
 
     const selectOptionKey = optionsStorage[key]
@@ -31,6 +36,7 @@ export function getValueStorage(key: keyof typeof optionsStorage) {
 
 }
 
+//crea o edita el valor
 export async function setValueStorage(key: keyof typeof optionsStorage, nwValue: any = null) {
     
     const selectOptionKey = optionsStorage[key]

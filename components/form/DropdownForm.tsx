@@ -15,6 +15,7 @@ type DropdownFormProps = {
     control: any;
     name: string;
     errors?: any;
+    disable?: boolean;
 }
 
 export default function DropdownForm({
@@ -23,7 +24,8 @@ export default function DropdownForm({
     // value = '',
     control,
     name,
-    errors = {}
+    errors = {},
+    disable = false
 } : DropdownFormProps){
     
     const theme = useTheme()
@@ -37,6 +39,7 @@ export default function DropdownForm({
                 name={name}
                 render={({ field: { onChange, onBlur, value } }) => (
                     <Dropdown 
+                        disable={disable}
                         mode='modal'
                         data={data}
                         value={value ?? ""}
@@ -56,7 +59,7 @@ export default function DropdownForm({
                         // inputSearchStyle
                         // searchPlaceholderTextColor={theme.colors.onBackground}
                         // searchPlaceholderTextColor
-                        // backgroundColor
+                        backgroundColor='rgba(0,0,0,0.5)'
                         placeholderStyle={{ color: theme.colors.secondary }}
                         fontFamily='Inter_900Black'
                         // selectedStyle
@@ -71,6 +74,7 @@ export default function DropdownForm({
                             borderColor: theme.colors.secondary,
                             borderTopEndRadius: 4,
                             borderTopStartRadius: 4,
+                            ...(disable && {opacity: 0.5})
                         }}
                     />
                 )}
