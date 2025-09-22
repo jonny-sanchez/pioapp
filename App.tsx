@@ -39,7 +39,9 @@ export default function App() {
         <PageLoadingInit/>
          :
         <NavigationContainer ref={navigationGlobal}>
+          {/* Loading screen global */}
           <LoadingScreen/>
+          {/* snackbar alerts global */}
           <SnackBarAlert/>
           <Stack.Navigator 
               initialRouteName={initialRouteName} 

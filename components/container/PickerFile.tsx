@@ -7,7 +7,13 @@ import { useTheme, Icon, IconButton } from "react-native-paper";
 import globalState from "helpers/states/globalState";
 import fotografyState from "helpers/states/fotografyState";
 
-export default function PickerFile(){
+type PickerFileProps = {
+    disabled?: boolean;
+}
+
+export default function PickerFile({
+    disabled = false
+} : PickerFileProps){
 
     const theme = useTheme()
 
@@ -49,8 +55,8 @@ export default function PickerFile(){
     }
 
     return (
-        <Pressable onPress={getImgCamera}>
-            <View className={`w-full h-52 rounded-lg flex items-center justify-center p-2`} style={{ backgroundColor: theme.colors.surfaceVariant }}>
+        <Pressable onPress={disabled ? () => {} : getImgCamera}>
+            <View className={`w-full h-52 rounded-lg flex items-center justify-center p-2 ${ disabled && 'opacity-50' }`} style={{ backgroundColor: theme.colors.surfaceVariant }}>
                 { 
                     metadatosPicture.imgUri ?
                         <View className="relative w-full h-full">

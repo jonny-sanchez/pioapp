@@ -22,11 +22,11 @@ export default function SaveVisitas(){
     // const route = useRoute()
     // const { nombre_tienda } = route.params as any
     const { openVisibleSnackBar } = alertsState()
-    const { metadatosPicture } = fotografyState()
+    const { metadatosPicture, clearMetadatosPicture } = fotografyState()
 
     const getTiendas = async():Promise<ResponseService<any[]>> => {
         try {
-            const result:ResponseService = await AJAX(`${URLPIOAPP}/tiendas/modulo/all`)
+            const result:ResponseService<any[]> = await AJAX(`${URLPIOAPP}/tiendas/modulo/all`)
             return result
         } catch (error) {
             openVisibleSnackBar(`${error}`, 'error')
@@ -36,7 +36,7 @@ export default function SaveVisitas(){
 
     const getTiposVisitas = async():Promise<ResponseService<any[]>> => {
         try {
-            const result:ResponseService = await AJAX(`${URLPIOAPP}/tipo/visitas/all`)
+            const result:ResponseService<any[]> = await AJAX(`${URLPIOAPP}/tipo/visitas/all`)
             return result
         } catch (error) {
             openVisibleSnackBar(`${error}`, 'error')
@@ -44,16 +44,64 @@ export default function SaveVisitas(){
         }
     }
 
+    const postCreateVisita = async(data:object):Promise<ResponseService<any>> => {
+        try {
+            const formData = new FormData()
+            Object.entries(data).forEach(([key, value])=> formData.append(`${key}`, value))
+            const result:ResponseService<any> = await AJAX(`${URLPIOAPP}/visitas/create`, "POST", formData, true)
+            openVisibleSnackBar(`${result.message}`, 'success')
+            return result
+        } catch (error) {
+            openVisibleSnackBar(`${error}`, 'error')
+            return generateJsonError(error, 'object')
+        }
+    }
+
+    const orderDataFormVisitas = (dataForm:schemaNwVisitaFormValidateType):object => {
+        const objectTienda = dataForm.tienda.split('-')
+        const empresa = objectTienda[0] || ''
+        const tienda = objectTienda[1] || ''
+        const findTienda:any = originalTiendas.find(el => el.codigo_empresa === empresa && el.codigo_tienda === tienda)
+
+        return {
+            empresa: empresa,
+            tienda: tienda,
+            tienda_nombre: findTienda?.nombre_tienda || null,
+            tienda_direccion: findTienda?.direccion_tienda || null,
+            id_tipo_visita: dataForm.tipo_visita,
+            photo_gps_longitude: metadatosPicture?.exif?.GPSLongitude || null,
+            photo_gps_latitude: metadatosPicture?.exif?.GPSLatitude || null,
+            phone_gps_longitude: metadatosPicture?.coords?.longitude || null,
+            phone_gps_latitude: metadatosPicture?.coords?.latitude || null,
+            name_original_image: metadatosPicture?.nameImg || null,
+            comentario: dataForm?.comentario || null,
+            foto_visita: { 
+                uri: metadatosPicture.imgUri,
+                type: metadatosPicture.mimeType,
+                name: metadatosPicture.nameImg
+            }
+        }
+    }
+
     const { setOpenScreenLoading, setCloseScreenLoading } = globalState()
+
+    const [ isLodingForm, setIsLoadingForm ] = useState<boolean>(false)
 
     const [ tipoVisitas, setTipoVisitas ] = useState([])
 
-    const [ tiendas, setTiendas ] = useState([])
+    const [originalTiendas, setOriginalTiendas] = useState<any[]>([])
 
-    const { control, handleSubmit, formState: { errors } } = useForm({
+    const [ tiendas, setTiendas ] = useState<any[]>([])
+
+    const { control, handleSubmit, reset, formState: { errors } } = useForm({
         resolver: yupResolver(schemaNwVisitaFormValidate),
         mode: 'all'
     })
+
+    const clearFormVisitas = () => {
+        reset()
+        clearMetadatosPicture()
+    }
 
     const submitFormNwVisita = async(data: schemaNwVisitaFormValidateType) => {
         const { imgUri, coords, mimeType, nameImg } = metadatosPicture
@@ -61,8 +109,17 @@ export default function SaveVisitas(){
         if(!imgUri) return openVisibleSnackBar('Imagen no encontrada.', "warning")
 
         if(!coords || !mimeType || !nameImg) return openVisibleSnackBar('Error en la imagen porfavor intentelo de nuevo.', "warning")
-        // alert(JSON.stringify(data))
-        alert(JSON.stringify(nameImg))
+
+        const uploadData = orderDataFormVisitas(data)
+
+        setIsLoadingForm(true)
+
+        const resultCreateVisita = await postCreateVisita(uploadData)
+
+        resultCreateVisita.status && clearFormVisitas()
+
+        setIsLoadingForm(false)
+
         // NavigationService.reset('Home')
         // NavigationService.navigate('Home', { keyIndex: 'rutas' })
 
@@ -74,6 +131,7 @@ export default function SaveVisitas(){
         const listTipoVisita = await getTiposVisitas()
         const flatTiendas:any = listTiendas.data?.flatMap(el => ({ label: el.nombre_tienda, value: `${el.codigo_empresa}-${el.codigo_tienda}` }))
         const flatTipoVisitas:any = listTipoVisita.data?.flatMap(el => ({ label: el.name, value: el.id_tipo_visita }))
+        setOriginalTiendas(listTiendas?.data ?? [])
         setTiendas(flatTiendas)
         setTipoVisitas(flatTipoVisitas)
         setCloseScreenLoading()
@@ -102,6 +160,7 @@ export default function SaveVisitas(){
                             control={control}
                             name="tienda"
                             errors={errors}
+                            disable={isLodingForm}
                         />
 
                         <DropdownForm
@@ -110,7 +169,7 @@ export default function SaveVisitas(){
                             control={control}
                             name="tipo_visita"
                             errors={errors}
-                            // disable={true}
+                            disable={isLodingForm}
                         />
 
                         <InputFormHook 
@@ -120,12 +179,19 @@ export default function SaveVisitas(){
                             placeholder="Ingrese un comentario" 
                             label="Comentario"
                             errors={errors}
-                            
+                            disabled={isLodingForm}
                         />
 
-                        <PickerFile/>
+                        <PickerFile disabled={isLodingForm}/>
 
-                        <View className="w-full mt-3 mb-6"><ButtonForm onPress={handleSubmit(submitFormNwVisita)} label="Guardar"/></View>
+                        <View className="w-full mt-3 mb-6">
+                            <ButtonForm 
+                                loading={isLodingForm} 
+                                disabled={isLodingForm}
+                                onPress={handleSubmit(submitFormNwVisita)} 
+                                label="Guardar"
+                            />
+                        </View>
 
                     </View>
 
