@@ -5,6 +5,8 @@ import { View, Animated, Dimensions, StyleSheet, TouchableWithoutFeedback  } fro
 import ButtonForm from 'components/form/ButtonForm';
 import bottomNavigation from 'helpers/navigator/bottomNavigator';
 import { NavigationService } from 'helpers/navigator/navigationScreens';
+import routers from 'helpers/navigator/routers';
+import { useRoute } from '@react-navigation/native';
 
 export default function DrawerDashboard () {
 
@@ -17,6 +19,8 @@ export default function DrawerDashboard () {
     const translateX = useRef(new Animated.Value(screenWidth)).current
 
     const theme = useTheme()
+
+    const router = useRoute()
 
     useEffect(() => {
       drawer && setVisible(drawer)
@@ -51,14 +55,31 @@ export default function DrawerDashboard () {
                 </View>
                 
                 {/* Section menu bootom */}
-                <Drawer.Section className='w-full' title="navegacion">
+                <Drawer.Section className='w-full' title="Módulos">
                   {
-                    bottomNavigation.map((el, index) => (
+                    routers.filter(el => (el?.hidden ?? false) !== true).map((el,index)=>(
+                      <Drawer.Item
+                        disabled={router.name === el.name}
+                        key={index}
+                        icon={el.icon}
+                        label={el?.title || ''}
+                        active={router.name === el.name}
+                        onPress={()=>{
+                          setCloseDrawer()
+                          setTimeout(() => NavigationService.reset(el.name), 200)
+                        }}
+                      />
+                    ))
+                  }
+                </Drawer.Section>
+                {/* <Drawer.Section className='w-full' title="Módulos">
+                  {
+                    bottomNavigation.filter(el => el.key !== 'home').map((el, index) => (
                       <Drawer.Item
                         key={index}
                         icon={el.focusedIcon}
                         label={el.title}
-                        active={bottomNavigation[indexNavigation].key === el.key}
+                        active={bottomNavigation[indexNavigation]?.key === el.key}
                         onPress={() => {
                           setCloseDrawer()
                           setTimeout(() => NavigationService.reset('Home', { keyIndex: el.key }), 200)
@@ -66,9 +87,15 @@ export default function DrawerDashboard () {
                       />
                     ))
                   }
-                </Drawer.Section>
+                </Drawer.Section> */}
+
               </View>      
-              <View className='w-full py-[30] px-[25]'><ButtonForm label='Cerrar sesion'/></View>    
+              <View className='w-full py-[30] px-[25]'>
+                <ButtonForm 
+                  onPress={()=>NavigationService.reset('Login')}
+                  label='Cerrar sesion'
+                />
+              </View>    
             </Animated.View>
           </View>
     )

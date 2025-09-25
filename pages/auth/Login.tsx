@@ -38,10 +38,13 @@ export default function Login() {
 
   const submitFormLogin = async(data: schemaLoginFormValidateType) => {
     setLoadingLogin(true)
-    const login = await validLogin(data)
+    // const login = await validLogin(data)
     setLoadingLogin(false)
-    login.status && NavigationService.reset('Home')
-    login.status && setValueStorage('user', login.data)
+    // login.status && NavigationService.reset('Home')
+    // login.status && setValueStorage('user', login.data)
+    
+    // DEPRECAR
+    NavigationService.reset('Home')
   }
 
   return (

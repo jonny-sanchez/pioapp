@@ -16,7 +16,7 @@ const bottomNavigation = [
         title: 'Inicio',
         focusedIcon: 'home', 
         unfocusedIcon: 'home-outline', 
-        appBarTitle: 'Pinulito',
+        appBarTitle: '',
         element: Home
     },  
     {
@@ -32,7 +32,8 @@ const bottomNavigation = [
         title: 'Visitas', 
         focusedIcon: 'storefront',
         unfocusedIcon: 'storefront-outline',
-        appBarTitle: 'Visitas',
+        // appBarTitle: 'Visitas',
+        appBarTitle: '',
         element: SaveVisitas 
     },
     { 

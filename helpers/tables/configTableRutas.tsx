@@ -20,7 +20,9 @@ const configTableRutas = [
         render: (data:any) => ( 
             <View className="flex flex-row gap-1">
                 {/* qrcode */}
-                <IconButtomForm icon="qrcode-scan"/>
+                <IconButtomForm icon="qrcode-scan" 
+                onPress={ ()=> NavigationService.navigate('ScannerQr') }
+                />
                 <IconButtomForm icon="eye"/>
             </View>
         )

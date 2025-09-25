@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { TextInput } from 'react-native-paper';
 import { Control, Controller, FieldValues } from 'react-hook-form'
-import { View, TextInput as RNTextInput } from 'react-native'
+import { View, TextInput as RNTextInput, KeyboardTypeOptions } from 'react-native'
 import { Text, useTheme, HelperText } from 'react-native-paper';
 
 type InputProps = {
@@ -14,6 +14,7 @@ type InputProps = {
     name: string;
     errors?: any;  
     disabled?: boolean;
+    inputType?:KeyboardTypeOptions | undefined
 }
 
 export default function InputFormHook({
@@ -25,7 +26,8 @@ export default function InputFormHook({
     control,
     name,
     errors = {},
-    disabled = false
+    disabled = false,
+    inputType
 } : InputProps){
 
     // const theme = useTheme()
@@ -38,6 +40,7 @@ export default function InputFormHook({
 
     const errorMessage = errors[name || ""]?.message || ""
 
+
     return (
         <View>
             <Controller 
@@ -45,6 +48,7 @@ export default function InputFormHook({
                 name={name}
                 render={({ field: { onChange, onBlur, value } }) => (
                     <TextInput
+                      keyboardType={inputType}
                       disabled={disabled}
                       mode="flat"
                       label={label}

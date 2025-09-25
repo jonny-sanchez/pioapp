@@ -1,7 +1,7 @@
 import { NavigationService } from "helpers/navigator/navigationScreens";
 import { getValueStorage } from "helpers/store/storeApp";
 
-// export const URLPIOAPP = `http://localhost:5000/api`
+// export const URLPIOAPP = `https://kp1ouabfgw.sharedwithexpose.com/api`
 export const URLPIOAPP = `http://10.0.2.2:5000/api`
 // 
 
@@ -44,7 +44,7 @@ export async function AJAX(
             ...(uploadData ? { body: formData ? uploadData : JSON.stringify(uploadData) } : {})
         })
 
-        const response:Response = await Promise.race([fetchResponse, timeout(60)]) as Response
+        const response:Response = await Promise.race([fetchResponse, timeout(2)]) as Response
         const data:object | any = blob ? await response.blob() : await response.json()
 
         if(response.status == 401) setTimeout(() => NavigationService.reset('Login'), 500)

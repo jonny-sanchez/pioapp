@@ -16,6 +16,7 @@ type DropdownFormProps = {
     name: string;
     errors?: any;
     disable?: boolean;
+    onChangeExtra?: (item: any) => void;
 }
 
 export default function DropdownForm({
@@ -25,7 +26,8 @@ export default function DropdownForm({
     control,
     name,
     errors = {},
-    disable = false
+    disable = false,
+    onChangeExtra
 } : DropdownFormProps){
     
     const theme = useTheme()
@@ -49,7 +51,10 @@ export default function DropdownForm({
                         search
                         searchPlaceholder='Buscar...'
                         // onChange={onChange}
-                        onChange={item => onChange(item.value)}
+                        onChange={item => {
+                            onChange(item.value)
+                            if(onChangeExtra) onChangeExtra(item)
+                        }}
                         onBlur={onBlur}
                         // onChange={item => setValue(item?.value || "")}
                         containerStyle={{ backgroundColor: theme.colors.background }}

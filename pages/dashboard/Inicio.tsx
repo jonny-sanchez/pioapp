@@ -25,7 +25,7 @@ export default function Inicio(){
     const [ index, setIndex ] = useState(keyNav)
 
     // const [ routes ] = useState<BottomNavItem[]>(bottomNavigator)
-    const routes:BottomNavItem[] = [...bottomNavigator.slice(0, 4)]
+    const routes:BottomNavItem[] = [...bottomNavigator]
 
     const renderScene = BottomNavigation.SceneMap(routes.reduce((acc:any, item)=>{ 
         acc[item.key] = item.element

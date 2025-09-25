@@ -8,6 +8,7 @@ type ButtonFormProps = {
     loading?: boolean;
     disabled?: boolean;
     style?: StyleProp<ViewStyle>;
+    buttonColor?: string;
 }
 
 export default function ButtonForm({
@@ -16,7 +17,8 @@ export default function ButtonForm({
     icon = '',
     loading = false,
     disabled = false,
-    style = { }
+    style = { },
+    buttonColor
 } : ButtonFormProps){
 
     const theme = useTheme()
@@ -28,6 +30,7 @@ export default function ButtonForm({
             mode='contained' 
             icon={`${icon}`} 
             onPress={onPress} 
+            buttonColor={buttonColor}
             style={[ style, { borderRadius: 5, paddingVertical: 8 } ]}
         > 
             { label }

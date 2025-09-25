@@ -1,6 +1,6 @@
 import AppBarHome from "components/container/AppBarHome"
 import ScrollViewContainer from "components/container/ScrollViewContainer"
-import { View } from 'react-native'
+import { View, Image } from 'react-native'
 import TextInfo from "components/typografy/TextInfo"
 import FormAdaptiveKeyBoard from "components/container/FormAdaptiveKeyBoard"
 import DropdownForm from "components/form/DropdownForm"
@@ -16,6 +16,10 @@ import { ResponseService, generateJsonError } from "types/RequestType"
 import { AJAX, URLPIOAPP } from "helpers/http/ajax"
 import alertsState from "helpers/states/alertsState"
 import fotografyState from "helpers/states/fotografyState"
+import { Checkbox, RadioButton, Text, useTheme, IconButton, Icon } from 'react-native-paper'
+import CheckBoxForm from "components/form/CheckBoxForm"
+import PickerSmallFile from "components/container/PickerSmallFile"
+import PageLayout from "components/Layouts/PageLayout"
 
 export default function SaveVisitas(){
 
@@ -83,15 +87,33 @@ export default function SaveVisitas(){
         }
     }
 
+    const theme = useTheme()
+
     const { setOpenScreenLoading, setCloseScreenLoading } = globalState()
 
     const [ isLodingForm, setIsLoadingForm ] = useState<boolean>(false)
 
-    const [ tipoVisitas, setTipoVisitas ] = useState([])
+    const [ isSupervision, SetIsSupervision ] = useState<boolean>(false)
+
+    const [ tipoVisitas, setTipoVisitas ] = useState([
+        { label: 'Supervisión', value: 3 },
+        { label: 'Actualización', value: 4 },
+    ])
 
     const [originalTiendas, setOriginalTiendas] = useState<any[]>([])
 
-    const [ tiendas, setTiendas ] = useState<any[]>([])
+    const [ tiendas, setTiendas ] = useState<any[]>([
+        { label: 'PLAZA GUADALUPE', value: `00005-00004` },
+        { label: 'AGUACATAN', value: `00007-00005` },
+        { label: 'VILLA LOBOS 1', value: `00034-00067` },
+        { label: 'CERINAL 1', value: `00005-00004` },
+        { label: 'BARBERENA 2', value: `00005-00004` },
+        { label: 'VILLA CANALES 4', value: `00005-00004` },
+    ])
+
+    const [isCantidadPersonas , setIsCantidadPersonas] = useState<boolean>(false)
+
+    // const [valueRadioBtn, setValueRadioBtn] = useState('');
 
     const { control, handleSubmit, reset, formState: { errors } } = useForm({
         resolver: yupResolver(schemaNwVisitaFormValidate),
@@ -99,6 +121,8 @@ export default function SaveVisitas(){
     })
 
     const clearFormVisitas = () => {
+        setIsCantidadPersonas(false)
+        SetIsSupervision(false)
         reset()
         clearMetadatosPicture()
     }
@@ -114,14 +138,15 @@ export default function SaveVisitas(){
 
         setIsLoadingForm(true)
 
-        const resultCreateVisita = await postCreateVisita(uploadData)
+        // const resultCreateVisita = await postCreateVisita(uploadData)
 
-        resultCreateVisita.status && clearFormVisitas()
+        // resultCreateVisita.status && clearFormVisitas()
+
+        openVisibleSnackBar('Visitada creada correctamente.', 'success')
+
+        clearFormVisitas()
 
         setIsLoadingForm(false)
-
-        // NavigationService.reset('Home')
-        // NavigationService.navigate('Home', { keyIndex: 'rutas' })
 
     }
 
@@ -137,67 +162,145 @@ export default function SaveVisitas(){
         setCloseScreenLoading()
     }
 
-    useEffect(() => { renderAll() }, [])
+    const validateIsSupervicion = (item:any) => {
+        const validSupervision = (item?.value || 0) == 3
+        setIsCantidadPersonas(false)
+        reset({
+              uniforme: false,
+              buzon: false,
+              tienda_limpia: false,
+              personas: false,
+            },
+            {
+                keepValues: true
+            }
+        )
+        SetIsSupervision(validSupervision ? true : false)
+    }
+
+    //descomentar para hacer funcionar
+    // useEffect(() => { renderAll() }, [])
+
+    const onChangeCheckBoxPersonas = (value:boolean) => {
+        setIsCantidadPersonas(value)
+    }
 
     return (
 
         <>
-            {/* <AppBarHome title="Nueva Visita" goBack={true}/> */}
+            <PageLayout titleAppBar="Visitas">
 
-            <ScrollViewContainer>
-                
-                <View className="w-full mt-6">
-                    <TextInfo style={{ textAlign: "justify" }}>Fomulario para ingreso de una nueva visita a una tienda porfavor completa los campos solicitados de manera correcta.</TextInfo>
-                </View>
+                <ScrollViewContainer>
 
-                <FormAdaptiveKeyBoard>
+                    {/* <View className="w-full mt-6">
+                        <TextInfo style={{ textAlign: "justify" }}>Fomulario para ingreso de una nueva visita a una tienda porfavor completa los campos solicitados de manera correcta.</TextInfo>
+                    </View> */}
 
-                    <View className="w-full flex-col gap-3.5 mt-5">
+                    <FormAdaptiveKeyBoard>
 
-                        <DropdownForm
-                            label="Tienda"
-                            data={tiendas}
-                            control={control}
-                            name="tienda"
-                            errors={errors}
-                            disable={isLodingForm}
-                        />
+                        <View className="w-full flex-col gap-3.5 mt-5 mb-5">
 
-                        <DropdownForm
-                            label="Tipo Visita"
-                            data={tipoVisitas}
-                            control={control}
-                            name="tipo_visita"
-                            errors={errors}
-                            disable={isLodingForm}
-                        />
-
-                        <InputFormHook 
-                            control={control} 
-                            maxLength={100}
-                            name="comentario" 
-                            placeholder="Ingrese un comentario" 
-                            label="Comentario"
-                            errors={errors}
-                            disabled={isLodingForm}
-                        />
-
-                        <PickerFile disabled={isLodingForm}/>
-
-                        <View className="w-full mt-3 mb-6">
-                            <ButtonForm 
-                                loading={isLodingForm} 
-                                disabled={isLodingForm}
-                                onPress={handleSubmit(submitFormNwVisita)} 
-                                label="Guardar"
+                            <DropdownForm
+                                label="Tienda"
+                                data={tiendas}
+                                control={control}
+                                name="tienda"
+                                errors={errors}
+                                disable={isLodingForm}
                             />
+
+                            <DropdownForm
+                                label="Tipo Visita"
+                                data={tipoVisitas}
+                                control={control}
+                                name="tipo_visita"
+                                errors={errors}
+                                disable={isLodingForm}
+                                onChangeExtra={(item) => validateIsSupervicion(item)}
+                            />
+
+                            <PickerFile disabled={isLodingForm}/>
+
+                            {/* CHECKBOX */}
+                            { 
+                                isSupervision && 
+                                <View className="w-full">
+                                    {/* <Text style={{ textAlign:"right", paddingRight: 15 }} variant="bodySmall">si/no</Text> */}
+                                    <CheckBoxForm 
+                                        control={control}
+                                        name="uniforme"
+                                        label="Uso de uniforme"
+                                        disabled={isLodingForm}
+                                    />
+                                    <CheckBoxForm 
+                                        control={control}
+                                        name="buzon"
+                                        label="Buzón cerrado"
+                                        disabled={isLodingForm}
+                                    />
+                                    <CheckBoxForm 
+                                        control={control}
+                                        name="tienda_limpia"
+                                        label="Tienda limpia"
+                                        disabled={isLodingForm}
+                                    />
+                                    <CheckBoxForm
+                                        control={control}
+                                        name="personas"
+                                        label="Cantidad Personas"
+                                        disabled={isLodingForm}
+                                        onChangeExtra={ (value) => onChangeCheckBoxPersonas(value) }
+                                    />
+                                </View> 
+                            }
+
+                            {/* FORMULARIO CANTIDAD PERSONAS */}
+                            {
+                                isCantidadPersonas &&
+                                <View className="flex flex-col gap-3.5"> 
+                                    <InputFormHook
+                                        control={control}
+                                        name="cantidad_personas"
+                                        errors={errors}
+                                        label="Cantidad"
+                                        maxLength={2}
+                                        placeholder="Ingrese una cantidad"
+                                        inputType="numeric"
+                                        disabled={isLodingForm}
+                                    />
+                                    {/* Picker */}
+                                    <PickerSmallFile disabled={isLodingForm}/>
+                                </View>
+                            }
+
+                            <InputFormHook 
+                                control={control} 
+                                maxLength={100}
+                                name="comentario" 
+                                placeholder="Ingrese un comentario" 
+                                label="Comentario"
+                                errors={errors}
+                                disabled={isLodingForm}
+                            />
+
+                            <View className="w-full mt-3 mb-6">
+                                <ButtonForm 
+                                    loading={isLodingForm} 
+                                    disabled={isLodingForm}
+                                    onPress={handleSubmit(submitFormNwVisita)} 
+                                    label="Guardar"
+                                    buttonColor={theme.colors.error}
+                                    // style={{ backgroundColor: theme.colors.error }}
+                                />
+                            </View>
+
                         </View>
 
-                    </View>
+                    </FormAdaptiveKeyBoard>                
 
-                </FormAdaptiveKeyBoard>                
+                </ScrollViewContainer>
 
-            </ScrollViewContainer>
+            </PageLayout>
         </>
 
     )
