@@ -113,10 +113,12 @@ export default function SaveVisitas(){
 
     const [isCantidadPersonas , setIsCantidadPersonas] = useState<boolean>(false)
 
+    const [ fotoCantidadPersonas, setFotoCantidadPersonas ] = useState<any>(null)
+
     // const [valueRadioBtn, setValueRadioBtn] = useState('');
 
     const { control, handleSubmit, reset, formState: { errors } } = useForm({
-        resolver: yupResolver(schemaNwVisitaFormValidate),
+        resolver: yupResolver(schemaNwVisitaFormValidate(isCantidadPersonas ? true : false)),
         mode: 'all'
     })
 
@@ -130,9 +132,11 @@ export default function SaveVisitas(){
     const submitFormNwVisita = async(data: schemaNwVisitaFormValidateType) => {
         const { imgUri, coords, mimeType, nameImg } = metadatosPicture
 
-        if(!imgUri) return openVisibleSnackBar('Imagen no encontrada.', "warning")
+        if(!imgUri) return openVisibleSnackBar('Porfavor agrege una imagen.', "warning")
 
         if(!coords || !mimeType || !nameImg) return openVisibleSnackBar('Error en la imagen porfavor intentelo de nuevo.', "warning")
+
+        if(!fotoCantidadPersonas && isCantidadPersonas) return openVisibleSnackBar("Porfavor agrege una imagen para cantidad de personas.", "warning")
 
         const uploadData = orderDataFormVisitas(data)
 
@@ -269,7 +273,10 @@ export default function SaveVisitas(){
                                         disabled={isLodingForm}
                                     />
                                     {/* Picker */}
-                                    <PickerSmallFile disabled={isLodingForm}/>
+                                    <PickerSmallFile 
+                                        disabled={isLodingForm}
+                                        onSelectFile={ (file) => setFotoCantidadPersonas(file) }    
+                                    />
                                 </View>
                             }
 

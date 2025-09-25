@@ -50,6 +50,7 @@ export default function DrawerDashboard () {
                     <Avatar.Image size={80} source={require('assets/images/default-user.jpg')} />
                     <View>
                         <Text variant='bodyLarge'>Diego Guevara</Text>
+                        <Text variant='bodySmall' style={{ color: theme.colors.primary }}>desarrollador</Text>
                         <Text variant='labelSmall' style={{ color: theme.colors.secondary }}>AL5117</Text>
                     </View>
                 </View>

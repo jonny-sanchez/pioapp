@@ -2,14 +2,16 @@ import globalState from 'helpers/states/globalState'
 import { View, Pressable } from 'react-native'
 import { Icon, Text, useTheme } from 'react-native-paper'
 import { openCamera, permissionCamera } from 'helpers/camara/cameraHelper'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 type PickerSmallFileProps = {
     disabled?: boolean;
+    onSelectFile?: (file:any) => void;
 }
 
 export default function PickerSmallFile({
-    disabled = false
+    disabled = false,
+    onSelectFile
 } : PickerSmallFileProps) {
 
     const theme = useTheme()
@@ -34,7 +36,11 @@ export default function PickerSmallFile({
 
         setFoto(resultImg)
 
+        if(onSelectFile) onSelectFile(resultImg)
+
     }
+
+    useEffect(() => { if(onSelectFile) onSelectFile(null) }, [])
 
     return (
         <Pressable onPress={disabled ? () => {} : getImgCamera}>
@@ -43,7 +49,7 @@ export default function PickerSmallFile({
                 style={{ backgroundColor: theme.colors.surfaceVariant, padding: 15 }}
             >
                 { foto ?  
-                    <View className='w-full rounded-lg' style={{ padding: 10, backgroundColor: theme.colors.onSurfaceVariant }}>
+                    <View className='w-full rounded-lg' style={{ padding: 10, backgroundColor: theme.colors.outline }}>
                         <View className='flex flex-row gap-3 items-center'>
                             <Icon  source={'image'} size={20}/>
                             <Text 
