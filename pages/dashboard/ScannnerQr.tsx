@@ -3,6 +3,7 @@ import { NavigationService } from "helpers/navigator/navigationScreens";
 import { View, StyleSheet } from 'react-native'
 import { Text } from "react-native-paper";
 import ButtonForm from "components/form/ButtonForm";
+import Svg, { Rect, Mask } from "react-native-svg";
 
 export default function ScannnerQr() {
 
@@ -35,6 +36,30 @@ export default function ScannnerQr() {
               }}
               onBarcodeScanned={handleBarcodeScanned}
             />
+            {/* Decorador */}
+            <View style={StyleSheet.absoluteFillObject}>
+              <Svg height="100%" width="100%">
+                <Mask id="mask">
+                  <Rect width="100%" height="100%" fill="white" />
+                  <Rect
+                    x="50%"
+                    y="50%"
+                    width="250"
+                    height="250"
+                    rx="24"
+                    ry="24"
+                    fill="black"
+                    transform="translate(-125, -125)"
+                  />
+                </Mask>
+                <Rect
+                  width="100%"
+                  height="100%"
+                  fill="rgba(15,23,42,0.6)"
+                  mask="url(#mask)"
+                />
+              </Svg>
+            </View>
         </View>
     )
 

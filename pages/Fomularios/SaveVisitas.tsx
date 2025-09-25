@@ -117,7 +117,7 @@ export default function SaveVisitas(){
 
     // const [valueRadioBtn, setValueRadioBtn] = useState('');
 
-    const { control, handleSubmit, reset, formState: { errors } } = useForm({
+    const { control, handleSubmit, reset, resetField, formState: { errors } } = useForm({
         resolver: yupResolver(schemaNwVisitaFormValidate(isCantidadPersonas ? true : false)),
         mode: 'all'
     })
@@ -169,16 +169,20 @@ export default function SaveVisitas(){
     const validateIsSupervicion = (item:any) => {
         const validSupervision = (item?.value || 0) == 3
         setIsCantidadPersonas(false)
-        reset({
-              uniforme: false,
-              buzon: false,
-              tienda_limpia: false,
-              personas: false,
-            },
-            {
-                keepValues: true
-            }
-        )
+        resetField('uniforme', { defaultValue: false })
+        resetField('buzon', { defaultValue: false })
+        resetField('tienda_limpia', { defaultValue: false })
+        resetField('personas', { defaultValue: false })
+        // reset({
+        //       uniforme: false,
+        //       buzon: false,
+        //       tienda_limpia: false,
+        //       personas: false,
+        //     },
+        //     {
+        //         keepValues: true
+        //     }
+        // )
         SetIsSupervision(validSupervision ? true : false)
     }
 

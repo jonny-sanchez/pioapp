@@ -93,7 +93,10 @@ export default function DrawerDashboard () {
               </View>      
               <View className='w-full py-[30] px-[25]'>
                 <ButtonForm 
-                  onPress={()=>NavigationService.reset('Login')}
+                  onPress={()=>{
+                    setCloseDrawer()
+                    setTimeout(() => NavigationService.reset('Login'), 200)
+                  }}
                   label='Cerrar sesion'
                 />
               </View>    
