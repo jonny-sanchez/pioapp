@@ -5,14 +5,22 @@ import { View } from 'react-native'
 import IconButtomForm from "components/form/IconButtomForm"
 
 const configTableRutas = [
+    // {
+    //     data: 'status_ruta',
+    //     name: 'Estado',
+    //     render: (data:any) => ( <ChipDecoration icon="progress-clock" title="Pendiente"/> )
+    // },
     {
-        data: 'nombre_tienda',
-        name: 'Tienda'
+        data: 'idRuta',
+        name: 'Ruta',
     },
     {
-        data: 'status_ruta',
-        name: 'Estado',
-        render: (data:any) => ( <ChipDecoration icon="progress-clock" title="Pendiente"/> )
+        data: 'ticket',
+        name: 'Ticket',
+    },
+    {
+        data: 'cantidad',
+        name: 'Cantidad',
     },
     {
         data: null,
@@ -21,9 +29,9 @@ const configTableRutas = [
             <View className="flex flex-row gap-1">
                 {/* qrcode */}
                 <IconButtomForm icon="qrcode-scan" 
-                onPress={ ()=> NavigationService.navigate('ScannerQr') }
+                    onPress={ ()=> NavigationService.navigate('QrRutas') }
                 />
-                <IconButtomForm icon="eye"/>
+                {/* <IconButtomForm icon="eye"/> */}
             </View>
         )
     }

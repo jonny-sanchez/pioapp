@@ -2,8 +2,12 @@ import { DataTable, Searchbar, useTheme, IconButton, Text } from 'react-native-p
 import React, { useState, useEffect } from 'react';
 import { GestureResponderEvent, View, ScrollView } from 'react-native'
 import SearchInput from 'components/form/SearchInput';
+import TableHeader from './TableHeader';
+import RowsTable from './RowsTable';
+import PaginationTable from './PaginationTable';
+import GroupRowsTable from './GroupRowsTable';
 
-interface ConfigFile {
+export interface ConfigFile {
   data?: any;
   name?: string;
   search?: boolean;
@@ -17,6 +21,7 @@ type DataTableInfoProps = {
     onPressFilter?: ((event: GestureResponderEvent) => void) & ((e: GestureResponderEvent) => void),
     pagination?: boolean; 
     configTable?: ConfigFile[];
+    groupField?: string;
 }
 
 export default function DataTableInfo({
@@ -25,10 +30,24 @@ export default function DataTableInfo({
     filter = false,
     pagination = false,
     onPressFilter = () => {},
-    configTable = []
+    configTable = [],
+    groupField = ''
 } : DataTableInfoProps){
 
+    function groupByField(data: any[], field: string) {
+      return data.reduce((acc: any, item: any) => {
+        const key = item[field] || 'Sin valor';
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(item);
+        return acc;
+      }, {});
+    }
+
     const [dataSearch, setDataSearch] = useState<any[]>(data)
+
+    const groupedData:object | null = groupField ? groupByField(dataSearch, groupField) : null;
+
+    const entriesGroupedData = Object.entries((groupedData ?? {})) as [any, any[]][] 
 
     const [page, setPage] = useState<number>(0)
 
@@ -66,12 +85,11 @@ export default function DataTableInfo({
       valueSearch ? setDataSearch(filasEncontradas) : setDataSearch(data)
     }
 
-
     useEffect(() => setPage(0), [itemsPerPage])
 
     return (
         <View className='w-full'>
-            <View className='flex w-full flex-row items-center gap-2 px-5 mb-5'>
+            <View className='flex w-full flex-row items-center gap-2 mb-5'>
                 { search && <SearchInput 
                   style={{ flex: 1 }}
                   onChangeText={onChangeSetSearch} 
@@ -87,55 +105,39 @@ export default function DataTableInfo({
                 }
             </View>
             <DataTable>
-              <DataTable.Header>
-                { 
-                  configTable.map(({ name }, index) => (
-                    // sortDirection='descending'
-                    <DataTable.Title key={index} numeric={false}>{ name }</DataTable.Title>
-                  )) 
-                }
-              </DataTable.Header>
-              {
-                dataSearch.length > 0 ? (pagination ? dataSearch.slice(from, to) : dataSearch).map((item:any, index:any) => (
-                  <DataTable.Row key={index}>
-                    {
-                      configTable.map(({ data:field, render }, i)=>(
-                        <DataTable.Cell style={{ paddingVertical: 4, paddingHorizontal: 4 }} key={i} numeric={false}>{ 
-                          render ? 
-                            render(
-                              (field || '') ? 
-                                item[field || ''] || '' : 
-                                item
-                            ) : 
-                            item[field || ''] || '' 
-                          }
-                        </DataTable.Cell>
-                      ))
-                    }
-                  </DataTable.Row>
-                )) :
-                <DataTable.Row>
-                  <DataTable.Cell style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>No hay resultados</DataTable.Cell>
-                </DataTable.Row>
-              }
-              
+              { !groupField && <TableHeader configTable={configTable}/> } 
+              {/* FILAS */}
+              { groupField ?
+                <GroupRowsTable
+                  configTable={configTable}
+                  entriesGroupedData={entriesGroupedData}
+                  from={from}
+                  pagination={pagination}
+                  to={to}
+                />
+               : 
+               <RowsTable 
+                  configTable={configTable} 
+                  dataSearch={dataSearch}
+                  from={from}
+                  to={to}
+                  pagination={pagination}
+                />
+              }       
+
             </DataTable>
             {/* Paginacion */}
-            { 
-              pagination && <DataTable.Pagination
-                page={page}
-                numberOfPages={Math.ceil(dataSearch.length / itemsPerPage)}
-                onPageChange={(page) => setPage(page)}
-                label={`${from + 1}-${to} de ${dataSearch.length}`}
-                numberOfItemsPerPageList={numberOfItemsPerPageList}
-                numberOfItemsPerPage={itemsPerPage}
-                onItemsPerPageChange={onItemsPerPageChange}
-                showFastPaginationControls
-                selectPageDropdownLabel={'Filas por página'}
-                // style={{ transform: [{ scale: 0.8 }], display: 'flex', flexDirection: 'row', paddingVertical: 0 }}
-                style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 6 }}
-              /> 
-            }
+            <PaginationTable
+              page={page}
+              setPage={setPage}
+              dataSearch={dataSearch}
+              from={from}
+              itemsPerPage={itemsPerPage}
+              numberOfItemsPerPageList={numberOfItemsPerPageList}
+              onItemsPerPageChange={onItemsPerPageChange}
+              pagination={pagination}
+              to={to}
+            />
         </View>
     )
 

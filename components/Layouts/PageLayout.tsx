@@ -16,7 +16,7 @@ export default function PageLayout({
 
     return (
         <>
-            <DrawerDashboard/>
+            {/* <DrawerDashboard/> */}
             <AppBarHome title={titleAppBar} goBack={goBack}/>
             { children }
         </>

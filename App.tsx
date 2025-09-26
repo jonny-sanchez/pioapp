@@ -3,8 +3,6 @@ import appThemeLight from 'themes/appThemeLight';
 import appThemeDark from 'themes/appThemeDark';
 import './global.css';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import routers from 'helpers/navigator/routers';
 import fontConfig from 'themes/fontConfig';
 import { useFonts, Inter_900Black } from '@expo-google-fonts/inter';
 import { navigationGlobal } from 'helpers/navigator/navigationScreens';
@@ -12,8 +10,8 @@ import globalState from 'helpers/states/globalState';
 import LoadingScreen from 'components/Screens/LoadingScreen';
 import PageLoadingInit from 'components/Screens/PageLoadingInit';
 import SnackBarAlert from 'components/Alerts/SnackBarAlert';
-
-const Stack = createStackNavigator()
+import StackNavigatorApp from 'pages/StackNavigatorApp';
+import DrawerDashboard from 'components/container/DrawerDashboard';
 
 export default function App() {
 
@@ -30,8 +28,6 @@ export default function App() {
     fonts: configureFonts({config: fontConfig})
   }
 
-  const initialRouteName = routers.find(el => el.default)?.name || ""
-
   return (
     <PaperProvider theme={theme}>
       {
@@ -39,30 +35,13 @@ export default function App() {
         <PageLoadingInit/>
          :
         <NavigationContainer ref={navigationGlobal}>
+          <DrawerDashboard/>
           {/* Loading screen global */}
           <LoadingScreen/>
           {/* snackbar alerts global */}
           <SnackBarAlert/>
-          <Stack.Navigator 
-              initialRouteName={initialRouteName} 
-              screenOptions={{ 
-                headerShown: false, 
-                cardStyle: { backgroundColor: theme.colors.background },
-                gestureEnabled: true,
-                gestureDirection: 'horizontal',
-                animation: 'slide_from_right' 
-              }}
-          >
-            { 
-              routers.map((el, index) => 
-                <Stack.Screen 
-                  key={index}
-                  name={el?.name || ""} 
-                  component={el?.component || null}
-                />
-              ) 
-            }
-          </Stack.Navigator>
+
+          <StackNavigatorApp/>
         </NavigationContainer>
       }
     </PaperProvider>

@@ -5,6 +5,7 @@ import ScannnerQr from "pages/dashboard/ScannnerQr"
 import Home from "pages/dashboard/Home"
 import Rutas from "pages/dashboard/Rutas"
 import Boleta from "pages/dashboard/Boleta"
+import ShowQrRuta from "pages/dashboard/ShowQrRuta"
 
 type RoutersType = {
     name: string;
@@ -59,6 +60,14 @@ const routers = [
     {
         name: 'ScannerQr',
         component: ScannnerQr,
+        default: false,
+        hidden: true,
+        icon: '',
+        title: ''
+    },
+    {
+        name: 'QrRutas',
+        component: ShowQrRuta,
         default: false,
         hidden: true,
         icon: '',

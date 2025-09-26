@@ -3,10 +3,10 @@ import { Modal, Portal, Text, useTheme, Avatar, Drawer } from 'react-native-pape
 import globalState from 'helpers/states/globalState';
 import { View, Animated, Dimensions, StyleSheet, TouchableWithoutFeedback  } from 'react-native';
 import ButtonForm from 'components/form/ButtonForm';
-import bottomNavigation from 'helpers/navigator/bottomNavigator';
-import { NavigationService } from 'helpers/navigator/navigationScreens';
+// import bottomNavigation from 'helpers/navigator/bottomNavigator';
+import { NavigationService, currentRouteName } from 'helpers/navigator/navigationScreens';
 import routers from 'helpers/navigator/routers';
-import { useRoute } from '@react-navigation/native';
+// import { useRoute } from '@react-navigation/native';
 
 export default function DrawerDashboard () {
 
@@ -20,7 +20,7 @@ export default function DrawerDashboard () {
 
     const theme = useTheme()
 
-    const router = useRoute()
+    // const router = useRoute()
 
     useEffect(() => {
       drawer && setVisible(drawer)
@@ -60,11 +60,12 @@ export default function DrawerDashboard () {
                   {
                     routers.filter(el => (el?.hidden ?? false) !== true).map((el,index)=>(
                       <Drawer.Item
-                        disabled={router.name === el.name}
+                        // disabled={router.name === el.name}
                         key={index}
                         icon={el.icon}
                         label={el?.title || ''}
-                        active={router.name === el.name}
+                        // active={router.name === el.name}
+                        active={el.name === currentRouteName}
                         onPress={()=>{
                           setCloseDrawer()
                           setTimeout(() => NavigationService.reset(el.name), 200)

@@ -20,6 +20,7 @@ import { Checkbox, RadioButton, Text, useTheme, IconButton, Icon } from 'react-n
 import CheckBoxForm from "components/form/CheckBoxForm"
 import PickerSmallFile from "components/container/PickerSmallFile"
 import PageLayout from "components/Layouts/PageLayout"
+import { NavigationService } from "helpers/navigator/navigationScreens"
 
 export default function SaveVisitas(){
 
@@ -151,6 +152,8 @@ export default function SaveVisitas(){
         clearFormVisitas()
 
         setIsLoadingForm(false)
+
+        NavigationService.reset('Home')
 
     }
 

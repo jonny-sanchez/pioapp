@@ -14,7 +14,8 @@ type InputProps = {
     name: string;
     errors?: any;  
     disabled?: boolean;
-    inputType?:KeyboardTypeOptions | undefined
+    inputType?:KeyboardTypeOptions | undefined,
+    counterWords?: boolean;
 }
 
 export default function InputFormHook({
@@ -27,7 +28,8 @@ export default function InputFormHook({
     name,
     errors = {},
     disabled = false,
-    inputType
+    inputType,
+    counterWords = false
 } : InputProps){
 
     // const theme = useTheme()
@@ -61,7 +63,7 @@ export default function InputFormHook({
                       right={
                         isPassword ?
                             <TextInput.Icon onPress={ () => setViewPassword(!viewPassword) } icon={ viewPassword ? 'eye-off' : 'eye' } /> 
-                            : <TextInput.Affix text={`${(value ?? "")?.length || 0 }/${maxLength}`}/>
+                            : (counterWords && <TextInput.Affix text={`${(value ?? "")?.length || 0 }/${maxLength}`}/>)
                       }
                       maxLength={maxLength}
                       error={errorMessage ? true : false}
