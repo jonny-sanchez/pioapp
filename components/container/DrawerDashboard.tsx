@@ -61,6 +61,7 @@ export default function DrawerDashboard () {
                     routers.filter(el => (el?.hidden ?? false) !== true).map((el,index)=>(
                       <Drawer.Item
                         // disabled={router.name === el.name}
+                        disabled={el.name === currentRouteName}
                         key={index}
                         icon={el.icon}
                         label={el?.title || ''}

@@ -6,6 +6,7 @@ import Home from "pages/dashboard/Home"
 import Rutas from "pages/dashboard/Rutas"
 import Boleta from "pages/dashboard/Boleta"
 import ShowQrRuta from "pages/dashboard/ShowQrRuta"
+import RecepcionRutas from "pages/dashboard/RecepcionRutas"
 
 type RoutersType = {
     name: string;
@@ -72,7 +73,15 @@ const routers = [
         hidden: true,
         icon: '',
         title: ''
-    }
+    },
+    {
+        name: 'RecepcionRutas',
+        component: RecepcionRutas,
+        default: false,
+        hidden: false,
+        icon: 'package-variant',
+        title: 'Recepcion'
+    },
 ] as const satisfies readonly RoutersType[]
 
 export type RouterName = typeof routers[number]['name']
