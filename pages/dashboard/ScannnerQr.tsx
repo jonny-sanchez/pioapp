@@ -4,6 +4,7 @@ import { View, StyleSheet } from 'react-native'
 import { Text } from "react-native-paper";
 import ButtonForm from "components/form/ButtonForm";
 import Svg, { Rect, Mask } from "react-native-svg";
+import PageLayout from "components/Layouts/PageLayout";
 
 export default function ScannnerQr() {
 
@@ -19,10 +20,12 @@ export default function ScannnerQr() {
 
     if (!permission?.granted) {
         return (
-          <View className="w-full flex-1 items-center justify-center p-35 flex flex-col gap-3">
-            <Text>Necesitamos su permiso para mostrar la cámara.</Text>
-            <ButtonForm label="conceder permiso" icon="camera" onPress={requestPermission}/>
-          </View>
+          <PageLayout goBack={true}>
+            <View className="w-full flex-1 items-center justify-center flex flex-col gap-3" style={{ padding: 25 }}>
+              <Text style={{ textAlign: 'center' }}>Necesitamos su permiso para mostrar la cámara.</Text>
+              <ButtonForm label="conceder permiso" icon="camera" onPress={requestPermission}/>
+            </View>
+          </PageLayout>
         );
     }
 

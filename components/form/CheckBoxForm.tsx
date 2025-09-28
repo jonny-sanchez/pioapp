@@ -8,6 +8,7 @@ type CheckBoxFormProps = {
     label?: string;
     onChangeExtra?: (value:boolean)=> void | undefined;
     disabled?: boolean;
+    color?: string;
 }
 
 export default function CheckBoxForm({
@@ -15,7 +16,8 @@ export default function CheckBoxForm({
     control,
     label = '',
     onChangeExtra,
-    disabled = false
+    disabled = false,
+    color
 } : CheckBoxFormProps) {
 
     return (
@@ -27,7 +29,9 @@ export default function CheckBoxForm({
                 render={({ field: { onChange, value } }) => (
                     <View className="w-full">
                         <Checkbox.Item 
+                            color={color}
                             disabled={disabled}
+                            mode="android"
                             label={label} 
                             status={value ? "checked" : "unchecked"}
                             onPress={() => {

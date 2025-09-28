@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { TextInput } from 'react-native-paper';
 import { Control, Controller, FieldValues } from 'react-hook-form'
-import { View, TextInput as RNTextInput, KeyboardTypeOptions } from 'react-native'
+import { View, TextInput as RNTextInput, KeyboardTypeOptions, ReturnKeyTypeOptions, NativeSyntheticEvent, TextInputSubmitEditingEventData } from 'react-native'
 import { Text, useTheme, HelperText } from 'react-native-paper';
 
 type InputProps = {
@@ -16,6 +16,8 @@ type InputProps = {
     disabled?: boolean;
     inputType?:KeyboardTypeOptions | undefined,
     counterWords?: boolean;
+    returnKeyType?: ReturnKeyTypeOptions,
+    onSubmitEditing?: ((e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => void) | undefined
 }
 
 export default function InputFormHook({
@@ -29,7 +31,9 @@ export default function InputFormHook({
     errors = {},
     disabled = false,
     inputType,
-    counterWords = false
+    counterWords = false,
+    returnKeyType,
+    onSubmitEditing
 } : InputProps){
 
     // const theme = useTheme()
@@ -59,6 +63,8 @@ export default function InputFormHook({
                       onChangeText={onChange}
                       onBlur={onBlur}
                       secureTextEntry={viewPassword}
+                      returnKeyType={returnKeyType}
+                      onSubmitEditing={onSubmitEditing}
                     //   right={isPassword ? passwordViewComponent : maxLengthComponent(value)}
                       right={
                         isPassword ?

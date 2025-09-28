@@ -5,13 +5,13 @@ import './global.css';
 import { NavigationContainer } from '@react-navigation/native';
 import fontConfig from 'themes/fontConfig';
 import { useFonts, Inter_900Black } from '@expo-google-fonts/inter';
-import { navigationGlobal } from 'helpers/navigator/navigationScreens';
+import { navigationGlobal, NavigationService } from 'helpers/navigator/navigationScreens';
 import globalState from 'helpers/states/globalState';
 import LoadingScreen from 'components/Screens/LoadingScreen';
 import PageLoadingInit from 'components/Screens/PageLoadingInit';
 import SnackBarAlert from 'components/Alerts/SnackBarAlert';
 import StackNavigatorApp from 'pages/StackNavigatorApp';
-import DrawerDashboard from 'components/container/DrawerDashboard';
+import DrawerDashboard from 'components/container/DrawerDashboard'; 
 
 export default function App() {
 
@@ -34,7 +34,11 @@ export default function App() {
         !fontsLoaded ?
         <PageLoadingInit/>
          :
-        <NavigationContainer ref={navigationGlobal}>
+        <NavigationContainer 
+          ref={navigationGlobal}
+          onReady={NavigationService.updateCurrentRouteName}
+          onStateChange={NavigationService.updateCurrentRouteName}
+        >
           <DrawerDashboard/>
           {/* Loading screen global */}
           <LoadingScreen/>
