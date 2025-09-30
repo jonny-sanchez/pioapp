@@ -1,15 +1,20 @@
 import { createStackNavigator } from '@react-navigation/stack';
-import routers from 'helpers/navigator/routers';
+import routers, { RouterName } from 'helpers/navigator/routers';
 import { useTheme } from 'react-native-paper';
 
+type StackNavigatorAppProps = {
+  initialRouteName?: RouterName
+}
 
 const Stack = createStackNavigator()
 
-export default function StackNavigatorApp(){
+export default function StackNavigatorApp({
+  initialRouteName = 'Login'
+} : StackNavigatorAppProps){
 
     const theme = useTheme()
 
-    const initialRouteName = routers.find(el => el.default)?.name || ""
+    // const initialRouteName = routers.find(el => el.default)?.name || ""
 
     return (
         <Stack.Navigator 

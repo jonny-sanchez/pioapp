@@ -11,9 +11,9 @@ import { NavigationService } from 'helpers/navigator/navigationScreens';
 import FormAdaptiveKeyBoard from 'components/container/FormAdaptiveKeyBoard';
 import { AJAX, URLPIOAPP } from 'helpers/http/ajax';
 import { ResponseService, generateJsonError } from 'types/RequestType';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import alertsState from 'helpers/states/alertsState';
-import { setValueStorage } from 'helpers/store/storeApp';
+import { getValueStorage, setValueStorage } from 'helpers/store/storeApp';
 
 export default function Login() {
 
@@ -38,14 +38,16 @@ export default function Login() {
 
   const submitFormLogin = async(data: schemaLoginFormValidateType) => {
     setLoadingLogin(true)
-    // const login = await validLogin(data)
+    const login = await validLogin(data)
     setLoadingLogin(false)
-    // login.status && NavigationService.reset('Home')
-    // login.status && setValueStorage('user', login.data)
+    login.status && NavigationService.reset('Home')
+    login.status && setValueStorage('user', login.data)
     
     // DEPRECAR
-    NavigationService.reset('Home')
+    // NavigationService.reset('Home')
   }
+
+  // useEffect(()=> { console.log(getValueStorage('user')) }, [])
 
   return (
     <FormAdaptiveKeyBoard>

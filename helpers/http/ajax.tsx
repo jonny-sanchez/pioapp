@@ -1,3 +1,4 @@
+import { logout } from "helpers/authHelper/authHelper";
 import { NavigationService } from "helpers/navigator/navigationScreens";
 import { getValueStorage } from "helpers/store/storeApp";
 
@@ -47,7 +48,7 @@ export async function AJAX(
         const response:Response = await Promise.race([fetchResponse, timeout(30)]) as Response
         const data:object | any = blob ? await response.blob() : await response.json()
 
-        if(response.status == 401) setTimeout(() => NavigationService.reset('Login'), 500)
+        if(response.status == 401) logout()
 
         if(!response.ok) throw new Error(data?.message || 'Internal Server error response.')
 

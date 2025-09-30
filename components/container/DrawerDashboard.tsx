@@ -6,6 +6,7 @@ import ButtonForm from 'components/form/ButtonForm';
 // import bottomNavigation from 'helpers/navigator/bottomNavigator';
 import { NavigationService, currentRouteName } from 'helpers/navigator/navigationScreens';
 import routers from 'helpers/navigator/routers';
+import { logout } from 'helpers/authHelper/authHelper';
 // import { useRoute } from '@react-navigation/native';
 
 export default function DrawerDashboard () {
@@ -97,7 +98,8 @@ export default function DrawerDashboard () {
                 <ButtonForm 
                   onPress={()=>{
                     setCloseDrawer()
-                    setTimeout(() => NavigationService.reset('Login'), 200)
+                    logout()
+                    // setTimeout(() => NavigationService.reset('Login'), 200)
                   }}
                   label='Cerrar sesion'
                 />
