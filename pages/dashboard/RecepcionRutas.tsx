@@ -17,6 +17,7 @@ export type MercanciaType = {
     id?: number;
     name?: string;
     cantidad?: number;
+    cantidadUpload?: number;
 }
 
 export default function RecepcionRutas() {
@@ -34,15 +35,21 @@ export default function RecepcionRutas() {
         mode: 'all'
     })
 
+    const [ editMercancia, setEditMercancia ] = useState<MercanciaType | null>(null)
+
     const [mercancia, setMercancia] = useState<MercanciaType[]>([
-        { id: 1, name: 'Pesquezo', cantidad: 34 },
-        { id: 2, name: 'Pollo crudo', cantidad: 67 },
-        { id: 3, name: 'Alitas', cantidad: 2 },
+        { id: 1, name: 'Pesquezo', cantidad: 34, cantidadUpload: 34 },
+        { id: 2, name: 'Pollo crudo', cantidad: 67, cantidadUpload: 67 },
+        { id: 3, name: 'Alitas', cantidad: 2, cantidadUpload: 2 },
     ])
 
     return (
         <>
-            <ModalizeProductCantidad modalizeRef={modalizeRef} closeModalize={onCloseModalizeUpdate}/>
+            <ModalizeProductCantidad 
+                modalizeRef={modalizeRef} 
+                closeModalize={onCloseModalizeUpdate}
+                mercancia={editMercancia}
+            />
 
             <PageLayout titleAppBar="Recepccion">
                 <ScrollViewContainer>
@@ -59,7 +66,8 @@ export default function RecepcionRutas() {
                                 configTable={
                                     configTableRecepccionRutas(
                                         control, 
-                                        onOpenModalizeUpdate
+                                        onOpenModalizeUpdate,
+                                        setEditMercancia
                                     )
                                 }
                             />

@@ -44,7 +44,7 @@ export async function AJAX(
             ...(uploadData ? { body: formData ? uploadData : JSON.stringify(uploadData) } : {})
         })
 
-        const response:Response = await Promise.race([fetchResponse, timeout(2)]) as Response
+        const response:Response = await Promise.race([fetchResponse, timeout(30)]) as Response
         const data:object | any = blob ? await response.blob() : await response.json()
 
         if(response.status == 401) setTimeout(() => NavigationService.reset('Login'), 500)

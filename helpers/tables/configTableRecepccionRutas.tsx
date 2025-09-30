@@ -6,7 +6,8 @@ import CheckBoxForm from "components/form/CheckBoxForm"
 
 const configTableRecepccionRutas = (
     control:any,
-    openModalize?: () => void
+    openModalize?: () => void,
+    setMercancia?: (nwValue:MercanciaType | null) => void
 ) => {
 
     return [
@@ -19,8 +20,12 @@ const configTableRecepccionRutas = (
             name: 'Cantidad',
             render: (data:MercanciaType) => { return (
                     <View className="flex flex-row justify-center items-center gap-3">
-                        <Text>{ data.cantidad }</Text>
-                        <IconButtomForm icon="pencil-outline" onPress={openModalize}/>
+                        <Text>{ data.cantidadUpload }</Text>
+                        <IconButtomForm icon="pencil-outline" onPress={ () => {
+                                setMercancia && setMercancia(data ? { ...data } : null)
+                                openModalize && openModalize()
+                            }
+                        }/>
                     </View>
                 ) 
             }

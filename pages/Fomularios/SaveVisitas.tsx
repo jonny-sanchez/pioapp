@@ -84,7 +84,13 @@ export default function SaveVisitas(){
                 uri: metadatosPicture.imgUri,
                 type: metadatosPicture.mimeType,
                 name: metadatosPicture.nameImg
-            }
+            },
+            uso_uniforme: dataForm?.uniforme || false,
+            buzon_cerrado: dataForm?.buzon || false,
+            tienda_limpia: dataForm?.tienda_limpia || false,
+            cantidad_personas: dataForm?.personas || false,
+            cantidad: dataForm?.cantidad_personas || 0
+            // name_original_photo_personas: 
         }
     }
 
@@ -97,8 +103,8 @@ export default function SaveVisitas(){
     const [ isSupervision, SetIsSupervision ] = useState<boolean>(false)
 
     const [ tipoVisitas, setTipoVisitas ] = useState([
-        { label: 'Supervisión', value: 3 },
-        { label: 'Actualización', value: 4 },
+        { label: 'Supervisión', value: 1 },
+        { label: 'Actualización', value: 2 },
     ])
 
     const [originalTiendas, setOriginalTiendas] = useState<any[]>([])
@@ -147,14 +153,17 @@ export default function SaveVisitas(){
 
         // resultCreateVisita.status && clearFormVisitas()
 
+        //DEPRECAR (SOLO ES PARA DEMO)
         openVisibleSnackBar('Visitada creada correctamente.', 'success')
-
         clearFormVisitas()
+        //DEPRECAR (SOLO ES PARA DEMO)
 
         setIsLoadingForm(false)
 
+        // resultCreateVisita.status && NavigationService.reset('Home')
+        //DEPRECAR (SOLO ES PARA DEMO)
         NavigationService.reset('Home')
-
+        //DEPRECAR (SOLO ES PARA DEMO)
     }
 
     const renderAll = async () => {
@@ -170,22 +179,12 @@ export default function SaveVisitas(){
     }
 
     const validateIsSupervicion = (item:any) => {
-        const validSupervision = (item?.value || 0) == 3
+        const validSupervision = (item?.value || 0) == 1
         setIsCantidadPersonas(false)
         resetField('uniforme', { defaultValue: false })
         resetField('buzon', { defaultValue: false })
         resetField('tienda_limpia', { defaultValue: false })
         resetField('personas', { defaultValue: false })
-        // reset({
-        //       uniforme: false,
-        //       buzon: false,
-        //       tienda_limpia: false,
-        //       personas: false,
-        //     },
-        //     {
-        //         keepValues: true
-        //     }
-        // )
         SetIsSupervision(validSupervision ? true : false)
     }
 
@@ -194,6 +193,7 @@ export default function SaveVisitas(){
 
     const onChangeCheckBoxPersonas = (value:boolean) => {
         setIsCantidadPersonas(value)
+        !value && resetField('cantidad_personas', { defaultValue: '' })
     }
 
     return (

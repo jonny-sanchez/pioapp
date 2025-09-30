@@ -5,28 +5,47 @@ import { useForm } from "react-hook-form"
 import ButtonForm from "components/form/ButtonForm"
 import FormAdaptiveKeyBoard from "components/container/FormAdaptiveKeyBoard"
 import { useKeyboardVisible } from "helpers/keyboard/keyboardHelper"
+import { MercanciaType } from "pages/dashboard/RecepcionRutas"
+import { useEffect, useState } from "react"
+import schemaModalizeEditMercanciaForm from "helpers/validatesForm/schemaModalizeEditMercanciaForm"
+import { yupResolver } from "@hookform/resolvers/yup"
 
 type ModalizeProductCantidadProps = {
     modalizeRef?: any;
     closeModalize?: () => void;
+    mercancia?: MercanciaType | null
 }
 
 export default function ModalizeProductCantidad({
     modalizeRef,
-    closeModalize
+    closeModalize,
+    mercancia = null
 } : ModalizeProductCantidadProps) {
+
+    const [ disabledBtn, setDisabledBtn ] = useState<boolean>(true) 
 
     const keyboardVisible = useKeyboardVisible()
 
-    const { control, handleSubmit, reset, resetField, formState: { errors } } = useForm({
-        // resolver: yupResolver(schemaListRutasForm),
+    const { control, handleSubmit, reset, resetField, formState: { errors }, watch } = useForm({
+        resolver: yupResolver(schemaModalizeEditMercanciaForm),
         mode: 'all'
     })
+
+    const valueCantidadWatch = watch('cantidad_update')
 
     const submitFormUpdateCantidad = async() => {
         closeModalize && closeModalize()
         reset()
     }
+
+    useEffect(()=>{
+        mercancia && resetField('cantidad_update', { defaultValue: `${ mercancia?.cantidadUpload || 0 }` })
+    }, [mercancia])
+
+    useEffect(()=> {
+        const validErrors =  (Object.keys(errors).length > 0 ? true : false)
+        setDisabledBtn((valueCantidadWatch == (mercancia?.cantidadUpload ?? '')) || validErrors ? true : false)
+    }, [valueCantidadWatch])
 
     return (
         <>
@@ -36,6 +55,7 @@ export default function ModalizeProductCantidad({
                 footerComponent={
                     !keyboardVisible && (
                         <ButtonForm 
+                            disabled={disabledBtn}
                             label="Editar" 
                             icon="pencil-outline"
                             onPress={handleSubmit(submitFormUpdateCantidad)}
@@ -53,7 +73,7 @@ export default function ModalizeProductCantidad({
                             placeholder="Ingrese una cantidad" 
                             maxLength={4}
                             label="Cantidad"
-                            onSubmitEditing={handleSubmit(submitFormUpdateCantidad)}
+                            // onSubmitEditing={handleSubmit(submitFormUpdateCantidad)}
                         />
                     </View>
                 </FormAdaptiveKeyBoard>
