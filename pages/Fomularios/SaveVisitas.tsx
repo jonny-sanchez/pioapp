@@ -142,7 +142,7 @@ export default function SaveVisitas(){
     }
 
     const submitFormNwVisita = async(data: schemaNwVisitaFormValidateType) => {
-        console.log(fotoCantidadPersonas)
+        // console.log(fotoCantidadPersonas)
 
         const { imgUri, coords, mimeType, nameImg } = metadatosPicture
 
@@ -201,6 +201,7 @@ export default function SaveVisitas(){
     const onChangeCheckBoxPersonas = (value:boolean) => {
         setIsCantidadPersonas(value)
         !value && resetField('cantidad_personas', { defaultValue: '' })
+        !value && setFotoCantidadPersonas(null)
     }
 
     return (

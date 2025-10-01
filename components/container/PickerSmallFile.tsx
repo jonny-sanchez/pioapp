@@ -40,7 +40,9 @@ export default function PickerSmallFile({
 
     }
 
-    useEffect(() => { if(onSelectFile) onSelectFile(null) }, [])
+    useEffect(() => { 
+        if(onSelectFile) onSelectFile(null) 
+    }, [])
 
     return (
         <Pressable onPress={disabled ? () => {} : getImgCamera}>
