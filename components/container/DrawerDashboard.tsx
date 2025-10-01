@@ -7,6 +7,7 @@ import ButtonForm from 'components/form/ButtonForm';
 import { NavigationService, currentRouteName } from 'helpers/navigator/navigationScreens';
 import routers from 'helpers/navigator/routers';
 import { logout } from 'helpers/authHelper/authHelper';
+import { getValueStorage } from 'helpers/store/storeApp';
 // import { useRoute } from '@react-navigation/native';
 
 export default function DrawerDashboard () {
@@ -20,6 +21,8 @@ export default function DrawerDashboard () {
     const translateX = useRef(new Animated.Value(screenWidth)).current
 
     const theme = useTheme()
+
+    const userSession = getValueStorage('user')
 
     // const router = useRoute()
 
@@ -50,9 +53,9 @@ export default function DrawerDashboard () {
                 <View className='w-full flex flex-row gap-4 items-center py-[30] px-[25]'>
                     <Avatar.Image size={80} source={require('assets/images/default-user.jpg')} />
                     <View>
-                        <Text variant='bodyLarge'>Diego Guevara</Text>
-                        <Text variant='bodySmall' style={{ color: theme.colors.primary }}>desarrollador</Text>
-                        <Text variant='labelSmall' style={{ color: theme.colors.secondary }}>AL5117</Text>
+                        <Text variant='bodyLarge'>{ `${userSession?.first_name || ''} ${userSession?.first_last_name || ''}` }</Text>
+                        <Text variant='bodySmall' style={{ color: theme.colors.primary }}>{ userSession?.puesto_trabajo || ' -- ' }</Text>
+                        <Text variant='labelSmall' style={{ color: theme.colors.secondary }}>{ userSession?.codigo_user || '--' }</Text>
                     </View>
                 </View>
                 

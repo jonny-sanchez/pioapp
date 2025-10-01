@@ -89,8 +89,13 @@ export default function SaveVisitas(){
             buzon_cerrado: dataForm?.buzon || false,
             tienda_limpia: dataForm?.tienda_limpia || false,
             cantidad_personas: dataForm?.personas || false,
-            cantidad: dataForm?.cantidad_personas || 0
-            // name_original_photo_personas: 
+            cantidad: dataForm?.cantidad_personas || 0,
+            name_original_photo_personas: fotoCantidadPersonas?.uri?.split('/').pop() || null,
+            foto_personas: fotoCantidadPersonas ? {
+                uri: fotoCantidadPersonas?.uri || '',
+                type: fotoCantidadPersonas?.mimeType || '',
+                name: fotoCantidadPersonas?.uri?.split('/').pop() || null
+            } : null
         }
     }
 
@@ -103,19 +108,19 @@ export default function SaveVisitas(){
     const [ isSupervision, SetIsSupervision ] = useState<boolean>(false)
 
     const [ tipoVisitas, setTipoVisitas ] = useState([
-        { label: 'Supervisión', value: 1 },
-        { label: 'Actualización', value: 2 },
+        // { label: 'Supervisión', value: 1 },
+        // { label: 'Actualización', value: 2 },
     ])
 
     const [originalTiendas, setOriginalTiendas] = useState<any[]>([])
 
     const [ tiendas, setTiendas ] = useState<any[]>([
-        { label: 'PLAZA GUADALUPE', value: `00005-00004` },
-        { label: 'AGUACATAN', value: `00007-00005` },
-        { label: 'VILLA LOBOS 1', value: `00034-00067` },
-        { label: 'CERINAL 1', value: `00005-00004` },
-        { label: 'BARBERENA 2', value: `00005-00004` },
-        { label: 'VILLA CANALES 4', value: `00005-00004` },
+        // { label: 'PLAZA GUADALUPE', value: `00005-00004` },
+        // { label: 'AGUACATAN', value: `00007-00005` },
+        // { label: 'VILLA LOBOS 1', value: `00034-00067` },
+        // { label: 'CERINAL 1', value: `00005-00004` },
+        // { label: 'BARBERENA 2', value: `00005-00004` },
+        // { label: 'VILLA CANALES 4', value: `00005-00004` },
     ])
 
     const [isCantidadPersonas , setIsCantidadPersonas] = useState<boolean>(false)
@@ -137,6 +142,8 @@ export default function SaveVisitas(){
     }
 
     const submitFormNwVisita = async(data: schemaNwVisitaFormValidateType) => {
+        console.log(fotoCantidadPersonas)
+
         const { imgUri, coords, mimeType, nameImg } = metadatosPicture
 
         if(!imgUri) return openVisibleSnackBar('Porfavor agrege una imagen.', "warning")
@@ -149,20 +156,20 @@ export default function SaveVisitas(){
 
         setIsLoadingForm(true)
 
-        // const resultCreateVisita = await postCreateVisita(uploadData)
+        const resultCreateVisita = await postCreateVisita(uploadData)
 
-        // resultCreateVisita.status && clearFormVisitas()
+        resultCreateVisita.status && clearFormVisitas()
 
         //DEPRECAR (SOLO ES PARA DEMO)
-        openVisibleSnackBar('Visitada creada correctamente.', 'success')
-        clearFormVisitas()
+        // openVisibleSnackBar('Visitada creada correctamente.', 'success')
+        // clearFormVisitas()
         //DEPRECAR (SOLO ES PARA DEMO)
 
         setIsLoadingForm(false)
 
-        // resultCreateVisita.status && NavigationService.reset('Home')
+        resultCreateVisita.status && NavigationService.reset('Home')
         //DEPRECAR (SOLO ES PARA DEMO)
-        NavigationService.reset('Home')
+        // NavigationService.reset('Home')
         //DEPRECAR (SOLO ES PARA DEMO)
     }
 
@@ -189,7 +196,7 @@ export default function SaveVisitas(){
     }
 
     //descomentar para hacer funcionar
-    // useEffect(() => { renderAll() }, [])
+    useEffect(() => { renderAll() }, [])
 
     const onChangeCheckBoxPersonas = (value:boolean) => {
         setIsCantidadPersonas(value)
