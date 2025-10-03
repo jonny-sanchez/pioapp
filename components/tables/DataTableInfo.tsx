@@ -6,6 +6,7 @@ import TableHeader from './TableHeader';
 import RowsTable from './RowsTable';
 import PaginationTable from './PaginationTable';
 import GroupRowsTable from './GroupRowsTable';
+import { groupByField } from 'helpers/Global/globalHelper';
 
 export interface ConfigFile {
   data?: any;
@@ -34,14 +35,14 @@ export default function DataTableInfo({
     groupField = ''
 } : DataTableInfoProps){
 
-    function groupByField(data: any[], field: string) {
-      return data.reduce((acc: any, item: any) => {
-        const key = item[field] || 'Sin valor';
-        if (!acc[key]) acc[key] = [];
-        acc[key].push(item);
-        return acc;
-      }, {});
-    }
+    // function groupByField(data: any[], field: string) {
+    //   return data.reduce((acc: any, item: any) => {
+    //     const key = item[field] || 'Sin valor';
+    //     if (!acc[key]) acc[key] = [];
+    //     acc[key].push(item);
+    //     return acc;
+    //   }, {});
+    // }
 
     const [dataSearch, setDataSearch] = useState<any[]>(data)
 

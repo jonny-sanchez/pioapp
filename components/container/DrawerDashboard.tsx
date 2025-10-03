@@ -4,15 +4,19 @@ import globalState from 'helpers/states/globalState';
 import { View, Animated, Dimensions, StyleSheet, TouchableWithoutFeedback  } from 'react-native';
 import ButtonForm from 'components/form/ButtonForm';
 // import bottomNavigation from 'helpers/navigator/bottomNavigator';
-import { NavigationService, currentRouteName } from 'helpers/navigator/navigationScreens';
-import routers from 'helpers/navigator/routers';
+// import { NavigationService, currentRouteName } from 'helpers/navigator/navigationScreens';
+// import routers from 'helpers/navigator/routers';
 import { logout } from 'helpers/authHelper/authHelper';
 import { getValueStorage } from 'helpers/store/storeApp';
+import menuRouterState, { RouterGrouped } from 'helpers/states/menuRouterState';
+import { currentRouteName, NavigationService } from 'helpers/navigator/navigationScreens';
 // import { useRoute } from '@react-navigation/native';
 
 export default function DrawerDashboard () {
 
     const { drawer, setCloseDrawer, indexNavigation } = globalState()
+    
+    const { routerMenu } = menuRouterState()
 
     const [ visible, setVisible ] = useState<boolean>(drawer)
 
@@ -60,41 +64,27 @@ export default function DrawerDashboard () {
                 </View>
                 
                 {/* Section menu bootom */}
-                <Drawer.Section className='w-full' title="Módulos">
-                  {
-                    routers.filter(el => (el?.hidden ?? false) !== true).map((el,index)=>(
-                      <Drawer.Item
-                        // disabled={router.name === el.name}
-                        disabled={el.name === currentRouteName}
-                        key={index}
-                        icon={el.icon}
-                        label={el?.title || ''}
-                        // active={router.name === el.name}
-                        active={el.name === currentRouteName}
-                        onPress={()=>{
-                          setCloseDrawer()
-                          setTimeout(() => NavigationService.reset(el.name), 200)
-                        }}
-                      />
-                    ))
-                  }
-                </Drawer.Section>
-                {/* <Drawer.Section className='w-full' title="Módulos">
-                  {
-                    bottomNavigation.filter(el => el.key !== 'home').map((el, index) => (
-                      <Drawer.Item
-                        key={index}
-                        icon={el.focusedIcon}
-                        label={el.title}
-                        active={bottomNavigation[indexNavigation]?.key === el.key}
-                        onPress={() => {
-                          setCloseDrawer()
-                          setTimeout(() => NavigationService.reset('Home', { keyIndex: el.key }), 200)
-                        }}
-                      />
-                    ))
-                  }
-                </Drawer.Section> */}
+                {
+                  Object.entries(routerMenu as RouterGrouped).map(([key, value], index) => (
+                    <Drawer.Section key={index} className='w-full' title={key}>
+                      {
+                        value.map((elRouter, i) => (
+                          <Drawer.Item
+                            key={i}
+                            label={elRouter?.title || ''}
+                            icon={elRouter?.icon}
+                            disabled={elRouter.name === currentRouteName}
+                            active={elRouter.name === currentRouteName}
+                            onPress={() => {
+                              setCloseDrawer()
+                              setTimeout(() => NavigationService.reset(elRouter.name), 200)
+                            }}
+                          />
+                        ))
+                      }
+                    </Drawer.Section>
+                  ))
+                }
 
               </View>      
               <View className='w-full py-[30] px-[25]'>

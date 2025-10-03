@@ -1,16 +1,54 @@
 import { View } from 'react-native'
-import ScrollViewContainer from "components/container/ScrollViewContainer"
-import FabFloating from "components/container/FabFloating"
-import { NavigationService } from "helpers/navigator/navigationScreens" 
-import TextInfo from "components/typografy/TextInfo"
-import CardTitle from 'components/Cards/CardTitle'
 // import { BottomNavKey from 'helpers/navigator/bottomNavigator'
-import bottomNavigation from 'helpers/navigator/bottomNavigator'
 import BoxImage from 'components/container/BoxImage'
-import Title from 'components/typografy/Title'
 import PageLayout from 'components/Layouts/PageLayout'
+import { useEffect } from 'react'
+import { generateJsonError, ResponseService } from 'types/RequestType'
+import { AJAX, URLPIOAPP } from 'helpers/http/ajax'
+import alertsState from 'helpers/states/alertsState'
+import globalState from 'helpers/states/globalState'
+import { orderRoutersMenu } from 'helpers/Global/HomeGlobalHelper'
+import menuRouterState from 'helpers/states/menuRouterState'
+
+export type PermissionMenuType = {
+    id_permission_menu?: number;
+    id_categorias_menu?: number;
+    id_menu_app?: number;
+    id_rol?: number;
+    id_type_menu?: number;
+    name_category?: string;
+    name_rol?: string;
+    name_route?: string;
+    name_type_menu?: string;
+    title?: string;
+}
 
 export default function Home(){
+
+    const { openVisibleSnackBar } = alertsState()
+    const { setOpenScreenLoading, setCloseScreenLoading } = globalState()
+    const { setRouterMenu } = menuRouterState()
+
+    const getMenusPermisssion = async():Promise<ResponseService<PermissionMenuType[]>> => {
+        try {
+            const result:ResponseService<PermissionMenuType[]> = await AJAX(`${URLPIOAPP}/permissions/all`, 'GET')
+            return result
+        } catch (error:any) {
+            openVisibleSnackBar(`${error}`, 'error')
+            return generateJsonError(`${error}`, 'array')
+        }
+    }
+
+    const initalize = async() => {
+        setOpenScreenLoading()
+        const resultPermisos = await getMenusPermisssion()
+        const dataOrder:any = orderRoutersMenu(resultPermisos.data as PermissionMenuType[])
+        // console.log(dataOrder)
+        setRouterMenu(dataOrder)
+        setCloseScreenLoading()
+    }
+
+    useEffect(() => { initalize() }, [])
 
     return (
         <>  
