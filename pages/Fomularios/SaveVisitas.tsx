@@ -13,7 +13,7 @@ import { useEffect, useState } from "react"
 import PickerFile from "components/container/PickerFile"
 import globalState from "helpers/states/globalState"
 import { ResponseService, generateJsonError } from "types/RequestType"
-import { AJAX, URLPIOAPP } from "helpers/http/ajax"
+import { AJAX, FormDataGenerate, URLPIOAPP } from "helpers/http/ajax"
 import alertsState from "helpers/states/alertsState"
 import fotografyState from "helpers/states/fotografyState"
 import { Checkbox, RadioButton, Text, useTheme, IconButton, Icon } from 'react-native-paper'
@@ -51,8 +51,7 @@ export default function SaveVisitas(){
 
     const postCreateVisita = async(data:object):Promise<ResponseService<any>> => {
         try {
-            const formData = new FormData()
-            Object.entries(data).forEach(([key, value])=> formData.append(`${key}`, value))
+            const formData = FormDataGenerate(data)
             const result:ResponseService<any> = await AJAX(`${URLPIOAPP}/visitas/create`, "POST", formData, true)
             openVisibleSnackBar(`${result.message}`, 'success')
             return result
@@ -196,7 +195,10 @@ export default function SaveVisitas(){
     }
 
     //descomentar para hacer funcionar
-    useEffect(() => { renderAll() }, [])
+    useEffect(() => { 
+        clearMetadatosPicture()
+        renderAll() 
+    }, [])
 
     const onChangeCheckBoxPersonas = (value:boolean) => {
         setIsCantidadPersonas(value)
