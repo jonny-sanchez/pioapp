@@ -2,9 +2,8 @@ import { logout } from "helpers/authHelper/authHelper";
 import { NavigationService } from "helpers/navigator/navigationScreens";
 import { getValueStorage } from "helpers/store/storeApp";
 
-// export const URLPIOAPP = `https://kp1ouabfgw.sharedwithexpose.com/api`
-export const URLPIOAPP = `http://10.0.2.2:5000/api`
-// 
+// export const URLPIOAPP = `http://10.0.2.2:5000/api`
+export const URLPIOAPP = `https://services.sistemaspinulito.com/pioapi`
 
 export const timeout = function(s:number)
 {
