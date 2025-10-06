@@ -9,6 +9,7 @@ type CheckBoxFormProps = {
     onChangeExtra?: (value:boolean)=> void | undefined;
     disabled?: boolean;
     color?: string;
+    positionLabel?: "trailing" | "leading" | undefined;
 }
 
 export default function CheckBoxForm({
@@ -17,7 +18,8 @@ export default function CheckBoxForm({
     label = '',
     onChangeExtra,
     disabled = false,
-    color
+    color,
+    positionLabel = 'trailing'
 } : CheckBoxFormProps) {
 
     return (
@@ -33,6 +35,7 @@ export default function CheckBoxForm({
                             disabled={disabled}
                             mode="android"
                             label={label} 
+                            position={positionLabel}
                             status={value ? "checked" : "unchecked"}
                             onPress={() => {
                                 const newValue = !value

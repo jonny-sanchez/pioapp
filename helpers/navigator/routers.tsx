@@ -7,6 +7,7 @@ import Rutas from "pages/dashboard/Rutas"
 import Boleta from "pages/dashboard/Boleta"
 import ShowQrRuta from "pages/dashboard/ShowQrRuta"
 import RecepcionRutas from "pages/dashboard/RecepcionRutas"
+import Marcaje from "pages/auth/Marcaje"
 
 type RoutersType = {
     name: string;
@@ -81,6 +82,14 @@ const routers = [
         hidden: false,
         icon: 'package-variant',
         title: 'Recepcion'
+    },
+    {
+        name: 'Marcaje',
+        component: Marcaje,
+        default: false,
+        hidden: false,
+        icon: 'gesture-tap-button',
+        title: 'Marcaje'
     },
 ] as const satisfies readonly RoutersType[]
 

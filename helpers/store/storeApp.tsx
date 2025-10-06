@@ -10,6 +10,14 @@ const optionsStorage = {
     user: {
         nameStorage: 'user',
         valueDefault: null,
+    },
+    rememberCredentials: {
+        nameStorage: 'valueCheckBoxCredentials',
+        valueDefault: null,
+    },
+    credentialsLogin: {
+        nameStorage: 'valueCredentialsLogin',
+        valueDefault: null,
     }
 }
 

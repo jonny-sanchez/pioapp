@@ -6,11 +6,15 @@ import { NavigationService } from 'helpers/navigator/navigationScreens';
 type AppBarHomeProps = {
     title?: string;
     goBack?: boolean;
+    themeApp?: boolean;
+    menuApp?: boolean;
 }
 
 export default function AppBarHome({
     title = '',
-    goBack = false
+    goBack = false,
+    themeApp = true,
+    menuApp = true
 } : AppBarHomeProps){
 
     const { dark, setDark, setOpenDrawer } = globalState()
@@ -21,8 +25,8 @@ export default function AppBarHome({
                 goBack && <Appbar.BackAction onPress={ () => NavigationService.goBack() } /> 
             }
             <Appbar.Content title={title}/>
-            <Appbar.Action onPress={setDark} icon={ dark ? 'weather-night' : 'weather-sunny' }/>
-            <Appbar.Action onPress={setOpenDrawer} icon="menu"/>
+            { themeApp && <Appbar.Action onPress={setDark} icon={ dark ? 'weather-night' : 'weather-sunny' }/>}
+            { menuApp && <Appbar.Action onPress={setOpenDrawer} icon="menu"/>}
         </Appbar.Header>
     )
 

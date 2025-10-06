@@ -3,11 +3,15 @@ import { IconButton, useTheme } from 'react-native-paper';
 type IconButtomFormProps = {
     icon?: string;
     onPress?: () => void;
+    modeButton?: "outlined" | "contained" | "contained-tonal",
+    containerColor?: string
 }
 
 export default function IconButtomForm({
     icon = '',
-    onPress = () => {}
+    onPress = () => {},
+    modeButton = 'contained-tonal',
+    containerColor
 } : IconButtomFormProps) {
 
     const theme = useTheme()
@@ -16,10 +20,10 @@ export default function IconButtomForm({
         <IconButton 
             icon={icon} 
             size={18} 
-            mode='contained-tonal' 
+            mode={modeButton} 
             iconColor={theme.colors.onPrimary}  
-            containerColor={theme.colors.primary}
+            containerColor={containerColor ? containerColor : theme.colors.primary}
             onPress={onPress}
-            />
+        />
     )
 }

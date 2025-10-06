@@ -6,18 +6,27 @@ type PageLayoutProps = {
     children?: React.ReactNode,
     titleAppBar?: string;
     goBack?: boolean;
+    menuApp?: boolean;
+    themeApp?: boolean;
 }
 
 export default function PageLayout({
     children,
     titleAppBar = '',
-    goBack = false
+    goBack = false,
+    menuApp = true,
+    themeApp = true
 } : PageLayoutProps) {
 
     return (
         <>
             {/* <DrawerDashboard/> */}
-            <AppBarHome title={titleAppBar} goBack={goBack}/>
+            <AppBarHome 
+                title={titleAppBar} 
+                goBack={goBack}
+                menuApp={menuApp}
+                themeApp={themeApp}
+            />
             { children }
         </>
     )

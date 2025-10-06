@@ -14,6 +14,8 @@ import { ResponseService, generateJsonError } from 'types/RequestType';
 import { useEffect, useState } from 'react';
 import alertsState from 'helpers/states/alertsState';
 import { getValueStorage, setValueStorage } from 'helpers/store/storeApp';
+import CheckBoxForm from 'components/form/CheckBoxForm';
+import SurfaceTapButton from 'components/container/SurfaceTapButton';
 
 export default function Login() {
 
@@ -31,7 +33,7 @@ export default function Login() {
     }
   }
 
-  const { control, handleSubmit, formState: { errors } } = useForm({
+  const { control, handleSubmit, formState: { errors }, resetField } = useForm({
     resolver: yupResolver(schemaLoginFormValidate),
     mode: 'all'
   })
@@ -42,12 +44,24 @@ export default function Login() {
     setLoadingLogin(false)
     login.status && NavigationService.reset('Home')
     login.status && setValueStorage('user', login.data)
-    
-    // DEPRECAR
-    // NavigationService.reset('Home')
+    if(login.status && data.recordar_btn) setValueStorage('credentialsLogin', { user: data.codigo })
   }
 
-  // useEffect(()=> { console.log(getValueStorage('user')) }, [])
+  const onChangeCheckBoxRemember = (value:boolean) => {
+    setValueStorage('rememberCredentials', { value })
+  }
+
+  const validRememberCredentials = () => {
+    const valueStore = getValueStorage('rememberCredentials')
+    const value = valueStore?.value || false
+    resetField('recordar_btn', { defaultValue: value })
+    if(!value) return
+    const valueStoreUser = getValueStorage('credentialsLogin')
+    const user = valueStoreUser?.user || ''
+    resetField('codigo', { defaultValue: user }) 
+  }
+
+  useEffect(()=> { validRememberCredentials() }, [])
 
   return (
     <FormAdaptiveKeyBoard>
@@ -81,13 +95,43 @@ export default function Login() {
           />
   
         </View>
-        <View className='w-full mt-6'>
+
+        <View className='flex flex-row justify-center items-center mt-3'>
+          <CheckBoxForm 
+            control={control} 
+            name='recordar_btn'
+            label='Recordarme'
+            positionLabel='leading'
+            disabled={loadingLogin}
+            onChangeExtra={onChangeCheckBoxRemember}
+          />
+        </View>
+
+        <View className='w-full mt-3'>
           <ButtonForm 
             disabled={loadingLogin}
             loading={loadingLogin}
             onPress={handleSubmit(submitFormLogin)} 
             label='Ingresar'/>
         </View>
+
+        <View className='w-full mt-3 flex-row justify-center items-center flex-wrap' style={{ gap: 5 }}>
+          <SurfaceTapButton 
+            icon='gesture-tap-button'
+            title='Marcaje'
+            onPress={()=>NavigationService.navigate('Marcaje')}
+            disabled={loadingLogin}
+          />
+          {/* <SurfaceTapButton 
+            icon='fingerprint'
+            title='Huella'
+          />
+          <SurfaceTapButton 
+            icon='face-recognition'
+            title='Facial'
+          /> */}
+        </View>
+
       </View>
     </FormAdaptiveKeyBoard>
   );
