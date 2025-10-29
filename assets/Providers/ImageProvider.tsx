@@ -1,0 +1,1 @@
+export const imageQrDefault = require('assets/images/QRPrueba.jpg');

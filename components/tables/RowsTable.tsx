@@ -1,5 +1,6 @@
 import { DataTable } from "react-native-paper"
-import { ConfigFile } from "./DataTableInfo"
+// import { ConfigFile } from "./DataTableInfo"
+import ConfigFile from "types/tables/ConfigFile"
 
 type RowsTableProps = {
     dataSearch?: any[];
@@ -23,8 +24,8 @@ export default function RowsTable({
                 dataSearch.length > 0 ? (pagination ? dataSearch.slice(from, to) : dataSearch).map((item:any, index:any) => (
                   <DataTable.Row key={index}>
                     {
-                      configTable.map(({ data:field, render }, i)=>(
-                        <DataTable.Cell style={{ paddingVertical: 4, paddingHorizontal: 4 }} key={i} numeric={false}>{ 
+                      configTable.map(({ data:field, render, numeric }, i)=>(
+                        <DataTable.Cell style={{ paddingVertical: 4, paddingHorizontal: 4 }} key={i} numeric={numeric || false}>{ 
                           render ? 
                             render(
                               (field || '') ? 

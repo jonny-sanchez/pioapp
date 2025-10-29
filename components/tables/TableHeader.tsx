@@ -1,4 +1,5 @@
-import { ConfigFile } from "./DataTableInfo"
+// import { ConfigFile } from "./DataTableInfo"
+import ConfigFile from "types/tables/ConfigFile";
 import { DataTable } from "react-native-paper"
 
 type TableHeaderProps = {

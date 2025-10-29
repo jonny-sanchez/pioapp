@@ -53,14 +53,12 @@ export default function ModalizeProductCantidad({
                 modalizeRef={modalizeRef} 
                 title="Editar"
                 footerComponent={
-                    !keyboardVisible && (
                         <ButtonForm 
                             disabled={disabledBtn}
                             label="Editar" 
                             icon="pencil-outline"
                             onPress={handleSubmit(submitFormUpdateCantidad)}
                         /> 
-                    )
                 }
             >
                 <FormAdaptiveKeyBoard>

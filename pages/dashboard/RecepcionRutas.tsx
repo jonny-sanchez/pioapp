@@ -38,9 +38,9 @@ export default function RecepcionRutas() {
     const [ editMercancia, setEditMercancia ] = useState<MercanciaType | null>(null)
 
     const [mercancia, setMercancia] = useState<MercanciaType[]>([
-        { id: 1, name: 'Pesquezo', cantidad: 34, cantidadUpload: 34 },
-        { id: 2, name: 'Pollo crudo', cantidad: 67, cantidadUpload: 67 },
-        { id: 3, name: 'Alitas', cantidad: 2, cantidadUpload: 2 },
+        // { id: 1, name: 'Pesquezo', cantidad: 34, cantidadUpload: 34 },
+        // { id: 2, name: 'Pollo crudo', cantidad: 67, cantidadUpload: 67 },
+        // { id: 3, name: 'Alitas', cantidad: 2, cantidadUpload: 2 },
     ])
 
     return (

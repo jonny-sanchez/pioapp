@@ -7,13 +7,15 @@ import RowsTable from './RowsTable';
 import PaginationTable from './PaginationTable';
 import GroupRowsTable from './GroupRowsTable';
 import { groupByField } from 'helpers/Global/globalHelper';
+import ConfigFile from 'types/tables/ConfigFile';
 
-export interface ConfigFile {
-  data?: any;
-  name?: string;
-  search?: boolean;
-  render?: any; 
-}
+// export interface ConfigFile {
+//   data?: any;
+//   name?: string;
+//   search?: boolean;
+//   render?: any; 
+//   numeric?: boolean | undefined;
+// }
 
 type DataTableInfoProps = {
     data?: any;
@@ -23,6 +25,7 @@ type DataTableInfoProps = {
     pagination?: boolean; 
     configTable?: ConfigFile[];
     groupField?: string;
+    buttons?: React.ReactNode
 }
 
 export default function DataTableInfo({
@@ -32,17 +35,9 @@ export default function DataTableInfo({
     pagination = false,
     onPressFilter = () => {},
     configTable = [],
-    groupField = ''
+    groupField = '',
+    buttons
 } : DataTableInfoProps){
-
-    // function groupByField(data: any[], field: string) {
-    //   return data.reduce((acc: any, item: any) => {
-    //     const key = item[field] || 'Sin valor';
-    //     if (!acc[key]) acc[key] = [];
-    //     acc[key].push(item);
-    //     return acc;
-    //   }, {});
-    // }
 
     const [dataSearch, setDataSearch] = useState<any[]>(data)
 
@@ -88,6 +83,10 @@ export default function DataTableInfo({
 
     useEffect(() => setPage(0), [itemsPerPage])
 
+    useEffect(() => {
+      searchQuery ? onChangeSetSearch(searchQuery) : setDataSearch(data)
+    }, [data])
+
     return (
         <View className='w-full'>
             <View className='flex w-full flex-row items-center gap-2 mb-5'>
@@ -103,6 +102,9 @@ export default function DataTableInfo({
                     style={{ width: 50, height: 50, }}
                     onPress={onPressFilter}
                   /> 
+                }
+                {
+                  buttons
                 }
             </View>
             <DataTable>

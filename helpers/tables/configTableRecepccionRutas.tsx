@@ -3,6 +3,7 @@ import IconButtomForm from "components/form/IconButtomForm"
 import { Text } from "react-native-paper"
 import { View } from "react-native"
 import CheckBoxForm from "components/form/CheckBoxForm"
+import ConfigFile from "types/tables/ConfigFile"
 
 const configTableRecepccionRutas = (
     control:any,
@@ -18,16 +19,25 @@ const configTableRecepccionRutas = (
         {
             data: null,
             name: 'Cantidad',
+            numeric: true,
             render: (data:MercanciaType) => { return (
                     <View className="flex flex-row justify-center items-center gap-3">
                         <Text>{ data.cantidadUpload }</Text>
-                        <IconButtomForm icon="pencil-outline" onPress={ () => {
-                                setMercancia && setMercancia(data ? { ...data } : null)
-                                openModalize && openModalize()
-                            }
-                        }/>
                     </View>
                 ) 
+            }
+        },
+        {
+            data: null,
+            // name: '',
+            render: (data:MercanciaType) => {
+                return (
+                    <IconButtomForm icon="pencil-outline" onPress={ () => {
+                            setMercancia && setMercancia(data ? { ...data } : null)
+                            openModalize && openModalize()
+                        }
+                    }/>
+                )
             }
         },
         {
@@ -43,7 +53,7 @@ const configTableRecepccionRutas = (
                 ) 
             }
         },
-    ]
+    ] as ConfigFile[]
 }
 
 export default configTableRecepccionRutas

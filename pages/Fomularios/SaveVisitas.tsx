@@ -21,6 +21,7 @@ import CheckBoxForm from "components/form/CheckBoxForm"
 import PickerSmallFile from "components/container/PickerSmallFile"
 import PageLayout from "components/Layouts/PageLayout"
 import { NavigationService } from "helpers/navigator/navigationScreens"
+import ToggleContainerAnimated from "components/Animaciones/ToggleContainerAnimated"
 
 export default function SaveVisitas(){
 
@@ -243,59 +244,53 @@ export default function SaveVisitas(){
                             <PickerFile disabled={isLodingForm}/>
 
                             {/* CHECKBOX */}
-                            { 
-                                isSupervision && 
-                                <View className="w-full">
-                                    {/* <Text style={{ textAlign:"right", paddingRight: 15 }} variant="bodySmall">si/no</Text> */}
-                                    <CheckBoxForm 
-                                        control={control}
-                                        name="uniforme"
-                                        label="Uso de uniforme"
-                                        disabled={isLodingForm}
-                                    />
-                                    <CheckBoxForm 
-                                        control={control}
-                                        name="buzon"
-                                        label="Buzón cerrado"
-                                        disabled={isLodingForm}
-                                    />
-                                    <CheckBoxForm 
-                                        control={control}
-                                        name="tienda_limpia"
-                                        label="Tienda limpia"
-                                        disabled={isLodingForm}
-                                    />
-                                    <CheckBoxForm
-                                        control={control}
-                                        name="personas"
-                                        label="Cantidad Personas"
-                                        disabled={isLodingForm}
-                                        onChangeExtra={ (value) => onChangeCheckBoxPersonas(value) }
-                                    />
-                                </View> 
-                            }
+                            <ToggleContainerAnimated className="w-full" visible={isSupervision}>
+                                {/* <Text style={{ textAlign:"right", paddingRight: 15 }} variant="bodySmall">si/no</Text> */}
+                                <CheckBoxForm 
+                                    control={control}
+                                    name="uniforme"
+                                    label="Uso de uniforme"
+                                    disabled={isLodingForm}
+                                />
+                                <CheckBoxForm 
+                                    control={control}
+                                    name="buzon"
+                                    label="Buzón cerrado"
+                                    disabled={isLodingForm}
+                                />
+                                <CheckBoxForm 
+                                    control={control}
+                                    name="tienda_limpia"
+                                    label="Tienda limpia"
+                                    disabled={isLodingForm}
+                                />
+                                <CheckBoxForm
+                                    control={control}
+                                    name="personas"
+                                    label="Cantidad Personas"
+                                    disabled={isLodingForm}
+                                    onChangeExtra={ (value) => onChangeCheckBoxPersonas(value) }
+                                />
+                            </ToggleContainerAnimated>
 
                             {/* FORMULARIO CANTIDAD PERSONAS */}
-                            {
-                                isCantidadPersonas &&
-                                <View className="flex flex-col gap-3.5"> 
-                                    <InputFormHook
-                                        control={control}
-                                        name="cantidad_personas"
-                                        errors={errors}
-                                        label="Cantidad"
-                                        maxLength={2}
-                                        placeholder="Ingrese una cantidad"
-                                        inputType="numeric"
-                                        disabled={isLodingForm}
-                                    />
-                                    {/* Picker */}
-                                    <PickerSmallFile 
-                                        disabled={isLodingForm}
-                                        onSelectFile={ (file) => setFotoCantidadPersonas(file) }    
-                                    />
-                                </View>
-                            }
+                            <ToggleContainerAnimated className="flex flex-col gap-3.5" visible={isCantidadPersonas}>
+                                <InputFormHook
+                                    control={control}
+                                    name="cantidad_personas"
+                                    errors={errors}
+                                    label="Cantidad"
+                                    maxLength={2}
+                                    placeholder="Ingrese una cantidad"
+                                    inputType="numeric"
+                                    disabled={isLodingForm}
+                                />
+                                {/* Picker */}
+                                <PickerSmallFile 
+                                    disabled={isLodingForm}
+                                    onSelectFile={ (file) => setFotoCantidadPersonas(file) }    
+                                />
+                            </ToggleContainerAnimated>
 
                             <InputFormHook 
                                 control={control} 

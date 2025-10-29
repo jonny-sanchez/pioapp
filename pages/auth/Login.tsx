@@ -116,12 +116,12 @@ export default function Login() {
         </View>
 
         <View className='w-full mt-3 flex-row justify-center items-center flex-wrap' style={{ gap: 5 }}>
-          <SurfaceTapButton 
+          {/* <SurfaceTapButton 
             icon='gesture-tap-button'
             title='Marcaje'
             onPress={()=>NavigationService.navigate('Marcaje')}
             disabled={loadingLogin}
-          />
+          /> */}
           {/* <SurfaceTapButton 
             icon='fingerprint'
             title='Huella'
