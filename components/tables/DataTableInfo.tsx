@@ -25,7 +25,8 @@ type DataTableInfoProps = {
     pagination?: boolean; 
     configTable?: ConfigFile[];
     groupField?: string;
-    buttons?: React.ReactNode
+    buttons?: React.ReactNode;
+    onPressRow?: (data:any) => void | undefined;
 }
 
 export default function DataTableInfo({
@@ -36,7 +37,8 @@ export default function DataTableInfo({
     onPressFilter = () => {},
     configTable = [],
     groupField = '',
-    buttons
+    buttons,
+    onPressRow
 } : DataTableInfoProps){
 
     const [dataSearch, setDataSearch] = useState<any[]>(data)
@@ -117,6 +119,7 @@ export default function DataTableInfo({
                   from={from}
                   pagination={pagination}
                   to={to}
+                  onPressRow={onPressRow}
                 />
                : 
                <RowsTable 
@@ -125,6 +128,7 @@ export default function DataTableInfo({
                   from={from}
                   to={to}
                   pagination={pagination}
+                  onPressRow={onPressRow}
                 />
               }       
 

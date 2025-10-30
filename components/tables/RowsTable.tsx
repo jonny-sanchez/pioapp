@@ -7,7 +7,8 @@ type RowsTableProps = {
     configTable?: ConfigFile[];
     pagination?:boolean;
     from?:any;
-    to?:any
+    to?:any;
+    onPressRow?: (data:any) => void | undefined;
 }
 
 export default function RowsTable({
@@ -15,14 +16,15 @@ export default function RowsTable({
     configTable = [],
     pagination = false,
     from,
-    to
+    to,
+    onPressRow
 } : RowsTableProps) {
 
     return (
         <>
             {
                 dataSearch.length > 0 ? (pagination ? dataSearch.slice(from, to) : dataSearch).map((item:any, index:any) => (
-                  <DataTable.Row key={index}>
+                  <DataTable.Row onPress={() => onPressRow && onPressRow(item)}  key={index}>
                     {
                       configTable.map(({ data:field, render, numeric }, i)=>(
                         <DataTable.Cell style={{ paddingVertical: 4, paddingHorizontal: 4 }} key={i} numeric={numeric || false}>{ 

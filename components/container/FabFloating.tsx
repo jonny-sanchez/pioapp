@@ -6,19 +6,22 @@ type FabFLoatingProps = {
     onPress?: () => void;
     label?: string;
     visible?: boolean;
+    disabled?: boolean;
 }
 
 export default function FabFloating({
     icon = 'plus',
     onPress = () => {},
     label,
-    visible = true
+    visible = true,
+    disabled = false
 } : FabFLoatingProps){
 
     const theme = useTheme()
 
     return (
         <FAB
+          disabled={disabled}
           icon={icon}
           color={theme.colors.surface}
           label={label}
@@ -26,8 +29,8 @@ export default function FabFloating({
           style={[
             styles.fab,
             {
-                backgroundColor: theme.colors.primary,
-                padding: 5
+              ...(disabled ? {} : { backgroundColor: theme.colors.primary }),
+              padding: 5
             }
           ]}
           onPress={onPress}

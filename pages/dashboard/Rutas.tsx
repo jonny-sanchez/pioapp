@@ -21,6 +21,9 @@ import TiendasRuta from "types/Rutas/TiendasRuta"
 import Option from "types/Dropdown/Option"
 import FabFloating from "components/container/FabFloating"
 import { handleScroll } from "helpers/Scroll/ScrollHelper"
+import { Modalize } from "react-native-modalize"
+import ModalizeDetalleArticulosLayout from "pages/Layouts/Rutas/ModalizeDetalleArticulosLayout"
+import detalleArticulosState from "helpers/states/detalleArticulosState"
 
 export default function Rutas() {
 
@@ -43,6 +46,14 @@ export default function Rutas() {
     const [visibleFab, setVisibleFab] = useState<boolean>(true); 
 
     const offsetY = useRef(0);
+
+    const modalizeRefDetalleArticulos = useRef<Modalize>(null)
+        
+    const onOpenModalizeDetalleArticulos = () => modalizeRefDetalleArticulos.current?.open()
+    
+    // const onCloseModalizeDetalleArticulos = () => modalizeRefDetalleArticulos.current?.close()
+
+    const { setRutaDetalle } = detalleArticulosState()
 
     const { control, handleSubmit, reset, resetField, formState: { errors }, watch } = useForm({
             resolver: yupResolver(schemaListRutasForm),
@@ -115,7 +126,20 @@ export default function Rutas() {
 
     return (
         <>
-            <FabFloating onPress={handlePressFabFilter} icon="filter-remove" label="Limpiar Filtros" visible={visibleFab}/>
+
+            <ModalizeDetalleArticulosLayout
+                modalizeRef={modalizeRefDetalleArticulos}
+            />
+
+            <FabFloating 
+                onPress={handlePressFabFilter} 
+                disabled={
+                    (valueDateFilterRuta || valueUbicacionesRuta) ? false : true
+                } 
+                icon="filter-remove" 
+                label="Limpiar Filtros" 
+                visible={visibleFab}
+            />
 
             <PageLayout titleAppBar="Rutas">
 
@@ -142,6 +166,10 @@ export default function Rutas() {
                                 configTable={configTableRutas}
                                 data={rutas}
                                 groupField="tienda_nombre"
+                                onPressRow={(data:RutasListType) => {
+                                    setRutaDetalle({...data})
+                                    onOpenModalizeDetalleArticulos()
+                                }}
                             />
                         </View>
                     </FormAdaptiveKeyBoard>
