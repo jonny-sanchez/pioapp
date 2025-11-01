@@ -12,6 +12,7 @@ type RutasListType = {
     name_tipo_entrega: string;
     tienda_nombre: string;
     tienda_direccion: string;
+    serie: string;
     codigo_empleado_piloto: number;
 }
 

@@ -5,14 +5,18 @@ import { Text } from "react-native-paper";
 import ButtonForm from "components/form/ButtonForm";
 import Svg, { Rect, Mask } from "react-native-svg";
 import PageLayout from "components/Layouts/PageLayout";
+import scannerQrState from "helpers/states/scannerQrState";
 
 export default function ScannnerQr() {
+
+    const { setValueScannedQr } = scannerQrState() 
 
     const [permission, requestPermission] = useCameraPermissions();
 
     const handleBarcodeScanned = (scanningResult: any) => {
         const { data, type } = scanningResult  
-        console.log(data)
+        // console.log(data)
+        setValueScannedQr(data ? { data } : null)
         NavigationService.goBack()
     }
 

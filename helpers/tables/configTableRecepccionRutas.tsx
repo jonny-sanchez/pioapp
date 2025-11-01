@@ -1,28 +1,35 @@
-import { MercanciaType } from "pages/dashboard/RecepcionRutas"
 import IconButtomForm from "components/form/IconButtomForm"
-import { Text } from "react-native-paper"
+import { MD3Theme, Text } from "react-native-paper"
 import { View } from "react-native"
 import CheckBoxForm from "components/form/CheckBoxForm"
 import ConfigFile from "types/tables/ConfigFile"
+import { ArticuloDetalleType } from "types/RecepccionRutas/DataArticulosRutaType"
 
 const configTableRecepccionRutas = (
     control:any,
-    openModalize?: () => void,
-    setMercancia?: (nwValue:MercanciaType | null) => void
+    theme: MD3Theme,
+    onOpenModalize: () => void,
+    setArticuloRecepccion: (param:ArticuloDetalleType | null) => void
 ) => {
 
     return [
         {
-            data: 'name',
-            name: 'Producto'
+            data: null,
+            name: 'Producto',
+            render: (data:ArticuloDetalleType) => (
+                <View className="w-full flex flex-col items-start">
+                    <Text variant="bodySmall" style={{ color: theme.colors.primary  }}>{data.itemCode}</Text>
+                    <Text variant="bodySmall" numberOfLines={3}>{data.dscription}</Text>
+                </View>
+            )
         },
         {
             data: null,
             name: 'Cantidad',
             numeric: true,
-            render: (data:MercanciaType) => { return (
+            render: (data:ArticuloDetalleType) => { return (
                     <View className="flex flex-row justify-center items-center gap-3">
-                        <Text>{ data.cantidadUpload }</Text>
+                        <Text>{ data.quantity }</Text>
                     </View>
                 ) 
             }
@@ -30,11 +37,13 @@ const configTableRecepccionRutas = (
         {
             data: null,
             // name: '',
-            render: (data:MercanciaType) => {
+            render: (data:ArticuloDetalleType) => {
                 return (
                     <IconButtomForm icon="pencil-outline" onPress={ () => {
-                            setMercancia && setMercancia(data ? { ...data } : null)
-                            openModalize && openModalize()
+                            // setMercancia && setMercancia(data ? { ...data } : null)
+                            // openModalize && openModalize()
+                            setArticuloRecepccion(data ? { ...data } : null)
+                            onOpenModalize()
                         }
                     }/>
                 )
@@ -43,11 +52,11 @@ const configTableRecepccionRutas = (
         {
             data: null,
             name: '',
-            render: (data:MercanciaType) => { return (
+            render: (data:ArticuloDetalleType) => { return (
                     <View className="flex flex-row">
                         <CheckBoxForm 
                             control={control}
-                            name={`${ data.name }`}
+                            name={`${ data.itemCode }`}
                         />
                     </View>
                 ) 

@@ -160,7 +160,7 @@ export default function Rutas() {
                                 loading={loadingTiendasRuta}
                             />
                             <DataTableInfo
-                                search={true}
+                                search={false}
                                 filter={false}
                                 pagination={true}
                                 configTable={configTableRutas}
