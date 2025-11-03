@@ -1,5 +1,5 @@
 import ScrollViewContainer from "components/container/ScrollViewContainer"
-import { View, Alert } from "react-native"
+import { View } from "react-native"
 import { Text, useTheme, IconButton } from "react-native-paper"
 import PageLayout from "components/Layouts/PageLayout"
 import PeriodoType from "types/PeriodoType"
@@ -15,6 +15,7 @@ import alertsState from "helpers/states/alertsState"
 import globalState from "helpers/states/globalState"
 import BoletaCard from "pages/Layouts/Boleta/BoletaCard"
 import BoletaDetailModal from "pages/Layouts/Boleta/BoletaDetailModal"
+import DialogComponent from "components/Modals/DialogComponent"
 import { AppTheme } from "types/ThemeTypes"
 import { locationPermission, getLocation } from "helpers/ubicacion/ubicacionHelper"
 import { getDeviceIPAddress } from "helpers/network/networkHelper"
@@ -30,6 +31,8 @@ export default function Boleta() {
     const [selectedBoleta, setSelectedBoleta] = useState<BoletaType | null>(null)
     const [showDetailModal, setShowDetailModal] = useState(false)
     const [isProcessingSignature, setIsProcessingSignature] = useState(false)
+    const [showFirmaDialog, setShowFirmaDialog] = useState(false)
+    const [pendingPeriodoId, setPendingPeriodoId] = useState<number | null>(null)
 
     const { control, handleSubmit, reset, resetField, watch, formState: { errors } } = useForm({
         // resolver: yupResolver(schemaListRutasForm),
@@ -215,59 +218,8 @@ export default function Boleta() {
                         setBoleta(boletaFinal)
                     } else {
                         setCloseScreenLoading()
-
-                        Alert.alert(
-                            'Boleta no firmada',
-                            '¿Desea firmar su boleta?',
-                            [
-                                {
-                                    text: 'No',
-                                    style: 'cancel',
-                                    onPress: () => {
-                                        openVisibleSnackBar('Operación cancelada', 'warning')
-                                    }
-                                },
-                                {
-                                    text: 'Sí',
-                                    onPress: async () => {
-                                        setOpenScreenLoading()
-                                        setIsProcessingSignature(true)
-
-                                        try {
-                                            openVisibleSnackBar('Iniciando proceso de firma...', 'warning')
-
-                                            const { longitude, latitude, ip } = await capturarDatosDispositivo();
-
-                                            openVisibleSnackBar('Procesando firma...', 'warning')
-                                            const resultFirma = await firmarBoleta(data.periodo, longitude || undefined, latitude || undefined, ip || undefined)
-
-                                            if (resultFirma.status && resultFirma.data) {
-                                                const firmaData = resultFirma.data
-                                                boletaFinal = {
-                                                    ...boletaFinal,
-                                                    firma: {
-                                                        idFirmaBoleta: firmaData.id_firma_boleta_pago,
-                                                        fechaFirma: firmaData.fecha_firma,
-                                                        valido: true
-                                                    }
-                                                }
-
-                                                openVisibleSnackBar('Boleta firmada exitosamente', 'success')
-                                                setBoleta(boletaFinal)
-                                            } else {
-                                                openVisibleSnackBar('Error al firmar la boleta', 'error')
-                                            }
-                                        } catch (error) {
-                                            openVisibleSnackBar('Error en el proceso de firma', 'error')
-                                        } finally {
-                                            setIsProcessingSignature(false)
-                                            setCloseScreenLoading()
-                                        }
-                                    }
-                                }
-                            ],
-                            { cancelable: false }
-                        )
+                        setPendingPeriodoId(data.periodo)
+                        setShowFirmaDialog(true)
                         return
                     }
                 } else {
@@ -297,6 +249,58 @@ export default function Boleta() {
     const handleCloseModal = () => {
         setShowDetailModal(false)
         setSelectedBoleta(null)
+    }
+
+    const handleConfirmFirma = async () => {
+        if (!pendingPeriodoId) return
+
+        setShowFirmaDialog(false)
+        setOpenScreenLoading()
+        setIsProcessingSignature(true)
+
+        try {
+            const resultBoleta = await getBoleta(pendingPeriodoId)
+            
+            if (resultBoleta.status && resultBoleta.data) {
+                let boletaFinal = normalizeBoleta(resultBoleta.data)
+
+                openVisibleSnackBar('Iniciando proceso de firma...', 'warning')
+
+                const { longitude, latitude, ip } = await capturarDatosDispositivo();
+
+                openVisibleSnackBar('Procesando firma...', 'warning')
+                const resultFirma = await firmarBoleta(pendingPeriodoId, longitude || undefined, latitude || undefined, ip || undefined)
+
+                if (resultFirma.status && resultFirma.data) {
+                    const firmaData = resultFirma.data
+                    boletaFinal = {
+                        ...boletaFinal,
+                        firma: {
+                            idFirmaBoleta: firmaData.id_firma_boleta_pago,
+                            fechaFirma: firmaData.fecha_firma,
+                            valido: true
+                        }
+                    }
+
+                    openVisibleSnackBar('Boleta firmada exitosamente', 'success')
+                    setBoleta(boletaFinal)
+                } else {
+                    openVisibleSnackBar('Error al firmar la boleta', 'error')
+                }
+            }
+        } catch (error) {
+            openVisibleSnackBar('Error en el proceso de firma', 'error')
+        } finally {
+            setIsProcessingSignature(false)
+            setCloseScreenLoading()
+            setPendingPeriodoId(null)
+        }
+    }
+
+    const handleCancelFirma = () => {
+        setShowFirmaDialog(false)
+        setPendingPeriodoId(null)
+        openVisibleSnackBar('Operación cancelada', 'warning')
     }
 
     useEffect(() => {
@@ -356,6 +360,21 @@ export default function Boleta() {
                     visible={showDetailModal}
                     boleta={selectedBoleta}
                     onDismiss={handleCloseModal}
+                />
+
+                {/* Dialog de confirmación de firma */}
+                <DialogComponent
+                    visible={showFirmaDialog}
+                    title="Boleta no firmada"
+                    content="¿Desea firmar su boleta? Se capturarán datos de ubicación y dispositivo para completar el proceso."
+                    type="warning"
+                    icon="file-sign"
+                    acceptText="Sí, firmar"
+                    cancelText="No"
+                    acceptIcon="check"
+                    cancelIcon="close"
+                    onAccept={handleConfirmFirma}
+                    onCancel={handleCancelFirma}
                 />
             </PageLayout>
         </>
