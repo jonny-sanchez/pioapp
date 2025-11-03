@@ -4,22 +4,33 @@ import { FAB, useTheme } from 'react-native-paper';
 type FabFLoatingProps = {
     icon?: string; 
     onPress?: () => void;
+    label?: string;
+    visible?: boolean;
+    disabled?: boolean;
 }
 
 export default function FabFloating({
     icon = 'plus',
-    onPress = () => {}
+    onPress = () => {},
+    label,
+    visible = true,
+    disabled = false
 } : FabFLoatingProps){
 
     const theme = useTheme()
 
     return (
         <FAB
+          disabled={disabled}
           icon={icon}
+          color={theme.colors.surface}
+          label={label}
+          visible={visible}
           style={[
             styles.fab,
             {
-                backgroundColor: theme.colors.secondaryContainer
+              ...(disabled ? {} : { backgroundColor: theme.colors.primary }),
+              padding: 5
             }
           ]}
           onPress={onPress}
@@ -30,7 +41,7 @@ export default function FabFloating({
 const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
-    margin: 16,
+    margin: 25,
     right: 0,
     bottom: 0,
     zIndex: 10

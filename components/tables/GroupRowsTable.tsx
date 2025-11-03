@@ -1,7 +1,8 @@
 import { DataTable } from "react-native-paper"
 import React from "react"
 import TableHeader from "./TableHeader"
-import { ConfigFile } from "./DataTableInfo"
+// import { ConfigFile } from "./DataTableInfo"
+import ConfigFile from "types/tables/ConfigFile"
 
 type GroupRowsTableProps = {
     pagination?: boolean;
@@ -9,6 +10,7 @@ type GroupRowsTableProps = {
     from?:any;
     to?:any;
     configTable?: ConfigFile[];
+    onPressRow?: (data:any) => void | undefined;
 }
 
 export default function GroupRowsTable({
@@ -16,7 +18,8 @@ export default function GroupRowsTable({
     entriesGroupedData = [],
     from,
     to,
-    configTable = []
+    configTable = [],
+    onPressRow
 } : GroupRowsTableProps){
 
     return (
@@ -31,10 +34,10 @@ export default function GroupRowsTable({
                   <TableHeader configTable={configTable}/>
                   {
                     items.map((el, index) => (
-                      <DataTable.Row key={index}>
+                      <DataTable.Row onPress={() => onPressRow && onPressRow(el)} key={index}>
                         {
-                          configTable.map(({ data:field, render }, i)=>(
-                            <DataTable.Cell style={{ paddingVertical: 4, paddingHorizontal: 4 }} key={i} numeric={false}>{ 
+                          configTable.map(({ data:field, render, numeric }, i)=>(
+                            <DataTable.Cell style={{ paddingVertical: 4, paddingHorizontal: 4 }} key={i} numeric={numeric || false}>{ 
                               render ? 
                                 render(
                                   (field || '') ? 

@@ -29,7 +29,7 @@ export default function ModalizeComponent({
             <Modalize 
                 handlePosition='inside'
                 ref={modalizeRef}
-                modalHeight={height * 0.60}
+                modalHeight={height * 0.80}
                 modalStyle={{ backgroundColor: theme.colors.background }}
                 handleStyle={{ backgroundColor: theme.colors.outline }}
                 scrollViewProps={{ 

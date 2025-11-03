@@ -2,11 +2,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { useTheme, HelperText } from 'react-native-paper'
 import { Controller } from 'react-hook-form'
 import { View } from 'react-native'
-
-interface Option {
-    label: string;
-    value: any; 
-}
+import Option from 'types/Dropdown/Option';
 
 type DropdownFormProps = {
     label?: string;
@@ -17,6 +13,8 @@ type DropdownFormProps = {
     errors?: any;
     disable?: boolean;
     onChangeExtra?: (item: any) => void;
+    onFocus?: (() => void) | undefined;
+    loading?: boolean;
 }
 
 export default function DropdownForm({
@@ -27,7 +25,9 @@ export default function DropdownForm({
     name,
     errors = {},
     disable = false,
-    onChangeExtra
+    onChangeExtra,
+    onFocus,
+    loading
 } : DropdownFormProps){
     
     const theme = useTheme()
@@ -43,7 +43,8 @@ export default function DropdownForm({
                     <Dropdown 
                         disable={disable}
                         mode='modal'
-                        data={data}
+                        // data={data}
+                        data={loading ? [ { value: '', label: '...Cargando' } ] : data}
                         value={value ?? ""}
                         valueField='value'
                         placeholder={label}
@@ -56,6 +57,7 @@ export default function DropdownForm({
                             if(onChangeExtra) onChangeExtra(item)
                         }}
                         onBlur={onBlur}
+                        onFocus={onFocus}
                         // onChange={item => setValue(item?.value || "")}
                         containerStyle={{ backgroundColor: theme.colors.background }}
                         // itemContainerStyle={{ backgroundColor: theme.colors.surfaceVariant }}

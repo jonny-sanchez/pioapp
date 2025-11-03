@@ -2,27 +2,34 @@ import ScrollViewContainer from "components/container/ScrollViewContainer";
 import PageLayout from "components/Layouts/PageLayout";
 import { View } from 'react-native'
 import { useForm } from "react-hook-form";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DataTableInfo from "components/tables/DataTableInfo";
 import { Text, useTheme } from "react-native-paper";
 import ButtonForm from "components/form/ButtonForm";
-import IconButtomForm from "components/form/IconButtomForm";
 import ContainerScannerQr from "pages/Layouts/RecepccionRuta/ContainerScannerQr";
-import CheckBoxForm from "components/form/CheckBoxForm";
 import { Modalize } from "react-native-modalize";
 import ModalizeProductCantidad from "pages/Layouts/RecepccionRuta/ModalizeProductCantidad";
 import configTableRecepccionRutas from "helpers/tables/configTableRecepccionRutas";
-
-export type MercanciaType = {
-    id?: number;
-    name?: string;
-    cantidad?: number;
-    cantidadUpload?: number;
-}
+import scannerQrState from "helpers/states/scannerQrState";
+import { generateJsonError, ResponseService } from "types/RequestType";
+import alertsState from "helpers/states/alertsState";
+import { AJAX, URLPIOAPP } from "helpers/http/ajax";
+import DataArticulosRutaType, { ArticuloDetalleType } from "types/RecepccionRutas/DataArticulosRutaType";
+import QrRecepccionObjectType from "types/RecepccionRutas/QrRecepccionObjectType";
+import globalState from "helpers/states/globalState";
+import recepccionRutaState from "helpers/states/recepccionRutaState";
 
 export default function RecepcionRutas() {
 
     const theme = useTheme()
+
+    const { valueScannedQr, clearValueScannedQr } = scannerQrState()
+
+    const { openVisibleSnackBar } = alertsState()
+
+    const { setOpenScreenLoading, setCloseScreenLoading } = globalState()
+
+    const { setArticuloRecepccion } = recepccionRutaState()
 
     const modalizeRef = useRef<Modalize>(null)
     
@@ -35,48 +42,73 @@ export default function RecepcionRutas() {
         mode: 'all'
     })
 
-    const [ editMercancia, setEditMercancia ] = useState<MercanciaType | null>(null)
+    const [articulosRecepccion, setArticulosRecepccion] = useState<DataArticulosRutaType | null>(null) 
 
-    const [mercancia, setMercancia] = useState<MercanciaType[]>([
-        { id: 1, name: 'Pesquezo', cantidad: 34, cantidadUpload: 34 },
-        { id: 2, name: 'Pollo crudo', cantidad: 67, cantidadUpload: 67 },
-        { id: 3, name: 'Alitas', cantidad: 2, cantidadUpload: 2 },
-    ])
+    const getMercanciaRuta = async(json:QrRecepccionObjectType):Promise<ResponseService<DataArticulosRutaType>> => {
+        try {
+            const result:ResponseService<DataArticulosRutaType> = await AJAX(`${ URLPIOAPP }/articulos/ruta/list/POS?serie=${json?.serie || ''}&docNum=${json?.id_pedido || ''}`)
+            return result
+        } catch (error) {
+            openVisibleSnackBar(`${error}`, "error")
+            return generateJsonError(`${error}`, 'object')
+        }
+    }
+
+    const handleValueScannerRuta = async():Promise<any> => {
+        if(!(valueScannedQr?.data || null)) return
+
+        setOpenScreenLoading()
+
+        const JsonValueQr:QrRecepccionObjectType = JSON.parse(valueScannedQr.data)
+        
+        const resultMercanciaRuta = await getMercanciaRuta(JsonValueQr) 
+
+        setArticulosRecepccion({...resultMercanciaRuta.data, tienda_nombre: JsonValueQr.nombre_tienda} as DataArticulosRutaType)
+
+        setCloseScreenLoading()
+
+        clearValueScannedQr()
+    }
+
+    useEffect(() => { handleValueScannerRuta() }, [valueScannedQr])
 
     return (
         <>
             <ModalizeProductCantidad 
                 modalizeRef={modalizeRef} 
                 closeModalize={onCloseModalizeUpdate}
-                mercancia={editMercancia}
             />
 
             <PageLayout titleAppBar="Recepccion">
                 <ScrollViewContainer>
                     <View className="flex-1 my-5 flex-col gap-10">
 
-                        <ContainerScannerQr disabled={false}/>
+                        <ContainerScannerQr listadoArticulosRuta={articulosRecepccion} disabled={false}/>
 
                         <View className="w-full">
                             <DataTableInfo
-                                data={mercancia}
+                                data={articulosRecepccion?.detalle || []}
                                 pagination={false}
                                 search={false}
                                 filter={false}
                                 configTable={
                                     configTableRecepccionRutas(
-                                        control, 
+                                        control,
+                                        theme,
                                         onOpenModalizeUpdate,
-                                        setEditMercancia
+                                        setArticuloRecepccion
                                     )
                                 }
+                                // onPressRow={(data:ArticuloDetalleType) => {
+                                //     console.log(data)
+                                // }}
                             />
                         </View>
 
                         <View className="w-full">
                             <ButtonForm 
                                 label="Recepccionar" 
-                                disabled={true} 
+                                disabled={!((articulosRecepccion?.detalle || []).length > 0)} 
                                 buttonColor={theme.colors.error}
                             />
                         </View>
