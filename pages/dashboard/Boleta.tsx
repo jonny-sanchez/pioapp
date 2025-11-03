@@ -1,21 +1,362 @@
 import ScrollViewContainer from "components/container/ScrollViewContainer"
-import { View } from "react-native"
-import DataTableInfo from "components/tables/DataTableInfo"
+import { View, Alert } from "react-native"
+import { Text, useTheme, IconButton } from "react-native-paper"
 import PageLayout from "components/Layouts/PageLayout"
+import PeriodoType from "types/PeriodoType"
+import BoletaType from "types/BoletaType"
+import { useState, useEffect } from "react"
+import FormAdaptiveKeyBoard from "components/container/FormAdaptiveKeyBoard"
+import DropdownForm from "components/form/DropdownForm"
+import { useForm } from "react-hook-form"
+import ButtonForm from "components/form/ButtonForm"
+import { AJAX, URLPIOAPP } from "helpers/http/ajax"
+import { ResponseService, generateJsonError } from "types/RequestType"
+import alertsState from "helpers/states/alertsState"
+import globalState from "helpers/states/globalState"
+import BoletaCard from "pages/Layouts/Boleta/BoletaCard"
+import BoletaDetailModal from "pages/Layouts/Boleta/BoletaDetailModal"
+import { AppTheme } from "types/ThemeTypes"
+import { locationPermission, getLocation } from "helpers/ubicacion/ubicacionHelper"
+import { getDeviceIPAddress } from "helpers/network/networkHelper"
 
-export default function Boleta(){
+export default function Boleta() {
+
+    const theme = useTheme() as AppTheme;
+    const { openVisibleSnackBar } = alertsState()
+    const { setOpenScreenLoading, setCloseScreenLoading } = globalState()
+
+    const [periodo, setPeriodo] = useState<PeriodoType[]>([])
+    const [boleta, setBoleta] = useState<BoletaType | null>(null)
+    const [selectedBoleta, setSelectedBoleta] = useState<BoletaType | null>(null)
+    const [showDetailModal, setShowDetailModal] = useState(false)
+    const [isProcessingSignature, setIsProcessingSignature] = useState(false)
+
+    const { control, handleSubmit, reset, resetField, watch, formState: { errors } } = useForm({
+        // resolver: yupResolver(schemaListRutasForm),
+        mode: 'all'
+    })
+
+    const selectedPeriodo = watch('periodo')
+
+    const normalizeBoleta = (boleta: BoletaType): BoletaType => {
+        return {
+            ...boleta,
+            numeroBoleta: boleta.numeroBoleta || 0,
+            empleado: {
+                codigo: boleta.empleado?.codigo || '',
+                nombre: boleta.empleado?.nombre || ''
+            },
+            periodo: boleta.periodo || {},
+            diasTrabajados: boleta.diasTrabajados || 0,
+            ingresos: {
+                salarioOrdinario: boleta.ingresos?.salarioOrdinario || 0,
+                horasSimples: boleta.ingresos?.horasSimples || 0,
+                horasDobles: boleta.ingresos?.horasDobles || 0,
+                bonificacion: boleta.ingresos?.bonificacion || 0,
+                otrosIngresos: boleta.ingresos?.otrosIngresos || 0,
+                totalIngresos: boleta.ingresos?.totalIngresos || 0
+            },
+            descuentos: {
+                igss: boleta.descuentos?.igss || 0,
+                isr: boleta.descuentos?.isr || 0,
+                ahorro: boleta.descuentos?.ahorro || 0,
+                seguro: boleta.descuentos?.seguro || 0,
+                otrosDescuentos: boleta.descuentos?.otrosDescuentos || 0,
+                totalDescuentos: boleta.descuentos?.totalDescuentos || 0
+            },
+            neto: boleta.neto || 0,
+            liquido: boleta.liquido || 0,
+            firma: {
+                idFirmaBoleta: boleta.firma?.idFirmaBoleta || '',
+                fechaFirma: boleta.firma?.fechaFirma || '',
+                valido: boleta.firma?.valido || false
+            }
+        }
+    }
+
+    // Tipos para la respuesta de verificación de firma
+    interface FirmaExistente {
+        id_firma_boleta_pago: string;
+        fecha_firma: string;
+        valido: boolean;
+    }
+
+    interface VerificacionFirmaResponse {
+        existe: boolean;
+        firma?: FirmaExistente;
+    }
+
+    // Tipo para la respuesta de firma exitosa
+    interface FirmaExitosaResponse {
+        id_firma_boleta_pago: string;
+        id_firma_boleta_pdv: number;
+        empleado: string;
+        periodo: string;
+        monto_liquido: number;
+        fecha_firma: string;
+        hash_boleta_firmada: string;
+        firma_uuid: string;
+    }
+
+    const getPeriodos = async (): Promise<ResponseService<PeriodoType[]>> => {
+        try {
+            const result: ResponseService<PeriodoType[]> = await AJAX(`${URLPIOAPP}/nomina/periodos/ultimos-pagados`, 'GET')
+            return result
+        } catch (error: any) {
+            openVisibleSnackBar(`${error}`, 'error')
+            return generateJsonError(`${error}`, 'array')
+        }
+    }
+
+    const verificarFirmaBoleta = async (periodoId: number): Promise<ResponseService<VerificacionFirmaResponse>> => {
+        try {
+            const result: ResponseService<VerificacionFirmaResponse> = await AJAX(`${URLPIOAPP}/nomina/firma-boleta/existe?id_periodo=${periodoId}`, 'GET')
+            return result
+        } catch (error: any) {
+            openVisibleSnackBar(`Error al verificar firma: ${error}`, 'error')
+            return generateJsonError(`${error}`, 'object')
+        }
+    }
+
+    const getBoleta = async (periodoId: number): Promise<ResponseService<BoletaType>> => {
+        try {
+            const result: ResponseService<BoletaType> = await AJAX(`${URLPIOAPP}/nomina/boleta/detalle-completo?id_periodo=${periodoId}`, 'GET')
+            return result
+        } catch (error: any) {
+            openVisibleSnackBar(`Error al obtener la boleta: ${error}`, 'error')
+            return generateJsonError(`${error}`, 'object')
+        }
+    }
+
+    // Función para capturar datos de geolocalización e IP
+    const capturarDatosDispositivo = async (): Promise<{ longitude: number | null, latitude: number | null, ip: string | null }> => {
+        let longitude: number | null = null;
+        let latitude: number | null = null;
+        let ip: string | null = null;
+
+        try {
+            openVisibleSnackBar('Obteniendo datos de ubicación...', 'warning');
+
+            const hasPermission = await locationPermission();
+            if (hasPermission) {
+                const location = await getLocation();
+                if (location) {
+                    longitude = location.coords.longitude;
+                    latitude = location.coords.latitude;
+                }
+            }
+
+            // Capturar IP del dispositivo
+            ip = await getDeviceIPAddress();
+
+            openVisibleSnackBar('Datos de dispositivo capturados', 'success');
+
+        } catch (error) {
+            openVisibleSnackBar('Error capturando datos del dispositivo', 'error');
+        }
+
+        return { longitude, latitude, ip };
+    };
+
+    const firmarBoleta = async (periodoId: number, gpsLongitude?: number, gpsLatitude?: number, ipDispositivo?: string): Promise<ResponseService<FirmaExitosaResponse>> => {
+        try {
+            const requestBody = {
+                id_periodo: periodoId,
+                phone_gps_longitude: gpsLongitude || null,
+                phone_gps_latitude: gpsLatitude || null,
+                ip_dispositivo: ipDispositivo || null
+            };
+
+            const result: ResponseService<FirmaExitosaResponse> = await AJAX(`${URLPIOAPP}/nomina/firma-boleta/firmar`, 'POST', requestBody)
+            return result
+        } catch (error: any) {
+            openVisibleSnackBar(`Error al firmar la boleta: ${error}`, 'error')
+            return generateJsonError(`${error}`, 'object')
+        }
+    }
+
+    const loadPeriodos = async () => {
+        setOpenScreenLoading()
+        const resultPeriodos = await getPeriodos()
+        if (resultPeriodos.status && resultPeriodos.data) {
+            setPeriodo(resultPeriodos.data)
+        }
+        setCloseScreenLoading()
+    }
+
+    const onSubmit = async (data: any) => {
+        if (!data.periodo) {
+            openVisibleSnackBar('Debe seleccionar un período', 'error')
+            return
+        }
+
+        setOpenScreenLoading()
+
+        try {
+            const resultBoleta = await getBoleta(data.periodo)
+
+            if (resultBoleta.status && resultBoleta.data) {
+                let boletaFinal = normalizeBoleta(resultBoleta.data)
+                const resultVerificacion = await verificarFirmaBoleta(data.periodo)
+
+                if (resultVerificacion.status && resultVerificacion.data) {
+                    const { existe, firma } = resultVerificacion.data
+
+                    if (existe && firma) {
+                        boletaFinal = {
+                            ...boletaFinal,
+                            firma: {
+                                idFirmaBoleta: firma.id_firma_boleta_pago,
+                                fechaFirma: firma.fecha_firma,
+                                valido: firma.valido
+                            }
+                        }
+                        openVisibleSnackBar('Boleta cargada correctamente', 'success')
+                        setBoleta(boletaFinal)
+                    } else {
+                        setCloseScreenLoading()
+
+                        Alert.alert(
+                            'Boleta no firmada',
+                            '¿Desea firmar su boleta?',
+                            [
+                                {
+                                    text: 'No',
+                                    style: 'cancel',
+                                    onPress: () => {
+                                        openVisibleSnackBar('Operación cancelada', 'warning')
+                                    }
+                                },
+                                {
+                                    text: 'Sí',
+                                    onPress: async () => {
+                                        setOpenScreenLoading()
+                                        setIsProcessingSignature(true)
+
+                                        try {
+                                            openVisibleSnackBar('Iniciando proceso de firma...', 'warning')
+
+                                            const { longitude, latitude, ip } = await capturarDatosDispositivo();
+
+                                            openVisibleSnackBar('Procesando firma...', 'warning')
+                                            const resultFirma = await firmarBoleta(data.periodo, longitude || undefined, latitude || undefined, ip || undefined)
+
+                                            if (resultFirma.status && resultFirma.data) {
+                                                const firmaData = resultFirma.data
+                                                boletaFinal = {
+                                                    ...boletaFinal,
+                                                    firma: {
+                                                        idFirmaBoleta: firmaData.id_firma_boleta_pago,
+                                                        fechaFirma: firmaData.fecha_firma,
+                                                        valido: true
+                                                    }
+                                                }
+
+                                                openVisibleSnackBar('Boleta firmada exitosamente', 'success')
+                                                setBoleta(boletaFinal)
+                                            } else {
+                                                openVisibleSnackBar('Error al firmar la boleta', 'error')
+                                            }
+                                        } catch (error) {
+                                            openVisibleSnackBar('Error en el proceso de firma', 'error')
+                                        } finally {
+                                            setIsProcessingSignature(false)
+                                            setCloseScreenLoading()
+                                        }
+                                    }
+                                }
+                            ],
+                            { cancelable: false }
+                        )
+                        return
+                    }
+                } else {
+                    openVisibleSnackBar('Error al verificar el estado de la boleta', 'error')
+                    return
+                }
+            } else {
+                openVisibleSnackBar('No se encontró boleta para el período seleccionado', 'error')
+            }
+        } catch (error) {
+            openVisibleSnackBar('Error al procesar la boleta', 'error')
+        }
+
+        setCloseScreenLoading()
+    }
+
+    const handleVerBoleta = (boleta: BoletaType) => {
+        setSelectedBoleta(boleta)
+        setShowDetailModal(true)
+    }
+
+    const handleVerDetalle = (boleta: BoletaType) => {
+        setSelectedBoleta(boleta)
+        setShowDetailModal(true)
+    }
+
+    const handleCloseModal = () => {
+        setShowDetailModal(false)
+        setSelectedBoleta(null)
+    }
+
+    useEffect(() => {
+        loadPeriodos()
+    }, [])
 
     return (
         <>
             <PageLayout titleAppBar="Boleta">
-                <ScrollViewContainer paddingHorizontal={0}>
+                <ScrollViewContainer>
                     <View className="w-full mt-6">
-                        <DataTableInfo
-                            pagination={true}
-                            filter={true} 
-                        />
+                        {/* Formulario de selección de período */}
+                        <FormAdaptiveKeyBoard>
+                            <View className="w-full flex-col gap-3.5 my-5">
+                                <DropdownForm
+                                    control={control}
+                                    name="periodo"
+                                    label="Periodos"
+                                    data={periodo.map((item) => ({
+                                        label: item.nombrePeriodo,
+                                        value: item.idPeriodo
+                                    }))}
+                                />
+                                <ButtonForm
+                                    label="Consultar boleta"
+                                    icon="file-search-outline"
+                                    disabled={!selectedPeriodo}
+                                    onPress={handleSubmit(onSubmit)}
+                                />
+                            </View>
+                        </FormAdaptiveKeyBoard>
+
+                        {/* Boleta encontrada */}
+                        {boleta ? (
+                            <View>
+                                <BoletaCard
+                                    boleta={boleta}
+                                    onVerBoleta={handleVerBoleta}
+                                    onVerDetalle={handleVerDetalle}
+                                />
+                            </View>
+                        ) : selectedPeriodo && !isProcessingSignature ? (
+                            <View className="px-4">
+                                <Text
+                                    className="text-center"
+                                    style={{ color: theme.colors.onSurfaceVariant }}
+                                >
+                                    Presione "Consultar boleta" para ver la boleta del período seleccionado.
+                                </Text>
+                            </View>
+                        ) : null}
                     </View>
                 </ScrollViewContainer>
+
+                {/* Modal de detalle */}
+                <BoletaDetailModal
+                    visible={showDetailModal}
+                    boleta={selectedBoleta}
+                    onDismiss={handleCloseModal}
+                />
             </PageLayout>
         </>
     )
