@@ -79,7 +79,7 @@ export default function RecepcionRutas() {
                 closeModalize={onCloseModalizeUpdate}
             />
 
-            <PageLayout titleAppBar="Recepccion">
+            <PageLayout titleAppBar="Recepccion"> 
                 <ScrollViewContainer>
                     <View className="flex-1 my-5 flex-col gap-10">
 
