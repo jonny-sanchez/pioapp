@@ -6,7 +6,7 @@ import ButtonForm from "components/form/ButtonForm"
 import FormAdaptiveKeyBoard from "components/container/FormAdaptiveKeyBoard"
 import { useKeyboardVisible } from "helpers/keyboard/keyboardHelper"
 import { useEffect, useState } from "react"
-import schemaModalizeEditMercanciaForm from "helpers/validatesForm/schemaModalizeEditMercanciaForm"
+import schemaModalizeEditMercanciaForm, { schemaModalizeEditMercanciaFormType } from "helpers/validatesForm/schemaModalizeEditMercanciaForm"
 import { yupResolver } from "@hookform/resolvers/yup"
 import recepccionRutaState from "helpers/states/recepccionRutaState"
 
@@ -24,7 +24,7 @@ export default function ModalizeProductCantidad({
 
     const [ disabledBtn, setDisabledBtn ] = useState<boolean>(true) 
 
-    const { articuloRecepccion } = recepccionRutaState()
+    const { articuloRecepccion, setArticuloRecepccion } = recepccionRutaState()
 
     // const keyboardVisible = useKeyboardVisible()
 
@@ -35,9 +35,15 @@ export default function ModalizeProductCantidad({
 
     const valueCantidadWatch = watch('cantidad_update')
 
-    const submitFormUpdateCantidad = async() => {
+    const clearFormUpdateCantidad = ():any => {
         closeModalize && closeModalize()
         reset()
+    }
+
+    const submitFormUpdateCantidad = async(data:schemaModalizeEditMercanciaFormType) => {
+        console.log(data)
+        console.log(articuloRecepccion)
+        clearFormUpdateCantidad()
     }
 
     useEffect(()=>{

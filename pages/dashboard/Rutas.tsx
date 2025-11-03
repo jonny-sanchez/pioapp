@@ -24,8 +24,12 @@ import { handleScroll } from "helpers/Scroll/ScrollHelper"
 import { Modalize } from "react-native-modalize"
 import ModalizeDetalleArticulosLayout from "pages/Layouts/Rutas/ModalizeDetalleArticulosLayout"
 import detalleArticulosState from "helpers/states/detalleArticulosState"
+import { AppTheme } from "types/ThemeTypes"
+import { useTheme } from "react-native-paper"
 
 export default function Rutas() {
+
+    const theme:AppTheme = useTheme() as AppTheme
 
     const { openVisibleSnackBar } = alertsState()
 
@@ -163,7 +167,7 @@ export default function Rutas() {
                                 search={false}
                                 filter={false}
                                 pagination={true}
-                                configTable={configTableRutas}
+                                configTable={configTableRutas(theme)}
                                 data={rutas}
                                 groupField="tienda_nombre"
                                 onPressRow={(data:RutasListType) => {

@@ -14,6 +14,7 @@ type RutasListType = {
     tienda_direccion: string;
     serie: string;
     codigo_empleado_piloto: number;
+    recepccionada?: number;
 }
 
 export default RutasListType

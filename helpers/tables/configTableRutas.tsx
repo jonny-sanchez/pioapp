@@ -1,11 +1,14 @@
-import ButtonForm from "components/form/ButtonForm"
 import { NavigationService } from "helpers/navigator/navigationScreens"
-import ChipDecoration from "components/decoration/ChipDecoration"
 import { View } from 'react-native'
 import IconButtomForm from "components/form/IconButtomForm"
 import RutasListType from "types/Rutas/RutasListType"
+import ConfigFile from "types/tables/ConfigFile"
+import AvatarIcon from "components/Avatars/AvatarIcon"
+import { AppTheme } from "types/ThemeTypes"
 
-const configTableRutas = [
+const configTableRutas = (
+    theme: AppTheme
+) => [
     // {
     //     data: 'status_ruta',
     //     name: 'Estado',
@@ -19,10 +22,17 @@ const configTableRutas = [
         data: 'id_pedido',
         name: 'Ticket',
     },
-    // {
-    //     data: 'cantidad',
-    //     name: 'Cantidad',
-    // },
+    {
+        data: null,
+        name: 'Estado',
+        render: (data:RutasListType) => (
+            <AvatarIcon 
+                icon={data.recepccionada != 0 ? 'truck-check' : 'truck-delivery'} 
+                style={{ backgroundColor: data.recepccionada != 0 ? theme.colors.success : theme.colors.warning }}
+                size={30}
+            />
+        )
+    },
     {
         data: null,
         name: 'Acciones',
@@ -36,6 +46,6 @@ const configTableRutas = [
             </View>
         )
     }
-]
+] as ConfigFile[]
 
 export default configTableRutas
