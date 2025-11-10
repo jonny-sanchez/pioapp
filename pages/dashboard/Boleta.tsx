@@ -138,8 +138,6 @@ export default function Boleta() {
         let ip: string | null = null;
 
         try {
-            openVisibleSnackBar('Obteniendo datos de ubicación...', 'warning');
-
             const hasPermission = await locationPermission();
             if (hasPermission) {
                 const location = await getLocation();
@@ -151,9 +149,6 @@ export default function Boleta() {
 
             // Capturar IP del dispositivo
             ip = await getDeviceIPAddress();
-
-            openVisibleSnackBar('Datos de dispositivo capturados', 'success');
-
         } catch (error) {
             openVisibleSnackBar('Error capturando datos del dispositivo', 'error');
         }
@@ -261,6 +256,7 @@ export default function Boleta() {
         try {
             const resultBoleta = await getBoleta(pendingPeriodoId)
             
+
             if (resultBoleta.status && resultBoleta.data) {
                 let boletaFinal = normalizeBoleta(resultBoleta.data)
 
@@ -314,11 +310,17 @@ export default function Boleta() {
                     <View className="w-full mt-6">
                         {/* Formulario de selección de período */}
                         <FormAdaptiveKeyBoard>
-                            <View className="w-full flex-col gap-3.5 my-5">
+                            <View className="w-full flex-col gap-3.5 mb-5">
+                                <Text style={{
+                                    color: theme.colors.onSurface,
+                                    fontSize: 14
+                                }}>
+                                    Consultar por quincena
+                                </Text>
                                 <DropdownForm
                                     control={control}
                                     name="periodo"
-                                    label="Periodos"
+                                    label="Quincena"
                                     data={periodo.map((item) => ({
                                         label: item.nombrePeriodo,
                                         value: item.idPeriodo
@@ -345,7 +347,6 @@ export default function Boleta() {
                         ) : selectedPeriodo && !isProcessingSignature ? (
                             <View className="px-4">
                                 <Text
-                                    className="text-center"
                                     style={{ color: theme.colors.onSurfaceVariant }}
                                 >
                                     Presione "Consultar boleta" para ver la boleta del período seleccionado.
@@ -366,7 +367,7 @@ export default function Boleta() {
                 <DialogComponent
                     visible={showFirmaDialog}
                     title="Boleta no firmada"
-                    content="¿Desea firmar su boleta? Se capturarán datos de ubicación y dispositivo para completar el proceso."
+                    content="¿Desea firmar su boleta? Para poder visualizar los detalles, es necesario firmarla."
                     type="warning"
                     icon="file-sign"
                     acceptText="Sí, firmar"
