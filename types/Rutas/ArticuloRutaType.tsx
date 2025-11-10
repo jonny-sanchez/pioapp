@@ -4,7 +4,8 @@ type ArticuloRutaType = {
     codigo_articulo: string,
     nombre_articulo: string,
     description: string,
-    cantidad: number
+    cantidad: number;
+    serie?: string;
 }
 
 export default ArticuloRutaType

@@ -7,7 +7,9 @@ export default function ListItemComponent({
     description = '',
     iconLeft,
     styleList,
-    rightElements
+    rightElements,
+    titleStyle,
+    descriptionStyle
 } : ListItemComponentType) {
 
     return (
@@ -15,7 +17,9 @@ export default function ListItemComponent({
             <List.Item
               title={title}
               style={styleList}
+              titleStyle={[ titleStyle ]}
               description={description}
+              descriptionStyle={[ descriptionStyle ]}
               left={props => (iconLeft && <List.Icon {...props} icon={iconLeft}/>)}
               right={props => (
                 <>

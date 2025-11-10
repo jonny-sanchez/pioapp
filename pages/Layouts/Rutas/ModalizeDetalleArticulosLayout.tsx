@@ -1,3 +1,4 @@
+import CardTitle from "components/Cards/CardTitle";
 import ScrollViewContainer from "components/container/ScrollViewContainer";
 import ListItemComponent from "components/List/ListItemComponent";
 import ModalizeComponent from "components/Modals/ModalizeComponent";
@@ -27,10 +28,10 @@ export default function ModalizeDetalleArticulosLayout({
 
     const [totalCantidadArticulos, setTotalCantidadArticulos] = useState<number>(0)
 
-    const getArticulos = async (id_pedido: number | null):Promise<ResponseService<ArticuloRutaType[]>> => {
+    const getArticulos = async (id_pedido: number | null, serie:string|null):Promise<ResponseService<ArticuloRutaType[]>> => {
         try {
-            if(!id_pedido) return generateJsonError(`No id pedido.`, 'array')
-            const result:ResponseService<ArticuloRutaType[]> = await AJAX(`${ URLPIOAPP }/articulos/ruta/list?id_pedido=${ id_pedido }`)
+            if(!id_pedido || !serie) return generateJsonError(`id Pedido o Serie no enviada`, 'array')
+            const result:ResponseService<ArticuloRutaType[]> = await AJAX(`${ URLPIOAPP }/articulos/ruta/list?id_pedido=${ id_pedido }&serie=${serie}`)
             return result
         } catch (error) {
             openVisibleSnackBar(`${error}`, 'error')
@@ -46,8 +47,9 @@ export default function ModalizeDetalleArticulosLayout({
 
     const renderItemsArticulos = async() => {
         const id_pedido:number|null = rutaDetalle?.id_pedido || null
+        const serie:string|null = rutaDetalle?.serie || null
         setLoadingSkeletetonArticulos(true)
-        const resultArticulos = await getArticulos(id_pedido)
+        const resultArticulos = await getArticulos(id_pedido, serie)
         setArticulosRuta(resultArticulos.data as ArticuloRutaType[])
         setLoadingSkeletetonArticulos(false)
     }
@@ -78,13 +80,14 @@ export default function ModalizeDetalleArticulosLayout({
                         loadingSkeletetonArticulos ?
                         <ListArticulosDetalleSkeleton/> :
                         <View>
+                            <CardTitle icon="truck" title={`${rutaDetalle?.serie}`} subtitle={`${rutaDetalle?.id_pedido}`} style={{ width: '100%' }}/>
                             { 
                                 articulosRuta.map((el, index) => (
                                     <ListItemComponent 
                                         key={index}
                                         styleList={{ width: '100%' }}
-                                        title={`${el.codigo_articulo} ${el.nombre_articulo}`} 
-                                        description={`${el.description}`}
+                                        title={`${el.nombre_articulo}`} 
+                                        description={`${el.codigo_articulo} ${el.description}`}
                                         rightElements={ 
                                             <>
                                                 <Text>{ el?.cantidad || 0 }</Text>
@@ -93,7 +96,7 @@ export default function ModalizeDetalleArticulosLayout({
                                     />
                                 )) 
                             }
-                    </View>
+                        </View>
                     }
                 </View>
             </ModalizeComponent>

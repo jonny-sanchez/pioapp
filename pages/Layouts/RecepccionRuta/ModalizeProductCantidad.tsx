@@ -9,16 +9,19 @@ import { useEffect, useState } from "react"
 import schemaModalizeEditMercanciaForm, { schemaModalizeEditMercanciaFormType } from "helpers/validatesForm/schemaModalizeEditMercanciaForm"
 import { yupResolver } from "@hookform/resolvers/yup"
 import recepccionRutaState from "helpers/states/recepccionRutaState"
+import DataArticulosRutaType from "types/RecepccionRutas/DataArticulosRutaType"
 
 type ModalizeProductCantidadProps = {
     modalizeRef?: any;
     closeModalize?: () => void;
+    setItemArtRecepcion: React.Dispatch<React.SetStateAction<DataArticulosRutaType | null>>
     // mercancia?: MercanciaType | null
 }
 
 export default function ModalizeProductCantidad({
     modalizeRef,
     closeModalize,
+    setItemArtRecepcion
     // mercancia = null
 } : ModalizeProductCantidadProps) {
 
@@ -40,19 +43,36 @@ export default function ModalizeProductCantidad({
         reset()
     }
 
+    const updateCantidadArticulo = (codigoArticulo: string, nuevaCantidad: number) => {
+      setItemArtRecepcion(prevState => {
+        if (!prevState) return prevState
+
+        const detalleActualizado = prevState.detalle?.map(item => 
+          item.codigo_articulo === codigoArticulo 
+            ? { ...item, cantidad: nuevaCantidad } 
+            : item
+        )
+
+        return {
+          ...prevState,
+          detalle: detalleActualizado,
+        }
+
+      })
+    }
+
     const submitFormUpdateCantidad = async(data:schemaModalizeEditMercanciaFormType) => {
-        console.log(data)
-        console.log(articuloRecepccion)
+        updateCantidadArticulo(`${articuloRecepccion?.codigo_articulo || ''}`, Number(data.cantidad_update))
         clearFormUpdateCantidad()
     }
 
     useEffect(()=>{
-        articuloRecepccion && resetField('cantidad_update', { defaultValue: `${ Number(articuloRecepccion.quantity || 0) }` })
+        articuloRecepccion && resetField('cantidad_update', { defaultValue: `${ Number(articuloRecepccion.cantidad || 0) }` })
     }, [articuloRecepccion])
 
     useEffect(()=> {
         const validErrors =  (Object.keys(errors).length > 0 ? true : false)
-        setDisabledBtn((valueCantidadWatch == (Number(articuloRecepccion?.quantity ?? '0').toString())) || validErrors ? true : false)
+        setDisabledBtn((valueCantidadWatch == (Number(articuloRecepccion?.cantidad ?? '0').toString())) || validErrors ? true : false)
     }, [valueCantidadWatch])
 
     return (

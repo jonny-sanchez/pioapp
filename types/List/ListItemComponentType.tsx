@@ -1,12 +1,14 @@
 import React from "react";
-import { StyleProp, ViewStyle } from "react-native";
+import { StyleProp, TextStyle, ViewStyle } from "react-native";
 
 type ListItemComponentType = {
-    title?: string;
-    description?: string;
+    title?: string | React.ReactNode;
+    description?: string | React.ReactNode;
     iconLeft?: string;
     styleList?: StyleProp<ViewStyle>;
-    rightElements?: React.ReactNode
+    rightElements?: React.ReactNode;
+    titleStyle?: StyleProp<TextStyle>;
+    descriptionStyle?: StyleProp<TextStyle>;
 }
 
 export default ListItemComponentType

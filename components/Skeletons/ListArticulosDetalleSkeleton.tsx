@@ -11,6 +11,7 @@ export default function ListArticulosDetalleSkeleton() {
     return (
         <>
             <View className="w-full flex flex-col mt-4 ml-3 gap-7 pr-8">
+                <Skeleton colorMode={colorMode} height={62} width={'100%'}/>
                 { 
                     Array(6).fill(null).map((el, index)=>(
                         <View key={index} className="flex flex-row w-full justify-between items-center">

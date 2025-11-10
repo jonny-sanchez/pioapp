@@ -7,13 +7,10 @@ import AvatarIcon from "components/Avatars/AvatarIcon"
 import { AppTheme } from "types/ThemeTypes"
 
 const configTableRutas = (
-    theme: AppTheme
+    theme: AppTheme,
+    reloadRutasController: () => Promise<any>,
+    reloadRutas: boolean
 ) => [
-    // {
-    //     data: 'status_ruta',
-    //     name: 'Estado',
-    //     render: (data:any) => ( <ChipDecoration icon="progress-clock" title="Pendiente"/> )
-    // },
     {
         data: 'no_ruta',
         name: 'Ruta',
@@ -37,12 +34,19 @@ const configTableRutas = (
         data: null,
         name: 'Acciones',
         render: (data:RutasListType) => ( 
-            <View className="flex flex-row gap-1">
+            <View className="flex flex-row">
                 {/* qrcode */}
-                <IconButtomForm icon="qrcode-scan" 
+                <IconButtomForm 
+                    disabled={data.recepccionada != 0}
+                    icon="qrcode-scan" 
                     onPress={ ()=> NavigationService.navigate('QrRutas', { rutas: data }) }
                 />
-                {/* <IconButtomForm icon="eye"/> */}
+                <IconButtomForm
+                    icon="reload"  
+                    onPress={ () => reloadRutasController() }
+                    loading={reloadRutas}
+                    disabled={reloadRutas}
+                />
             </View>
         )
     }
