@@ -31,8 +31,8 @@ export default function ContainerScannerQr({
                             <Icon source={'store'} size={45} color={theme.colors.background}/>
                             <Text style={{ color: theme.colors.background, textAlign: 'center', marginBottom: 10 }}>{ listadoArticulosRuta?.tienda_nombre ?? '??' }</Text>
                             <Text variant="bodySmall" style={{ color: theme.colors.background, textAlign: 'center' }}>Serie - { listadoArticulosRuta?.cabecera?.serie ?? '??' }</Text>
-                            <Text variant="bodySmall" style={{ color: theme.colors.background, textAlign: 'center' }}>Ticket - { listadoArticulosRuta?.cabecera?.docNum ?? '??' }</Text>
-                            <Text variant="bodySmall" style={{ color: theme.colors.background, textAlign: 'center' }}>Fecha - { listadoArticulosRuta?.cabecera?.docDate ?? '??' }</Text>
+                            <Text variant="bodySmall" style={{ color: theme.colors.background, textAlign: 'center' }}>Ticket - { listadoArticulosRuta?.cabecera?.id_pedido ?? '??' }</Text>
+                            <Text variant="bodySmall" style={{ color: theme.colors.background, textAlign: 'center' }}>Fecha - { listadoArticulosRuta?.cabecera?.fecha_entrega ?? '??' }</Text>
                         </View>
                     )
                 }

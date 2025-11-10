@@ -3,7 +3,7 @@ type RutasListType = {
     id_pedido:number;
     empresa: string;
     tienda:string;
-    fecha_entrega: Date | string;
+    fecha_entrega: string;
     piloto: string;             
     no_ruta: number;
     nombre_ruta: string;

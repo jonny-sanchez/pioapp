@@ -14,10 +14,12 @@ import scannerQrState from "helpers/states/scannerQrState";
 import { generateJsonError, ResponseService } from "types/RequestType";
 import alertsState from "helpers/states/alertsState";
 import { AJAX, URLPIOAPP } from "helpers/http/ajax";
-import DataArticulosRutaType, { ArticuloDetalleType } from "types/RecepccionRutas/DataArticulosRutaType";
+import DataArticulosRutaType from "types/RecepccionRutas/DataArticulosRutaType";
 import QrRecepccionObjectType from "types/RecepccionRutas/QrRecepccionObjectType";
 import globalState from "helpers/states/globalState";
 import recepccionRutaState from "helpers/states/recepccionRutaState";
+import ArticuloRutaType from "types/Rutas/ArticuloRutaType";
+import DialogComponent from "components/Modals/DialogComponent";
 
 export default function RecepcionRutas() {
 
@@ -42,11 +44,77 @@ export default function RecepcionRutas() {
         mode: 'all'
     })
 
+    const [loadingRecepcion, setLoadingRecepcion] = useState<boolean>(false)
+
+    const [visibleDialogConfirmRecepcion, setVisibleDialogConfirmRecepcion] = useState<boolean>(false)
+
     const [articulosRecepccion, setArticulosRecepccion] = useState<DataArticulosRutaType | null>(null) 
+
+    const [payloadRecepcion, setPayloadRecepcion] = useState<DataArticulosRutaType|null>(null);
+
+    const postUploadRecepcion = async(body:DataArticulosRutaType) : Promise<ResponseService<any>> => {
+        try {
+            const result:ResponseService<any> = await AJAX(
+                `${ URLPIOAPP }/recepcion/articulos/save`,
+                'POST',
+                body
+            )
+            openVisibleSnackBar(`${result?.message||''}`, 'success')
+            return result
+        } catch (error) {
+            openVisibleSnackBar(`${error}`, 'error')
+            return generateJsonError(`${error}`, 'object')
+        }
+    }
+
+    const orderDataEnvServiceRecepcion = (data:any):DataArticulosRutaType => {
+
+        let validArticulos:ArticuloRutaType[] = []
+
+        Object.entries(data).forEach(([key, value]) => {
+            if(!value) return
+            const validArticulo:ArticuloRutaType|null = 
+                articulosRecepccion?.detalle?.find(({ codigo_articulo }) => codigo_articulo === key) || null
+
+            validArticulo && validArticulos.push(validArticulo)
+        })
+
+        const dataUploadRecepcion:DataArticulosRutaType = {
+            cabecera: articulosRecepccion?.cabecera,
+            detalle: validArticulos
+        }
+
+        return dataUploadRecepcion
+
+    }
+
+    const handleSubmitFormRecepcionArt = async (data:any) => {
+        const payloadRecepcionValid:DataArticulosRutaType = orderDataEnvServiceRecepcion(data)
+
+        if((payloadRecepcionValid?.detalle?.length ?? 0) <= 0) return openVisibleSnackBar('Debes seleccionar al menos un producto.', 'warning')
+
+        setPayloadRecepcion(payloadRecepcionValid)
+
+        setVisibleDialogConfirmRecepcion(true)
+    }
+
+    const confirmModalRecepcion = async():Promise<any> => {
+
+        setLoadingRecepcion(true)
+
+        setVisibleDialogConfirmRecepcion(false)
+
+        const resultRecepccionUpload =  await postUploadRecepcion(payloadRecepcion as DataArticulosRutaType)
+        
+        resultRecepccionUpload.status && setArticulosRecepccion(null)
+
+        setLoadingRecepcion(false)
+
+    }
 
     const getMercanciaRuta = async(json:QrRecepccionObjectType):Promise<ResponseService<DataArticulosRutaType>> => {
         try {
-            const result:ResponseService<DataArticulosRutaType> = await AJAX(`${ URLPIOAPP }/articulos/ruta/list/POS?serie=${json?.serie || ''}&docNum=${json?.id_pedido || ''}`)
+            const result:ResponseService<DataArticulosRutaType> = await AJAX(`${ URLPIOAPP }/articulos/ruta/list/POS?serie=${json?.serie || ''}&id_pedido=${json?.id_pedido || ''}`)
             return result
         } catch (error) {
             openVisibleSnackBar(`${error}`, "error")
@@ -74,16 +142,30 @@ export default function RecepcionRutas() {
 
     return (
         <>
+            {/* dialog component */}
+            <DialogComponent
+                visible={visibleDialogConfirmRecepcion}
+                title="Confirmar Recepcion"
+                content={`Total articulos: ${ payloadRecepcion?.detalle?.reduce( (sum, { cantidad }) => sum + cantidad, 0) }`}
+                icon="package-variant"
+                onAccept={() => confirmModalRecepcion()}
+                onCancel={() => setVisibleDialogConfirmRecepcion(false)}
+                disabledButtonAccept={loadingRecepcion}
+                loadingButtonAccept={loadingRecepcion}
+            />
+
+            {/* Modalize */}
             <ModalizeProductCantidad 
                 modalizeRef={modalizeRef} 
                 closeModalize={onCloseModalizeUpdate}
+                setItemArtRecepcion={setArticulosRecepccion}
             />
 
-            <PageLayout titleAppBar="Recepccion">
+            <PageLayout titleAppBar="Recepccion"> 
                 <ScrollViewContainer>
                     <View className="flex-1 my-5 flex-col gap-10">
 
-                        <ContainerScannerQr listadoArticulosRuta={articulosRecepccion} disabled={false}/>
+                        <ContainerScannerQr listadoArticulosRuta={articulosRecepccion} disabled={loadingRecepcion}/>
 
                         <View className="w-full">
                             <DataTableInfo
@@ -96,7 +178,8 @@ export default function RecepcionRutas() {
                                         control,
                                         theme,
                                         onOpenModalizeUpdate,
-                                        setArticuloRecepccion
+                                        setArticuloRecepccion,
+                                        loadingRecepcion
                                     )
                                 }
                                 // onPressRow={(data:ArticuloDetalleType) => {
@@ -107,8 +190,13 @@ export default function RecepcionRutas() {
 
                         <View className="w-full">
                             <ButtonForm 
+                                loading={loadingRecepcion}
+                                onPress={handleSubmit(handleSubmitFormRecepcionArt)}
                                 label="Recepccionar" 
-                                disabled={!((articulosRecepccion?.detalle || []).length > 0)} 
+                                disabled={(
+                                    !((articulosRecepccion?.detalle || []).length > 0) ||
+                                    loadingRecepcion
+                                )} 
                                 buttonColor={theme.colors.error}
                             />
                         </View>

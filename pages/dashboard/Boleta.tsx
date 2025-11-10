@@ -255,6 +255,7 @@ export default function Boleta() {
 
         try {
             const resultBoleta = await getBoleta(pendingPeriodoId)
+            
 
             if (resultBoleta.status && resultBoleta.data) {
                 let boletaFinal = normalizeBoleta(resultBoleta.data)

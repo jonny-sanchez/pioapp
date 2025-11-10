@@ -3,23 +3,26 @@ import { MD3Theme, Text } from "react-native-paper"
 import { View } from "react-native"
 import CheckBoxForm from "components/form/CheckBoxForm"
 import ConfigFile from "types/tables/ConfigFile"
-import { ArticuloDetalleType } from "types/RecepccionRutas/DataArticulosRutaType"
+// import { ArticuloDetalleType } from "types/RecepccionRutas/DataArticulosRutaType"
+import ArticuloRutaType from "types/Rutas/ArticuloRutaType"
+import { boolean } from "yup"
 
 const configTableRecepccionRutas = (
     control:any,
     theme: MD3Theme,
     onOpenModalize: () => void,
-    setArticuloRecepccion: (param:ArticuloDetalleType | null) => void
+    setArticuloRecepccion: (param:ArticuloRutaType | null) => void,
+    loadingRecepcion: boolean = false
 ) => {
 
     return [
         {
             data: null,
             name: 'Producto',
-            render: (data:ArticuloDetalleType) => (
+            render: (data:ArticuloRutaType) => (
                 <View className="w-full flex flex-col items-start">
-                    <Text variant="bodySmall" style={{ color: theme.colors.primary  }}>{data.itemCode}</Text>
-                    <Text variant="bodySmall" numberOfLines={3}>{data.dscription}</Text>
+                    <Text variant="bodySmall" style={{ color: theme.colors.primary  }}>{data.codigo_articulo}</Text>
+                    <Text variant="bodySmall" numberOfLines={3}>{data.nombre_articulo}</Text>
                 </View>
             )
         },
@@ -27,9 +30,9 @@ const configTableRecepccionRutas = (
             data: null,
             name: 'Cantidad',
             numeric: true,
-            render: (data:ArticuloDetalleType) => { return (
+            render: (data:ArticuloRutaType) => { return (
                     <View className="flex flex-row justify-center items-center gap-3">
-                        <Text>{ data.quantity }</Text>
+                        <Text>{ data.cantidad }</Text>
                     </View>
                 ) 
             }
@@ -37,11 +40,9 @@ const configTableRecepccionRutas = (
         {
             data: null,
             // name: '',
-            render: (data:ArticuloDetalleType) => {
+            render: (data:ArticuloRutaType) => {
                 return (
-                    <IconButtomForm icon="pencil-outline" onPress={ () => {
-                            // setMercancia && setMercancia(data ? { ...data } : null)
-                            // openModalize && openModalize()
+                    <IconButtomForm disabled={loadingRecepcion} icon="pencil-outline" onPress={ () => {
                             setArticuloRecepccion(data ? { ...data } : null)
                             onOpenModalize()
                         }
@@ -52,11 +53,12 @@ const configTableRecepccionRutas = (
         {
             data: null,
             name: '',
-            render: (data:ArticuloDetalleType) => { return (
+            render: (data:ArticuloRutaType) => { return (
                     <View className="flex flex-row">
                         <CheckBoxForm 
+                            disabled={loadingRecepcion}
                             control={control}
-                            name={`${ data.itemCode }`}
+                            name={`${ data.codigo_articulo }`}
                         />
                     </View>
                 ) 

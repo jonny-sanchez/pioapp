@@ -20,6 +20,8 @@ interface DialogComponentProps {
     acceptIcon?: string;
     cancelIcon?: string;
     type?: 'confirmation' | 'warning' | 'error' | 'info' | 'success';
+    disabledButtonAccept?: boolean;
+    loadingButtonAccept?: boolean; 
 }
 
 const DialogComponent: React.FC<DialogComponentProps> = ({
@@ -37,7 +39,9 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
     cancelButtonMode = 'outlined',
     acceptIcon = 'check',
     cancelIcon = 'close',
-    type = 'confirmation'
+    type = 'confirmation',
+    disabledButtonAccept = false,
+    loadingButtonAccept = false
 }) => {
     const theme = useTheme() as AppTheme;
 
@@ -175,6 +179,8 @@ const DialogComponent: React.FC<DialogComponentProps> = ({
                         mode={acceptButtonMode}
                         onPress={onAccept}
                         icon={acceptIcon}
+                        loading={loadingButtonAccept}
+                        disabled={disabledButtonAccept}
                         style={{ 
                             flex: 1,
                             marginLeft: hideCancel ? 0 : 4

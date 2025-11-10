@@ -1,9 +1,10 @@
-import { ArticuloDetalleType } from "types/RecepccionRutas/DataArticulosRutaType";
+// import { ArticuloDetalleType } from "types/RecepccionRutas/DataArticulosRutaType";
+import ArticuloRutaType from "types/Rutas/ArticuloRutaType";
 import { create } from "zustand";
 
 type RecepccionRutaStateType = {
-    articuloRecepccion: ArticuloDetalleType | null;
-    setArticuloRecepccion: (newArticuloRecepccion:ArticuloDetalleType | null) => void;
+    articuloRecepccion: ArticuloRutaType | null;
+    setArticuloRecepccion: (newArticuloRecepccion:ArticuloRutaType | null) => void;
 }
 
 const recepccionRutaState = create<RecepccionRutaStateType>((set) => ({

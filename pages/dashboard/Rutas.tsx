@@ -49,6 +49,8 @@ export default function Rutas() {
 
     const [visibleFab, setVisibleFab] = useState<boolean>(true); 
 
+    const [reloadRutas, setReloadRutas] = useState<boolean>(false)
+
     const offsetY = useRef(0);
 
     const modalizeRefDetalleArticulos = useRef<Modalize>(null)
@@ -92,12 +94,26 @@ export default function Rutas() {
         }
     }
 
+    const stateHandleSetRutas = async() => {
+        const result = await getRutas()
+        setRutas(result.data as RutasListType[])
+    }
+
     const renderRutas = async() => {
         if(!queryParamsRutas.fecha_entrega) return
         setOpenScreenLoading()
-        const result = await getRutas()
-        setRutas(result.data as RutasListType[])
+
+        await stateHandleSetRutas()
+        
         setCloseScreenLoading()
+    }
+
+    const reloadRutasController = async ():Promise<any> => {
+        setReloadRutas(true)
+
+        await stateHandleSetRutas()
+
+        setReloadRutas(false)
     }
 
     const onFocusDropdownTiendas = async() => {
@@ -167,7 +183,11 @@ export default function Rutas() {
                                 search={false}
                                 filter={false}
                                 pagination={true}
-                                configTable={configTableRutas(theme)}
+                                configTable={configTableRutas(
+                                    theme,
+                                    reloadRutasController,
+                                    reloadRutas
+                                )}
                                 data={rutas}
                                 groupField="tienda_nombre"
                                 onPressRow={(data:RutasListType) => {
