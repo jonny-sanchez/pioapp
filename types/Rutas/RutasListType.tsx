@@ -1,5 +1,5 @@
 type RutasListType = {
-    id:string;
+    // id:string;
     id_pedido:number;
     empresa: string;
     tienda:string;

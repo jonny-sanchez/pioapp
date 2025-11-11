@@ -16,8 +16,8 @@ const configTableRutas = (
         name: 'Ruta',
     },
     {
-        data: 'id_pedido',
-        name: 'Ticket',
+        data: 'serie',
+        name: 'Serie',
     },
     {
         data: null,
@@ -25,7 +25,9 @@ const configTableRutas = (
         render: (data:RutasListType) => (
             <AvatarIcon 
                 icon={data.recepccionada != 0 ? 'truck-check' : 'truck-delivery'} 
-                style={{ backgroundColor: data.recepccionada != 0 ? theme.colors.success : theme.colors.warning }}
+                style={{ 
+                    backgroundColor: data.recepccionada != 0 ? theme.colors.success : theme.colors.warning, 
+                }}
                 size={30}
             />
         )
@@ -34,18 +36,20 @@ const configTableRutas = (
         data: null,
         name: 'Acciones',
         render: (data:RutasListType) => ( 
-            <View className="flex flex-row">
+            <View className="flex flex-row gap-1">
                 {/* qrcode */}
                 <IconButtomForm 
+                    style={{ margin: 0 }}
                     disabled={data.recepccionada != 0}
                     icon="qrcode-scan" 
                     onPress={ ()=> NavigationService.navigate('QrRutas', { rutas: data }) }
                 />
                 <IconButtomForm
+                    style={{ margin: 0 }}
                     icon="reload"  
                     onPress={ () => reloadRutasController() }
                     loading={reloadRutas}
-                    disabled={reloadRutas}
+                    disabled={reloadRutas || data.recepccionada != 0}
                 />
             </View>
         )
