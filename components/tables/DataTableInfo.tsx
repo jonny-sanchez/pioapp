@@ -86,6 +86,7 @@ export default function DataTableInfo({
     useEffect(() => setPage(0), [itemsPerPage])
 
     useEffect(() => {
+      setPage(0)
       searchQuery ? onChangeSetSearch(searchQuery) : setDataSearch(data)
     }, [data])
 
@@ -137,7 +138,11 @@ export default function DataTableInfo({
             <PaginationTable
               page={page}
               setPage={setPage}
+
               dataSearch={dataSearch}
+              entriesGroupedData={entriesGroupedData}
+              groupField={groupField}
+
               from={from}
               itemsPerPage={itemsPerPage}
               numberOfItemsPerPageList={numberOfItemsPerPageList}

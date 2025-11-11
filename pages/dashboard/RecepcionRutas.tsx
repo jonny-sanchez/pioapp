@@ -161,7 +161,7 @@ export default function RecepcionRutas() {
                 setItemArtRecepcion={setArticulosRecepccion}
             />
 
-            <PageLayout titleAppBar="Recepccion"> 
+            <PageLayout titleAppBar="Recepción"> 
                 <ScrollViewContainer>
                     <View className="flex-1 my-5 flex-col gap-10">
 
@@ -192,7 +192,8 @@ export default function RecepcionRutas() {
                             <ButtonForm 
                                 loading={loadingRecepcion}
                                 onPress={handleSubmit(handleSubmitFormRecepcionArt)}
-                                label="Recepccionar" 
+                                label="Recepcionar" 
+                                icon="upload"
                                 disabled={(
                                     !((articulosRecepccion?.detalle || []).length > 0) ||
                                     loadingRecepcion

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { DataTable } from "react-native-paper"
 
 type PaginationTableProps = {
@@ -10,6 +11,8 @@ type PaginationTableProps = {
     to?:any;
     numberOfItemsPerPageList?: any;
     onItemsPerPageChange?: any;
+    entriesGroupedData?: [any, any[]][];
+    groupField?: string;
 }
 
 export default function PaginationTable({
@@ -21,17 +24,24 @@ export default function PaginationTable({
     from,
     to,
     numberOfItemsPerPageList,
-    onItemsPerPageChange
+    onItemsPerPageChange,
+    entriesGroupedData,
+    groupField
 } : PaginationTableProps) {
+
+    const dataLenght:number = groupField ? Object.keys(entriesGroupedData ?? {}).length : dataSearch.length
 
     return (
         <>
             { 
               pagination && <DataTable.Pagination
                 page={page}
-                numberOfPages={Math.ceil(dataSearch.length / itemsPerPage)}
+                numberOfPages={Math.ceil(dataLenght / itemsPerPage)}
+                // numberOfPages={Math.ceil(dataSearch.length / itemsPerPage)}
                 onPageChange={(page:any) => setPage(page)}
-                label={`${from + 1}-${to} de ${dataSearch.length}`}
+                // label={`${from + 1}-${to} de ${dataSearch.length}`}
+                label={`${from + 1}-${to} de ${dataLenght}`}
+
                 numberOfItemsPerPageList={numberOfItemsPerPageList}
                 numberOfItemsPerPage={itemsPerPage}
                 onItemsPerPageChange={onItemsPerPageChange}

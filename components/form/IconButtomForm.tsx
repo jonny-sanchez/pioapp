@@ -1,3 +1,4 @@
+import { StyleProp, ViewStyle } from 'react-native';
 import { IconButton, useTheme } from 'react-native-paper';
 
 type IconButtomFormProps = {
@@ -7,6 +8,7 @@ type IconButtomFormProps = {
     containerColor?: string;
     disabled?:boolean;
     loading?: boolean;
+    style?: StyleProp<ViewStyle>
 }
 
 export default function IconButtomForm({
@@ -15,13 +17,15 @@ export default function IconButtomForm({
     modeButton = 'contained-tonal',
     containerColor,
     disabled = false,
-    loading = false
+    loading = false,
+    style
 } : IconButtomFormProps) {
 
     const theme = useTheme()
     
     return (
         <IconButton 
+            style={[style]}
             loading={loading}
             disabled={disabled}
             icon={icon} 
