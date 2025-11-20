@@ -1,9 +1,10 @@
 import { logout } from "helpers/authHelper/authHelper";
 import { NavigationService } from "helpers/navigator/navigationScreens";
+import { validateConnectionInternetActive } from "helpers/network/internetHelper";
 import { getValueStorage } from "helpers/store/storeApp";
 
-// export const URLPIOAPP = `http://10.0.2.2:5000/api`
-export const URLPIOAPP = `https://services.sistemaspinulito.com/pioapi`
+export const URLPIOAPP = `http://10.0.2.2:5000/api`
+// export const URLPIOAPP = `https://services.sistemaspinulito.com/pioapi`
 
 export const timeout = function(s:number)
 {
@@ -24,6 +25,11 @@ export async function AJAX(
 ) {
 
     try {
+        //validar intenert antes de comenzar el fetch
+        const resultInternetActive = await validateConnectionInternetActive()
+
+        if(!resultInternetActive) NavigationService.navigate('InternetFail')
+
         const user = getValueStorage('user')
         // const user = { token: '' }
 

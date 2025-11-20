@@ -178,6 +178,7 @@ export default function Rutas() {
                                 onFocus={onFocusDropdownTiendas}
                                 data={optionsTiendasRuta}
                                 loading={loadingTiendasRuta}
+                                disable={!(valueDateFilterRuta)}
                             />
                             <DataTableInfo
                                 search={false}

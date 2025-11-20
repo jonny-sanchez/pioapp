@@ -18,6 +18,10 @@ const optionsStorage = {
     credentialsLogin: {
         nameStorage: 'valueCredentialsLogin',
         valueDefault: null,
+    },
+    convivio: {
+        nameStorage: 'convivioStorage',
+        valueDefault: null
     }
 }
 

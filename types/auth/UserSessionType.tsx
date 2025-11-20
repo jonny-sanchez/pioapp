@@ -1,0 +1,19 @@
+export type UserSessionType = {
+  codigo_user?: string;
+  createdAt?: string;
+  direccion?: string;
+  dpi?: string;
+  email?: string;
+  fecha_nacimiento?: string;
+  first_last_name?: string;
+  first_name?: string;
+  id_rol?: number;
+  id_users?: number;
+  puesto_trabajo?: string;
+  second_last_name?: string;
+  second_name?: string;
+  token?: string;
+  updatedAt?: string;
+  userCreatedAt?: string | null;
+  userUpdatedAt?: string | null;
+};

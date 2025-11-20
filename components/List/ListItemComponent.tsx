@@ -9,12 +9,14 @@ export default function ListItemComponent({
     styleList,
     rightElements,
     titleStyle,
-    descriptionStyle
+    descriptionStyle,
+    className = ''
 } : ListItemComponentType) {
 
     return (
         <>
             <List.Item
+              className={className}  
               title={title}
               style={styleList}
               titleStyle={[ titleStyle ]}
