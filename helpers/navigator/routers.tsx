@@ -9,6 +9,7 @@ import ShowQrRuta from "pages/dashboard/ShowQrRuta"
 import RecepcionRutas from "pages/dashboard/RecepcionRutas"
 import Marcaje from "pages/auth/Marcaje"
 import FailConnectInternet from "pages/network/FailConnectInternet"
+import ConvivioInvitacion from "pages/dashboard/ConvivioInvitacion"
 
 type RoutersType = {
     name: string;
@@ -99,6 +100,14 @@ const routers = [
         hidden: false,
         icon: '',
         title: 'Sin conexion'
+    },
+    {
+        name: 'InvitacionConvivio',
+        component: ConvivioInvitacion,
+        default: false,
+        hidden: false,
+        icon: 'party-popper',
+        title: 'Convivio'
     }
 ] as const satisfies readonly RoutersType[]
 

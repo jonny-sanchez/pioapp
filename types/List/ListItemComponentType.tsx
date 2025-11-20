@@ -9,6 +9,7 @@ type ListItemComponentType = {
     rightElements?: React.ReactNode;
     titleStyle?: StyleProp<TextStyle>;
     descriptionStyle?: StyleProp<TextStyle>;
+    className?: string;
 }
 
 export default ListItemComponentType

@@ -9,6 +9,7 @@ type ButtonFormProps = {
     disabled?: boolean;
     style?: StyleProp<ViewStyle>;
     buttonColor?: string;
+    className?: string;
 }
 
 export default function ButtonForm({
@@ -18,13 +19,15 @@ export default function ButtonForm({
     loading = false,
     disabled = false,
     style = { },
-    buttonColor
+    buttonColor,
+    className = ''
 } : ButtonFormProps){
 
     const theme = useTheme()
 
     return (
         <Button 
+            className={className}
             loading={loading} 
             disabled={disabled}  
             mode='contained' 
