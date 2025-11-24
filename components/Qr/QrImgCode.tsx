@@ -6,13 +6,15 @@ type QrImgCodeProps = {
     size?: number | undefined;
     logo?: string | ImageSourcePropType | undefined;
     backgroundColor?: string | undefined;
+    getRef?: ((c: any) => any) | undefined;
 }
 
 export default function QrImgCode({
     value,
     size,
     logo,
-    backgroundColor
+    backgroundColor,
+    getRef
 } : QrImgCodeProps) {
 
     return (
@@ -22,6 +24,7 @@ export default function QrImgCode({
                 size={size}
                 value={value}
                 backgroundColor={backgroundColor}
+                getRef={getRef}
             />
         </>
     )

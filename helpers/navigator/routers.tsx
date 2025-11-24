@@ -10,6 +10,7 @@ import RecepcionRutas from "pages/dashboard/RecepcionRutas"
 import Marcaje from "pages/auth/Marcaje"
 import FailConnectInternet from "pages/network/FailConnectInternet"
 import ConvivioInvitacion from "pages/dashboard/ConvivioInvitacion"
+import NominaConvivio from "pages/dashboard/NominaConvivio"
 
 type RoutersType = {
     name: string;
@@ -108,6 +109,14 @@ const routers = [
         hidden: false,
         icon: 'party-popper',
         title: 'Convivio'
+    },
+    {
+        name: 'NominaConvivio',
+        component: NominaConvivio,
+        default: false,
+        hidden: false,
+        icon: 'calendar-star',
+        title: 'Gestion convivio'
     }
 ] as const satisfies readonly RoutersType[]
 
