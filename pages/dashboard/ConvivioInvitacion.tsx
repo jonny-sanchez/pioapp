@@ -95,7 +95,7 @@ export default function ConvivioInvitacion() {
                         <IconButtomForm 
                             size={25}
                             icon={'download'} 
-                            style={{ position: 'absolute', zIndex: 10, top: -12, right: -12 }}
+                            style={{ position: 'absolute', zIndex: 10, top: -20, right: -20 }}
                             onPress={onPressButtonDownloadQr}
                             loading={downloadingQr}
                             disabled={downloadingQr}
@@ -103,7 +103,10 @@ export default function ConvivioInvitacion() {
                         {
                             (user?.id_users || '') && 
                             <QrImgCode 
-                                value={`${ user?.id_users || '' }`} 
+                                value={JSON.stringify({
+                                    codigo: Number(user?.id_users) || '',
+                                    id_tipo_persona_convivio: 1
+                                })} 
                                 size={200} 
                                 getRef={(c) => (qrRef.current = c)}
                             />

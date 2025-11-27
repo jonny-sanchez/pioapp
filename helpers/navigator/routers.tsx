@@ -11,6 +11,8 @@ import Marcaje from "pages/auth/Marcaje"
 import FailConnectInternet from "pages/network/FailConnectInternet"
 import ConvivioInvitacion from "pages/dashboard/ConvivioInvitacion"
 import NominaConvivio from "pages/dashboard/NominaConvivio"
+import CrearQrConvivio from "pages/dashboard/NominaConvivio/CrearQrConvivio"
+import CrearProductoConvivio from "pages/dashboard/NominaConvivio/CrearProductoConvivio"
 
 type RoutersType = {
     name: string;
@@ -117,6 +119,22 @@ const routers = [
         hidden: false,
         icon: 'calendar-star',
         title: 'Gestion convivio'
+    },
+    {
+        name: 'CrearQrConvivio',
+        component: CrearQrConvivio,
+        default: false,
+        hidden: true,
+        icon: '',
+        title: 'Generar Qr Convivio'
+    },
+    {
+        name: 'CrearProductoConvivio',
+        component: CrearProductoConvivio,
+        default: false,
+        hidden: true,
+        icon: '',
+        title: 'Crear producto convivio'
     }
 ] as const satisfies readonly RoutersType[]
 
