@@ -7,21 +7,32 @@ import ListItemComponent from "components/List/ListItemComponent";
 import QrImgCode from "components/Qr/QrImgCode";
 import Title from "components/typografy/Title";
 import { View } from "react-native";
-import { List, useTheme } from "react-native-paper";
+import { Icon, IconButton, List, Text, useTheme } from "react-native-paper";
 import { imageConvivio2025 } from "assets/Providers/ImageProvider";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getValueStorage, setValueStorage } from "helpers/store/storeApp";
 import { UserSessionType } from "types/auth/UserSessionType";
 import InfoAlert from "components/Alerts/InfoAlert";
 import { AppTheme } from "types/ThemeTypes";
 import TextInfo from "components/typografy/TextInfo";
 import StorageConvivioType from "types/convivio/StorageConvivioType";
+import PageToggleScreen from "components/Screens/PageToggleScreen";
+import IconButtomForm from "components/form/IconButtomForm";
+import alertsState from "helpers/states/alertsState";
+import RNFS from 'react-native-fs';
+import { addToGallery } from "helpers/Galery/GaleryHelper";
 
 export default function ConvivioInvitacion() {
 
     const theme:AppTheme = useTheme() as AppTheme
 
+    const qrRef = useRef<any>(null);
+
+    const { openVisibleSnackBar } = alertsState()
+
     const [initialLoad, setInitialLoad] = useState(true)
+
+    const [downloadingQr, setDownloadingQr] = useState<boolean>(false)
 
     const [user, setUser] = useState<UserSessionType | null>(null)
 
@@ -40,6 +51,28 @@ export default function ConvivioInvitacion() {
         convivioStorage && setConvivio(convivioStorage)
     }
 
+    const handleDownloadQrGalery = async () : Promise<any> => {
+        try {
+            if (!qrRef.current)
+                return openVisibleSnackBar(`El QR aún no está listo`, 'error')
+          
+            qrRef.current.toDataURL(async (data: string) => {
+                const filePath = `${RNFS.PicturesDirectoryPath}/qr_${Date.now()}.png`
+                await RNFS.writeFile(filePath, data, 'base64');
+                await addToGallery(filePath);
+                openVisibleSnackBar(`El QR se guardó en tu galería`, 'success')
+            })
+        } catch (error) {
+            openVisibleSnackBar(`No se pudo guardar el QR`, 'error')
+        }
+    }
+
+    const onPressButtonDownloadQr = async() => {
+        setDownloadingQr(true)
+        await handleDownloadQrGalery()
+        setDownloadingQr(false)
+    }
+
     useEffect(() => {
         if (!initialLoad) convivio && setValueStorage('convivio', convivio)
     }, [convivio])
@@ -52,11 +85,50 @@ export default function ConvivioInvitacion() {
 
     return (
         <>
+            {/* pagina toggle Qr */}
+            <PageToggleScreen
+                onPressIconClose={() => setConvivio(prev=>({ ...prev, QrView: !prev.QrView }))}
+                visible={convivio.QrView}
+            >
+                <View className="w-full h-full relative flex flex-col gap-3 items-center justify-center px-10">
+                    <View className="bg-white p-2" style={{ position: 'relative' }}>
+                        <IconButtomForm 
+                            size={25}
+                            icon={'download'} 
+                            style={{ position: 'absolute', zIndex: 10, top: -20, right: -20 }}
+                            onPress={onPressButtonDownloadQr}
+                            loading={downloadingQr}
+                            disabled={downloadingQr}
+                        />
+                        {
+                            (user?.id_users || '') && 
+                            <QrImgCode 
+                                value={JSON.stringify({
+                                    codigo: Number(user?.id_users) || '',
+                                    id_tipo_persona_convivio: 1
+                                })} 
+                                size={200} 
+                                getRef={(c) => (qrRef.current = c)}
+                            />
+                        }
+                    </View>
+                    <View className="flex flex-col items-center justify-center gap-2">
+                        <Icon size={45} source={'food-turkey'}/>
+                        <Title style={{ textAlign: 'center' }}>Qr Juegos y Comida</Title>
+                    </View>
+                    <InfoAlert 
+                        styleContent={{ position: 'absolute', bottom: 45, padding: 8 }}
+                        label="Presente este Qr en el evento para consumir cualquiere tipo de alimento, bebida o juego."
+                    />
+                </View>
+            </PageToggleScreen>
+
+            {/* Pagina principal */}
             <PageLayout titleAppBar="Convivio">
                 <ScrollViewContainer>
-                    <View className="flex flex-col items-center gap-5 mt-3">
+                    <View className="flex flex-col items-center gap-5 mt-3 mb-10">
 
-                        <BoxImage img={imageConvivio2025} height={250} width={250}/>
+                        <BoxImage img={imageConvivio2025} height={200} width={200}/>
 
                         <View>
                             <Title style={{ textAlign: 'center' }}>Convivio 2025</Title>
@@ -89,32 +161,27 @@ export default function ConvivioInvitacion() {
 
                         <ButtonForm
                             className="w-full"
-                            icon="check-circle"
-                            buttonColor={theme.colors.success}
-                            label="Confirmar asistencia."
-                            onPress={() => setConvivio(prev => ({ ...prev, asistenciaConfirmada: true }))}
+                            icon={
+                                convivio.asistenciaConfirmada ? 
+                                    "eye" : 
+                                    "check-circle"
+                            }
+                            buttonColor={
+                                convivio.asistenciaConfirmada ? 
+                                    theme.colors.primary : 
+                                    theme.colors.success
+                            }
+                            label={
+                                convivio.asistenciaConfirmada ? 
+                                    "Ver Qr" : 
+                                    "Confirmar asistencia."
+                            }
+                            onPress={
+                                convivio.asistenciaConfirmada ? 
+                                () => setConvivio(prev => ({ ...prev, QrView: !prev.QrView })) :
+                                () => setConvivio(prev => ({ QrView: true, asistenciaConfirmada: true }))
+                            }
                         />                          
-
-                        {/* <ButtonForm 
-                            className="w-full"
-                            icon="download" 
-                            label="Descargar invitacion"
-                        /> */}
-
-                        {/* <View className="w-full flex flex-col items-center justify-center">
-                            <View className="bg-white p-2">
-                                {
-                                    (user?.id_users || '') && 
-                                    <QrImgCode 
-                                        value={
-                                            `${ user?.id_users || '' }`
-                                        } 
-                                        size={120}
-                                    />
-                                }
-                            </View>
-                            <InfoAlert label="Presente este Qr en el evento para consumir cualquiere tipo de alimento."/>
-                        </View>  */}
 
                     </View>
                 </ScrollViewContainer>

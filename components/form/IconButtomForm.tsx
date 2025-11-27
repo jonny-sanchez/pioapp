@@ -8,7 +8,8 @@ type IconButtomFormProps = {
     containerColor?: string;
     disabled?:boolean;
     loading?: boolean;
-    style?: StyleProp<ViewStyle>
+    style?: StyleProp<ViewStyle>;
+    size?: number | undefined;
 }
 
 export default function IconButtomForm({
@@ -18,7 +19,8 @@ export default function IconButtomForm({
     containerColor,
     disabled = false,
     loading = false,
-    style
+    style,
+    size = 18
 } : IconButtomFormProps) {
 
     const theme = useTheme()
@@ -29,7 +31,7 @@ export default function IconButtomForm({
             loading={loading}
             disabled={disabled}
             icon={icon} 
-            size={18} 
+            size={size} 
             mode={modeButton} 
             iconColor={theme.colors.onPrimary}  
             containerColor={containerColor ? containerColor : theme.colors.primary}

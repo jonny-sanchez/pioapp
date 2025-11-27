@@ -1,6 +1,7 @@
 import { GestureResponderEvent, StyleProp, ViewStyle } from 'react-native';
 import { Avatar, Card, IconButton, useTheme } from 'react-native-paper';
 import { Pressable } from 'react-native';
+import React from 'react';
 
 type CardTitleProps = {
   title?: string;
@@ -8,7 +9,8 @@ type CardTitleProps = {
   size?: number;
   icon?: string;
   style?: StyleProp<ViewStyle>;
-  onPress?: ((event: GestureResponderEvent) => void) | null | undefined
+  onPress?: ((event: GestureResponderEvent) => void) | null | undefined;
+  rightElement?: React.ReactNode
 }
 
 export default function CardTitle({ 
@@ -17,7 +19,8 @@ export default function CardTitle({
   size = 45,
   icon = '',
   style = {},
-  onPress = () => {}
+  onPress = () => {},
+  rightElement
 } : CardTitleProps){
 
     const theme = useTheme()
@@ -32,7 +35,12 @@ export default function CardTitle({
           title={title}
           subtitle={subtitle}
           left={(props) => <Avatar.Icon { ...props } size={size}  icon={icon} />}
-          // right={() => <IconButton  icon="dots-vertical"/>}
+          right={
+            () => (
+              rightElement
+              // <IconButton  icon="dots-vertical"/>
+            ) 
+          }
         />
       </Pressable>
     )
