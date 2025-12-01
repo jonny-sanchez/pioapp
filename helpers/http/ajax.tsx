@@ -3,8 +3,8 @@ import { NavigationService } from "helpers/navigator/navigationScreens";
 import { validateConnectionInternetActive } from "helpers/network/internetHelper";
 import { getValueStorage } from "helpers/store/storeApp";
 
-export const URLPIOAPP = `http://10.0.2.2:5000/api`
-// export const URLPIOAPP = `https://services.sistemaspinulito.com/pioapi`
+// export const URLPIOAPP = `http://10.0.2.2:5000/api`
+export const URLPIOAPP = `https://services.sistemaspinulito.com/pioapi`
 
 export const timeout = function(s:number)
 {

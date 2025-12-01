@@ -116,14 +116,14 @@ export default function NominaConvivio() {
                             <CardTitle 
                                 style={{ width: '100%' }} 
                                 icon="qrcode-scan" 
-                                title="Sannear QR" 
+                                title="Scannear Invitacion" 
                                 rightElement={<IconButton icon={'chevron-right'}/>}
                                 onPress={() => NavigationService.navigate('ScannerQr')}
                             />
                             <CardTitle 
                                 style={{ width: '100%' }} 
                                 icon="account-check"
-                                title="Generar QR" 
+                                title="Generar Invitacion" 
                                 rightElement={<IconButton icon={'chevron-right'}/>}
                                 onPress={() => NavigationService.navigate('CrearQrConvivio')}
                             />

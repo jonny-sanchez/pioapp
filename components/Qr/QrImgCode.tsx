@@ -7,6 +7,7 @@ type QrImgCodeProps = {
     logo?: string | ImageSourcePropType | undefined;
     backgroundColor?: string | undefined;
     getRef?: ((c: any) => any) | undefined;
+    quietZone?: number | undefined;
 }
 
 export default function QrImgCode({
@@ -14,7 +15,8 @@ export default function QrImgCode({
     size,
     logo,
     backgroundColor,
-    getRef
+    getRef,
+    quietZone = 7
 } : QrImgCodeProps) {
 
     return (
@@ -25,6 +27,7 @@ export default function QrImgCode({
                 value={value}
                 backgroundColor={backgroundColor}
                 getRef={getRef}
+                quietZone={quietZone}
             />
         </>
     )

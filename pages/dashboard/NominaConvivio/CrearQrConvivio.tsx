@@ -5,7 +5,10 @@ import ButtonForm from "components/form/ButtonForm";
 import DropdownForm from "components/form/DropdownForm";
 import IconButtomForm from "components/form/IconButtomForm";
 import PageLayout from "components/Layouts/PageLayout";
+import MenuComponent from "components/Menus/MenuComponent";
+import MenuItem from "components/Menus/MenuItem";
 import QrImgCode from "components/Qr/QrImgCode";
+import { base64GetRef, getPathRefFile, saveQrGalery } from "helpers/Galery/GaleryHelper";
 import { AJAX, URLPIOAPP } from "helpers/http/ajax";
 import alertsState from "helpers/states/alertsState";
 import globalState from "helpers/states/globalState";
@@ -19,8 +22,13 @@ import { Icon, Text, useTheme } from "react-native-paper";
 import PersonasConvivioType from "types/convivio/PersonasConvivioType";
 import { generateJsonError, ResponseService } from "types/RequestType";
 import { AppTheme } from "types/ThemeTypes";
+import Share from 'react-native-share' 
 
 export default function CrearQrConvivio() {
+
+    const qrRef = useRef<any>(null);
+
+    const [visibleMenuQr, setVisibleMenuQr] = useState<boolean>(false)
 
     const modalizeRefCreateInvitado = useRef<Modalize>(null)
         
@@ -61,6 +69,28 @@ export default function CrearQrConvivio() {
     const handleSubmitQrInvitados = async (data:schemaGenerateQrPersonaConvivioType) => {
         setUserQr(data.persona_convivio)
     } 
+
+    const handleDownloadQrInvitado = async() => {
+        try {
+            await saveQrGalery(qrRef.current)
+            openVisibleSnackBar(`El QR se guardó en tu galería`, 'success')
+            setVisibleMenuQr(false)
+        } catch (error) {
+            openVisibleSnackBar(`${error}`, 'error')
+        }
+    } 
+
+    const handleShareQrForWhatsApp = async() => {
+        // const filePath = await base64GetRef(qrRef.current)
+        const filePath = await getPathRefFile(qrRef.current, 'cache')
+        console.log(`file://${filePath}`)
+        await Share.open({
+            title: `Qr invitacion`,
+            url: `file://${filePath}`,
+            message: 'Hola, compartimos Qr de invitacion para el convivio Pinulito 2025.',
+        })
+        setVisibleMenuQr(false)
+    }
 
     const init = async () => {
         setOpenScreenLoading()
@@ -127,15 +157,31 @@ export default function CrearQrConvivio() {
                             >
                                 {
                                     userQr ?
-                                    <View className="bg-white p-2" style={{ position: 'relative' }}>
-                                        <IconButtomForm 
-                                            size={25}
-                                            icon={'share'} 
-                                            style={{ position: 'absolute', zIndex: 10, top: -20, right: -20 }}
-                                        />
+                                    <View 
+                                        // className="bg-white p-2" 
+                                        style={{ position: 'relative' }}
+                                    >
+                                        <MenuComponent
+                                            visible={visibleMenuQr}
+                                            onDismiss={() => setVisibleMenuQr(false)}
+                                            styleContainer={{ position: 'absolute', zIndex: 10, top: -20, right: -20 }}
+                                            anchor={
+                                                <IconButtomForm 
+                                                    size={25}
+                                                    icon={'dots-vertical'} 
+                                                    onPress={() => setVisibleMenuQr(true)}
+                                                />
+                                            }
+                                        >
+                                            <MenuItem title="Descargar" onPress={handleDownloadQrInvitado} leadingIcon={'download'}/>
+                                            <MenuItem title="Compartir" onPress={handleShareQrForWhatsApp} leadingIcon={'share'}/>
+                                        </MenuComponent>
+
                                         <QrImgCode 
                                             value={userQr} 
                                             size={200}
+                                            quietZone={7}
+                                            getRef={(c) => (qrRef.current = c)}
                                         />  
                                     </View> :
                                     <View className="flex justify-center items-center gap-2">
