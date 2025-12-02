@@ -17,6 +17,7 @@ import { IconButton, Text, useTheme } from "react-native-paper";
 import ResponseConsumoPersonaType from "types/convivio/ResponseConsumoPersonaType";
 import { ResponseGetPersonaQrType } from "types/convivio/ResponseGetPersonaQrType";
 import ValueQrPersonasType from "types/convivio/ValueQrPersonasType";
+import MethodRequestType from "types/Request/MethodRequestType";
 import { generateJsonError, ResponseService } from "types/RequestType";
 import { AppTheme } from "types/ThemeTypes";
 
@@ -61,9 +62,9 @@ export default function NominaConvivio() {
         }
     }
 
-    const postAddConsumo = async (data:ResponseConsumoPersonaType) : Promise<ResponseService<any>> => {
+    const postAddConsumo = async (data:ResponseConsumoPersonaType, method:MethodRequestType) : Promise<ResponseService<any>> => {
         try {
-            const result = await AJAX(`${URLPIOAPP}/consumos/convivio/create`, 'POST', data)
+            const result = await AJAX(`${URLPIOAPP}/consumos/convivio/create`, method, data)
             return result
         } catch (error) {
             openVisibleSnackBar(`${error}`, 'error')
@@ -93,9 +94,9 @@ export default function NominaConvivio() {
         setCloseScreenLoading()
     }
 
-    const handleOnpressAddConsumo = async (data:ResponseConsumoPersonaType) => {
+    const handleOnpressAddConsumo = async (data:ResponseConsumoPersonaType, method:MethodRequestType) => {
         setOpenScreenLoading()
-        const resultAddConsumo = await postAddConsumo(data)
+        const resultAddConsumo = await postAddConsumo(data, method)
         if(resultAddConsumo.status) {
             const resultConsumoPersona = await getConsumoPersona(personaQr?.id_personas_convivio ?? 0)
             setConsumoPersona(resultConsumoPersona?.data ?? [])
@@ -116,14 +117,14 @@ export default function NominaConvivio() {
                             <CardTitle 
                                 style={{ width: '100%' }} 
                                 icon="qrcode-scan" 
-                                title="Sannear QR" 
+                                title="Scannear Invitacion" 
                                 rightElement={<IconButton icon={'chevron-right'}/>}
                                 onPress={() => NavigationService.navigate('ScannerQr')}
                             />
                             <CardTitle 
                                 style={{ width: '100%' }} 
                                 icon="account-check"
-                                title="Generar QR" 
+                                title="Generar Invitacion" 
                                 rightElement={<IconButton icon={'chevron-right'}/>}
                                 onPress={() => NavigationService.navigate('CrearQrConvivio')}
                             />
@@ -183,9 +184,15 @@ export default function NominaConvivio() {
                                                     <IconButtomForm 
                                                         icon="plus" 
                                                         style={{ margin: 0 }}
-                                                        onPress={() => handleOnpressAddConsumo(data)}
+                                                        onPress={() => handleOnpressAddConsumo(data, 'POST')}
                                                     />
-                                                    {/* <IconButtomForm icon="minus" containerColor={theme.colors.error} style={{ margin: 0 }}/> */}
+                                                    <IconButtomForm 
+                                                        icon="minus" 
+                                                        disabled={Number(data.total_consumido ?? "0") <= 0}
+                                                        containerColor={theme.colors.error} 
+                                                        style={{ margin: 0 }}
+                                                        onPress={() => handleOnpressAddConsumo(data, 'DELETE')}
+                                                    />
                                                 </View>
                                                 
                                             </View>

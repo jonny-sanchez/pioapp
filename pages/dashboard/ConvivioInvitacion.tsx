@@ -91,30 +91,36 @@ export default function ConvivioInvitacion() {
                 visible={convivio.QrView}
             >
                 <View className="w-full h-full relative flex flex-col gap-3 items-center justify-center px-10">
-                    <View className="bg-white p-2" style={{ position: 'relative' }}>
-                        <IconButtomForm 
-                            size={25}
-                            icon={'download'} 
-                            style={{ position: 'absolute', zIndex: 10, top: -20, right: -20 }}
-                            onPress={onPressButtonDownloadQr}
-                            loading={downloadingQr}
-                            disabled={downloadingQr}
-                        />
+                    <View 
+                        // className="bg-white p-2" 
+                        style={{ position: 'relative' }}
+                    >
                         {
                             (user?.id_users || '') && 
-                            <QrImgCode 
-                                value={JSON.stringify({
-                                    codigo: Number(user?.id_users) || '',
-                                    id_tipo_persona_convivio: 1
-                                })} 
-                                size={200} 
-                                getRef={(c) => (qrRef.current = c)}
-                            />
+                            <>
+                                <IconButtomForm 
+                                    size={25}
+                                    icon={'download'} 
+                                    style={{ position: 'absolute', zIndex: 10, top: -20, right: -20 }}
+                                    onPress={onPressButtonDownloadQr}
+                                    loading={downloadingQr}
+                                    disabled={downloadingQr}
+                                />
+                                <QrImgCode 
+                                    value={JSON.stringify({
+                                        codigo: Number(user?.id_users) || '',
+                                        id_tipo_persona_convivio: 1
+                                    })} 
+                                    size={200} 
+                                    getRef={(c) => (qrRef.current = c)}
+                                    quietZone={7}
+                                />
+                            </>
                         }
                     </View>
                     <View className="flex flex-col items-center justify-center gap-2">
                         <Icon size={45} source={'food-turkey'}/>
-                        <Title style={{ textAlign: 'center' }}>Qr Juegos y Comida</Title>
+                        <Title style={{ textAlign: 'center' }}>Juegos y Comida</Title>
                     </View>
                     <InfoAlert 
                         styleContent={{ position: 'absolute', bottom: 45, padding: 8 }}
@@ -128,7 +134,7 @@ export default function ConvivioInvitacion() {
                 <ScrollViewContainer>
                     <View className="flex flex-col items-center gap-5 mt-3 mb-10">
 
-                        <BoxImage img={imageConvivio2025} height={200} width={200}/>
+                        <BoxImage img={imageConvivio2025} height={250} width={250}/>
 
                         <View>
                             <Title style={{ textAlign: 'center' }}>Convivio 2025</Title>
@@ -173,7 +179,7 @@ export default function ConvivioInvitacion() {
                             }
                             label={
                                 convivio.asistenciaConfirmada ? 
-                                    "Ver Qr" : 
+                                    "Ver Invitacion" : 
                                     "Confirmar asistencia."
                             }
                             onPress={
