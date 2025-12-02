@@ -83,7 +83,7 @@ export default function CrearQrConvivio() {
     const handleShareQrForWhatsApp = async() => {
         // const filePath = await base64GetRef(qrRef.current)
         const filePath = await getPathRefFile(qrRef.current, 'cache')
-        console.log(`file://${filePath}`)
+        // console.log(`file://${filePath}`)
         await Share.open({
             title: `Qr invitacion`,
             url: `file://${filePath}`,
