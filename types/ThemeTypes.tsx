@@ -10,6 +10,10 @@ interface CustomColors {
   onWarning: string;
   warningContainer: string;
   onWarningContainer: string;
+  skyBlue: string,
+  onSkyBlue: string,
+  skyBlueContainer: string,
+  onSkyBlueContainer: string,
 }
 
 // Tipado final: combina los colores de MD3 + los personalizados

@@ -10,19 +10,29 @@ export default function ListItemComponent({
     rightElements,
     titleStyle,
     descriptionStyle,
-    className = ''
+    className = '',
+    rippleColor,
+    leftElements,
+    descriptionNumberOfLines
 } : ListItemComponentType) {
 
     return (
         <>
             <List.Item
+              rippleColor={rippleColor}
               className={className}  
               title={title}
               style={styleList}
               titleStyle={[ titleStyle ]}
               description={description}
               descriptionStyle={[ descriptionStyle ]}
-              left={props => (iconLeft && <List.Icon {...props} icon={iconLeft}/>)}
+              descriptionNumberOfLines={descriptionNumberOfLines}
+              left={props => (
+                <>
+                    {iconLeft && <List.Icon {...props} icon={iconLeft}/>}
+                    {leftElements}
+                </>
+              )}
               right={props => (
                 <>
                     {/* <List.Icon {...props} icon={'camera'}/> */}

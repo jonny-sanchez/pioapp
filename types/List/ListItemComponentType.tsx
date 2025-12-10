@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleProp, TextStyle, ViewStyle } from "react-native";
+import { ColorValue, StyleProp, TextStyle, ViewStyle } from "react-native";
 
 type ListItemComponentType = {
     title?: string | React.ReactNode;
@@ -10,6 +10,9 @@ type ListItemComponentType = {
     titleStyle?: StyleProp<TextStyle>;
     descriptionStyle?: StyleProp<TextStyle>;
     className?: string;
+    rippleColor?: ColorValue | undefined;
+    leftElements?: React.ReactNode;
+    descriptionNumberOfLines?: number | undefined;
 }
 
 export default ListItemComponentType

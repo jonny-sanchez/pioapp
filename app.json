@@ -19,7 +19,14 @@
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
           "recordAudioAndroid": true
         }
-      ]
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow $(PRODUCT_NAME) to use Face ID."
+        }
+      ],
+      "expo-notifications"
     ],
     "orientation": "portrait",
     "icon": "./assets/images/LOGOPINULITO.png",
@@ -33,12 +40,20 @@
       "**/*"
     ],
     "ios": {
+      "config": {
+        "googleMapsApiKey": "process.env.GOOGLE_MAPS_API_KEY"
+      },
       "supportsTablet": true,
       "entitlements": {
         "com.apple.developer.networking.wifi-info": true
       }
     },
     "android": {
+      "config": {
+        "googleMaps": {
+          "apiKey": "process.env.GOOGLE_MAPS_API_KEY"
+        }
+      },
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/LOGOPINULITO.png",
         "backgroundColor": "#fcb900"

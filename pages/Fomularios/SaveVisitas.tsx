@@ -16,17 +16,25 @@ import { ResponseService, generateJsonError } from "types/RequestType"
 import { AJAX, FormDataGenerate, URLPIOAPP } from "helpers/http/ajax"
 import alertsState from "helpers/states/alertsState"
 import fotografyState from "helpers/states/fotografyState"
-import { Checkbox, RadioButton, Text, useTheme, IconButton, Icon } from 'react-native-paper'
+import { Checkbox, RadioButton, Text, useTheme, IconButton, Icon, List } from 'react-native-paper'
 import CheckBoxForm from "components/form/CheckBoxForm"
 import PickerSmallFile from "components/container/PickerSmallFile"
 import PageLayout from "components/Layouts/PageLayout"
 import { NavigationService } from "helpers/navigator/navigationScreens"
 import ToggleContainerAnimated from "components/Animaciones/ToggleContainerAnimated"
+import { RouteProp, useRoute } from "@react-navigation/native"
+import CardContent from "components/Cards/CardContent"
+import ListItemComponent from "components/List/ListItemComponent"
+
+type RouteParamasVisitas = {
+    idVisitaEmergencia?:number|undefined
+}
 
 export default function SaveVisitas(){
 
-    // const route = useRoute()
-    // const { nombre_tienda } = route.params as any
+    const [isVisitaEmergencia, setIsVisitaEmergencia] = useState<boolean>(false)
+    const route = useRoute<RouteProp<{ params:RouteParamasVisitas }, 'params'>>();
+    const idVisitaEmergencia = route?.params?.idVisitaEmergencia ?? null 
     const { openVisibleSnackBar } = alertsState()
     const { metadatosPicture, clearMetadatosPicture } = fotografyState()
 
@@ -195,11 +203,25 @@ export default function SaveVisitas(){
         SetIsSupervision(validSupervision ? true : false)
     }
 
-    //descomentar para hacer funcionar
-    useEffect(() => { 
+    //funciones para visitas emergencia o visitas programadas
+    const validateIsVisitaEmergencia = () => {
+        console.log(idVisitaEmergencia)
+        if(!idVisitaEmergencia) return
+        //para seleccionar una tienda el valor es {empresa}-{tienda}
+        resetField('tienda', { defaultValue: '00004-00027' })
+        resetField('tipo_visita', { defaultValue: 5 })
+        setIsVisitaEmergencia(true)
+    }
+    //funciones para visitas emergencia o visitas programadas
+
+    const init = async() => {
         clearMetadatosPicture()
-        renderAll() 
-    }, [])
+        await renderAll() 
+        validateIsVisitaEmergencia()
+    }
+
+    //descomentar para hacer funcionar
+    useEffect(() => { init() }, [])
 
     const onChangeCheckBoxPersonas = (value:boolean) => {
         setIsCantidadPersonas(value)
@@ -210,7 +232,7 @@ export default function SaveVisitas(){
     return (
 
         <>
-            <PageLayout titleAppBar="Visitas">
+            <PageLayout titleAppBar="Visitas" goBack={idVisitaEmergencia ? true : false}>
 
                 <ScrollViewContainer>
 
@@ -222,13 +244,29 @@ export default function SaveVisitas(){
 
                         <View className="w-full flex-col gap-3.5 mt-5 mb-5">
 
+                            <ToggleContainerAnimated className="w-full" visible={isVisitaEmergencia}>
+                                <CardContent className="w-full">
+                                    <ListItemComponent
+                                        iconLeft={'calendar'}
+                                        title={"Fecha programacion"}
+                                        description={"2025-10-12"}
+                                    />
+                                    <ListItemComponent
+                                        iconLeft={'comment-text-outline'}
+                                        title={"Comentario"}
+                                        description={"Supervisar inventario de pollo para que en la casa"}
+                                        descriptionNumberOfLines={0}
+                                    />
+                                </CardContent>
+                            </ToggleContainerAnimated>
+
                             <DropdownForm
                                 label="Tienda"
                                 data={tiendas}
                                 control={control}
                                 name="tienda"
                                 errors={errors}
-                                disable={isLodingForm}
+                                disable={isLodingForm || isVisitaEmergencia}
                             />
 
                             <DropdownForm
@@ -237,10 +275,11 @@ export default function SaveVisitas(){
                                 control={control}
                                 name="tipo_visita"
                                 errors={errors}
-                                disable={isLodingForm}
+                                disable={isLodingForm || isVisitaEmergencia}
                                 onChangeExtra={(item) => validateIsSupervicion(item)}
                             />
 
+                            {/* Picker photo */}
                             <PickerFile disabled={isLodingForm}/>
 
                             {/* CHECKBOX */}
@@ -300,6 +339,7 @@ export default function SaveVisitas(){
                                 label="Comentario"
                                 errors={errors}
                                 disabled={isLodingForm}
+                                multiline={true}
                             />
 
                             <View className="w-full mt-3 mb-6">

@@ -19,6 +19,8 @@ import SurfaceTapButton from 'components/container/SurfaceTapButton';
 
 export default function Login() {
 
+  const [isBiometricSupported, setIsBiometricSupported] = useState<boolean>(false);
+
   const { openVisibleSnackBar } = alertsState()
 
   const [ loadingLogin, setLoadingLogin ] = useState<boolean>(false)
@@ -61,7 +63,9 @@ export default function Login() {
     resetField('codigo', { defaultValue: user }) 
   }
 
-  useEffect(()=> { validRememberCredentials() }, [])
+  useEffect(()=> {
+    validRememberCredentials()
+  }, [])
 
   return (
     <FormAdaptiveKeyBoard>
@@ -125,8 +129,9 @@ export default function Login() {
           {/* <SurfaceTapButton 
             icon='fingerprint'
             title='Huella'
-          />
-          <SurfaceTapButton 
+            visible={isBiometricSupported}
+          /> */}
+          {/* <SurfaceTapButton 
             icon='face-recognition'
             title='Facial'
           /> */}
