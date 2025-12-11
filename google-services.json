@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:763302326702:android:f8060d193e18f7c768183f",
+        "mobilesdk_app_id": "1:763302326702:android:ff5cddc005d3167e68183f",
         "android_client_info": {
-          "package_name": "pio_app.diego"
+          "package_name": "com.anonymous.pioapp"
         }
       },
       "oauth_client": [],
