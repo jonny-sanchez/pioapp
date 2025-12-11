@@ -16,13 +16,13 @@ import alertsState from 'helpers/states/alertsState';
 import { getValueStorage, setValueStorage } from 'helpers/store/storeApp';
 import CheckBoxForm from 'components/form/CheckBoxForm';
 import SurfaceTapButton from 'components/container/SurfaceTapButton';
+import { isDeviceReal } from 'helpers/Device/DeviceHelper';
+import { generateTokenNotificationPush, notificationPermissionGranted } from 'helpers/Notification/NotificationPushHelper';
 
 export default function Login() {
 
   const [isBiometricSupported, setIsBiometricSupported] = useState<boolean>(false);
-
   const { openVisibleSnackBar } = alertsState()
-
   const [ loadingLogin, setLoadingLogin ] = useState<boolean>(false)
 
   const validLogin = async(data: schemaLoginFormValidateType) : Promise<ResponseService> => {
@@ -63,8 +63,27 @@ export default function Login() {
     resetField('codigo', { defaultValue: user }) 
   }
 
-  useEffect(()=> {
+  const generateTokenFCM = async () => {
+    try {
+      const isDevice:boolean = isDeviceReal()
+      if(!isDevice) return openVisibleSnackBar(`Ooops no se puede recibir notificacion porque estas en un emulador.`, 'warning')
+      const resultNotification:boolean = await notificationPermissionGranted()
+      if(!resultNotification) return
+      const tokenPushNotification = await generateTokenNotificationPush()
+      console.log(tokenPushNotification)
+    } catch (error) {
+      console.log(error)
+      openVisibleSnackBar(`${error}`, 'error') 
+    }
+  } 
+
+  const init = async () => {
     validRememberCredentials()
+    generateTokenFCM()
+  }
+
+  useEffect(()=> {
+    init()
   }, [])
 
   return (

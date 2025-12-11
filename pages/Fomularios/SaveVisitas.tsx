@@ -344,6 +344,7 @@ export default function SaveVisitas(){
 
                             <View className="w-full mt-3 mb-6">
                                 <ButtonForm 
+                                    icon="content-save"
                                     loading={isLodingForm} 
                                     disabled={isLodingForm}
                                     onPress={handleSubmit(submitFormNwVisita)} 

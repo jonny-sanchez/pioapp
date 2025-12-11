@@ -17,6 +17,10 @@ import { RouterName } from 'helpers/navigator/routers';
 import { getValueStorage, setValueStorage } from 'helpers/store/storeApp';
 import { generateJsonError, ResponseService } from 'types/RequestType';
 import { AJAX, URLPIOAPP } from 'helpers/http/ajax';
+import AppInitTransition from 'components/Animaciones/AppInitTransition';
+import { configureNotificationHandler } from 'helpers/Notification/NotificationPushHelper';
+
+configureNotificationHandler()
 
 export default function App() {
 
@@ -68,22 +72,21 @@ export default function App() {
   return (
     <PaperProvider theme={theme}>
       {
-        !fontsLoaded || !validSession ?
-        <PageLoadingInit/>
-         :
-        <NavigationContainer 
-          ref={navigationGlobal}
-          onReady={NavigationService.updateCurrentRouteName}
-          onStateChange={NavigationService.updateCurrentRouteName}
-        >
-          <DrawerDashboard/>
-          {/* Loading screen global */}
-          <LoadingScreen/>
-          {/* snackbar alerts global */}
-          <SnackBarAlert/>
+        <AppInitTransition loading={!fontsLoaded || !validSession}>
+          <NavigationContainer 
+            ref={navigationGlobal}
+            onReady={NavigationService.updateCurrentRouteName}
+            onStateChange={NavigationService.updateCurrentRouteName}
+          >
+            <DrawerDashboard/>
+            {/* Loading screen global */}
+            <LoadingScreen/>
+            {/* snackbar alerts global */}
+            <SnackBarAlert/>
 
-          <StackNavigatorApp initialRouteName={routerInit}/>
-        </NavigationContainer>
+            <StackNavigatorApp initialRouteName={routerInit}/>
+          </NavigationContainer>
+        </AppInitTransition>
       }
     </PaperProvider>
   );
