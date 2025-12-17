@@ -26,6 +26,7 @@ import { RouteProp, useRoute } from "@react-navigation/native"
 import CardContent from "components/Cards/CardContent"
 import ListItemComponent from "components/List/ListItemComponent"
 import ResponseVisitaEmergenciaType from "types/VisitaEmergencia/ResponseVisitaEmergenciaType"
+import SkeletonSaveVisitas from "./Layouts/SkeletonSaveVisitas"
 
 type RouteParamasVisitas = {
     visitaEmergencia?:ResponseVisitaEmergenciaType|undefined|null
@@ -38,6 +39,7 @@ export default function SaveVisitas(){
     const visitaEmergencia:ResponseVisitaEmergenciaType|null = route?.params?.visitaEmergencia ?? null
     const { openVisibleSnackBar } = alertsState()
     const { metadatosPicture, clearMetadatosPicture } = fotografyState()
+    const [ renderInit, setRenderInit ] = useState<boolean>(false)
 
     const getTiendas = async():Promise<ResponseService<any[]>> => {
         try {
@@ -184,7 +186,8 @@ export default function SaveVisitas(){
     }
 
     const renderAll = async () => {
-        setOpenScreenLoading()
+        // setOpenScreenLoading()
+        setRenderInit(true)
         const listTiendas = await getTiendas()
         const listTipoVisita = await getTiposVisitas()
         const flatTiendas:any = listTiendas.data?.flatMap(el => ({ label: el.nombre_tienda, value: `${el.codigo_empresa}-${el.codigo_tienda}` }))
@@ -192,7 +195,8 @@ export default function SaveVisitas(){
         setOriginalTiendas(listTiendas?.data ?? [])
         setTiendas(flatTiendas)
         setTipoVisitas(flatTipoVisitas)
-        setCloseScreenLoading()
+        // setCloseScreenLoading()
+        setRenderInit(false)
     }
 
     const validateIsSupervicion = (item:any) => {
@@ -244,6 +248,8 @@ export default function SaveVisitas(){
                     {/* <View className="w-full mt-6">
                         <TextInfo style={{ textAlign: "justify" }}>Fomulario para ingreso de una nueva visita a una tienda porfavor completa los campos solicitados de manera correcta.</TextInfo>
                     </View> */}
+                    
+                    { renderInit && <SkeletonSaveVisitas styleContent={{ position: 'absolute', zIndex: 1 }}/> } 
 
                     <FormAdaptiveKeyBoard>
 

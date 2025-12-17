@@ -7,7 +7,7 @@ import ListSubheader from "components/List/ListSubheader";
 import TouchRipple from "components/Touch/TouchRipple";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
-import { Badge, useTheme } from "react-native-paper";
+import { Badge, Icon, Text, useTheme } from "react-native-paper";
 import { AppTheme } from "types/ThemeTypes";
 import ModalDetailNotification from "./Layouts/ModalDetailNotification";
 import { getValueStorage } from "helpers/store/storeApp";
@@ -18,24 +18,25 @@ import NotificacionAppType from "types/Notificaciones/NotificacionAppType";
 import { generateJsonError, ResponseService } from "types/RequestType";
 import alertsState from "helpers/states/alertsState";
 import { AJAX, URLPIOAPP } from "helpers/http/ajax";
+import ChipDecoration from "components/decoration/ChipDecoration";
+import TextInfo from "components/typografy/TextInfo";
+import Title from "components/typografy/Title";
+import NotificationLayout from "./Layouts/NotificationLayout";
+import SkeletonNotifications from "./Layouts/SkeletonNotifications";
 
 export default function ListNotification () {
 
     const theme:AppTheme = useTheme() as AppTheme
-
     const { openVisibleSnackBar } = alertsState()
-
-    const { notificacionesToday } = notificationState()
-
+    const { notificacionesToday, loadingNotificationToday, setloadingNotificationToday } = notificationState()
     const [notificationSelectActual, setNotificationSelectActual] = useState<NotificacionAppType|null>(null)
-
-    const [accordionHoy, setAccordionHoy] = useState<boolean>(true);
-
+    // const [accordionHoy, setAccordionHoy] = useState<boolean>(true);
     const [portalModal, setPortalModal] = useState<boolean>(false);
-
     const notificacionesHoyNoLeidas:number = notificacionesToday?.filter(({ leido }) => !leido)?.length ?? 0
+    const [chipSelect, setChipSelect] = useState<'hoy'|'anteriores'>('hoy')
+    const notisNoLeidasText = notificacionesHoyNoLeidas > 0 ? `(${notificacionesHoyNoLeidas})` : ''
 
-    const handleToggleAccordionHoy = () => setAccordionHoy(!accordionHoy)
+    // const handleToggleAccordionHoy = () => setAccordionHoy(!accordionHoy)
 
     const handleCloseTogglePortalModal = () => setPortalModal(false)
 
@@ -63,6 +64,7 @@ export default function ListNotification () {
     }
 
     const init = async() => {
+        setloadingNotificationToday(true)
         const token = getTokenAuth()
         initSocketNotification(token)
     }
@@ -88,60 +90,53 @@ export default function ListNotification () {
                 goBack={true}
             >
                 <ScrollViewContainer paddingHorizontal={25}>
-                    <View className="w-full my-6">
+                    {
+                        loadingNotificationToday 
+                            ? <SkeletonNotifications/>
+                            :
+                            <View className="w-full mt-6 mb-10">
+                                {/* Chip filters */}
+                                <View className="w-full flex-row gap-2 mb-8">
+                                    <ChipDecoration 
+                                        title="Hoy" 
+                                        mode="flat" 
+                                        icon={chipSelect === 'hoy' ? 'check' : ''} 
+                                        onPress={() => setChipSelect('hoy')}
+                                        style={{ backgroundColor: theme.colors.surfaceVariant }}
+                                    />
+                                    <ChipDecoration 
+                                        title="Anteriores" 
+                                        mode="flat" 
+                                        icon={chipSelect === 'anteriores' ? 'check' : ''} 
+                                        onPress={() => setChipSelect('anteriores')}
+                                        style={{ backgroundColor: theme.colors.surfaceVariant }}
+                                    />
+                                </View>
+                                <Text  
+                                    variant="titleMedium"
+                                    style={{ color: theme.colors.primary, marginBottom: 15, }}
+                                >
+                                    { chipSelect === 'hoy' && `Hoy ${ notisNoLeidasText }` }
+                                    { chipSelect === 'anteriores' && `Anteriores` }
+                                </Text>
 
-                        <Accordion 
-                            title={`Hoy ${notificacionesHoyNoLeidas > 0 ? `(${notificacionesHoyNoLeidas})` : ''}`} 
-                            expanded={accordionHoy} 
-                            onPress={handleToggleAccordionHoy}
-                        >
-                            
-                            <FlatListVirtualize
-                                data={notificacionesToday}
-                                keyExtractor={(_, i) => i.toString()}
-                                scrollEnabled={false}
-                                renderItem={({ item, index }: { item: NotificacionAppType; index: number }) => (
-                                    <>
-                                        <ListSubheader label={item.AsuntoNotificacionModel.name_asunto}/>
-                                        <TouchRipple onPress={() => handleOpenTogglePortalModal(item)}>
-                                            <View className="w-full flex flex-row">
-                                                <View style={{
-                                                   width: 3,
-                                                   height: '100%',
-                                                   ...(item.leido ? {} : { backgroundColor: theme.colors.primary  })
-                                                }}></View>
-                                                <ListItemComponent 
-                                                    styleList={{ width: '100%' }}
-                                                    iconLeft="bell"
-                                                    title={item.title} 
-                                                    titleStyle={{ ...(item.leido ? { } : { color: theme.colors.primary }) }}
-                                                    description={item.body}
-                                                    rightElements={
-                                                        <View className="justify-center">
-                                                            <Badge 
-                                                                size={15} 
-                                                                style={{ 
-                                                                    backgroundColor: 
-                                                                        item.leido 
-                                                                            ? theme.colors.success
-                                                                            : theme.colors.error
-                                                                }}
-                                                            />
-                                                        </View>
-                                                    }
-                                                />
-                                            </View>
-                                        </TouchRipple>
-                                    </>
-                                )}
-                            />
+                                { chipSelect === 'hoy' && 
+                                    <NotificationLayout 
+                                        notifications={notificacionesToday} 
+                                        onPressNoti={(item) => handleOpenTogglePortalModal(item)}
+                                    /> 
+                                }
 
-                        </Accordion>
+                                { chipSelect === 'anteriores' && 
+                                    <NotificationLayout 
+                                        notifications={[]} 
+                                        onPressNoti={(item) => handleOpenTogglePortalModal(item)}
+                                    /> 
+                                }
 
-                        <Accordion title="Anteriores">
-                        </Accordion>
-
-                    </View>
+                            </View>
+                    }
+                    
                 </ScrollViewContainer>
             </PageLayout>
         </>

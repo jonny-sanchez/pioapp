@@ -38,12 +38,12 @@ export default function AppBarHome({
                         icon={ dark ? 'weather-night' : 'weather-sunny' }
                     />
             }
-            {/* bell-outline */}
+            {/* bell-badge-outline */}
             { 
                 notification && 
                     <Appbar.Action 
                         onPress={() => NavigationService.navigate('Notificaciones')} 
-                        icon={'bell-badge-outline'} 
+                        icon={'bell-outline'} 
                         iconColor={theme.colors.error}
                     /> 
             }

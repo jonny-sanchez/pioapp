@@ -13,12 +13,14 @@ export default function ListItemComponent({
     className = '',
     rippleColor,
     leftElements,
-    descriptionNumberOfLines
+    descriptionNumberOfLines,
+    onPress
 } : ListItemComponentType) {
 
     return (
         <>
             <List.Item
+              onPress={onPress}
               rippleColor={rippleColor}
               className={className}  
               title={title}

@@ -1,3 +1,5 @@
+import { NavigationService } from "helpers/navigator/navigationScreens";
+import { validateConnectionInternetActive } from "helpers/network/internetHelper";
 import { handleSocketConnection, socketInstance } from "helpers/Socket/SocketHelper";
 import notificationState from "helpers/states/notificationState";
 import { Socket } from "socket.io-client";
@@ -6,11 +8,14 @@ import NotificacionAppType from "types/Notificaciones/NotificacionAppType";
 
 let socket: Socket | null = null;
 
-export const initSocketNotification = (token:string) => {
+export const initSocketNotification = async (token:string) => {
     if (socket) {
         socket.disconnect()
         socket = null
     }
+
+    const resultInternetActive = await validateConnectionInternetActive()
+    if(!resultInternetActive) NavigationService.navigate('InternetFail')
 
     socket = socketInstance(`${URLPIOAPPSOCKET}/notificaciones`, token)
     handleSocketConnection(socket)
@@ -29,6 +34,7 @@ export const initSocketNotification = (token:string) => {
     socket.emit("notificaciones_hoy");
     socket.on("notificaciones-listar", (data:NotificacionAppType[]) => {
         notificationState.getState().setNotifications(data)
+        notificationState.getState().setloadingNotificationToday(false)
     });
 
     return socket;

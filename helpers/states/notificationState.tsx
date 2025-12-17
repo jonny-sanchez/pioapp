@@ -6,6 +6,8 @@ type NotificationStateType = {
     addNotification: (newNotification: NotificacionAppType) => void;
     setNotifications: (newNotifications: NotificacionAppType[]) => void;
     updateLeidoById: (data: NotificacionAppType) => void;
+    loadingNotificationToday: boolean;
+    setloadingNotificationToday: (newLoadingNotificationToday:boolean) => void;
 }
 
 const notificationState = create<NotificationStateType>((set)=>({
@@ -24,7 +26,9 @@ const notificationState = create<NotificationStateType>((set)=>({
                     : noti
             )
         })
-    )
+    ),
+    loadingNotificationToday: false,
+    setloadingNotificationToday: (newLoadingNotificationToday) => set({ loadingNotificationToday: newLoadingNotificationToday })
 }))
 
 export default notificationState
