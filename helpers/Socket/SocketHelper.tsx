@@ -17,7 +17,7 @@ export const handleSocketConnection = (socket: Socket) => {
 
     // const { openVisibleSnackBar } = alertsState()
 
-    socket.on("connect", () => {
+    socket.on("connect", async() => {
         console.log("Socket conectado:", socket?.id);
     });
 

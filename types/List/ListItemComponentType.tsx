@@ -1,5 +1,5 @@
 import React from "react";
-import { ColorValue, StyleProp, TextStyle, ViewStyle } from "react-native";
+import { ColorValue, GestureResponderEvent, StyleProp, TextStyle, ViewStyle } from "react-native";
 
 type ListItemComponentType = {
     title?: string | React.ReactNode;
@@ -13,6 +13,7 @@ type ListItemComponentType = {
     rippleColor?: ColorValue | undefined;
     leftElements?: React.ReactNode;
     descriptionNumberOfLines?: number | undefined;
+    onPress?: (((event: GestureResponderEvent) => void) & ((e: GestureResponderEvent) => void) & ((e: GestureResponderEvent) => void)) | undefined
 }
 
 export default ListItemComponentType

@@ -29,7 +29,13 @@ export default function Login() {
 
   const validLogin = async(data: schemaLoginFormValidateType) : Promise<ResponseService> => {
     try {
-      const result:ResponseService = await AJAX(`${ URLPIOAPP }/auth/login`, 'POST', data)
+      const result:ResponseService = await AJAX(`${ URLPIOAPP }/auth/login`, 'POST', {
+        ...data,
+        ...(idDevice && exponentPushToken ? { 
+          id_unique_device: idDevice,
+          exponent_push_token: exponentPushToken
+        } : {})
+      })
       return result
     } catch (error:any) {
       openVisibleSnackBar(`${ error }`, 'error')

@@ -4,7 +4,7 @@ import ButtonForm from "components/form/ButtonForm";
 import ListItemComponent from "components/List/ListItemComponent";
 import ModalPortal from "components/Modals/ModalPortal";
 import { NavigationService } from "helpers/navigator/navigationScreens";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { Text, useTheme } from "react-native-paper";
 import { AppTheme } from "types/ThemeTypes";
@@ -13,6 +13,11 @@ import { getUbicacionActual } from "helpers/ubicacion/ubicacionHelper";
 import alertsState from "helpers/states/alertsState";
 import { openWazeNavigation } from "helpers/Waze/WazeHelper";
 import NotificacionAppType from "types/Notificaciones/NotificacionAppType";
+import { generateJsonError, ResponseService } from "types/RequestType";
+import { AJAX, URLPIOAPP } from "helpers/http/ajax";
+import ResponseVisitaEmergenciaType from "types/VisitaEmergencia/ResponseVisitaEmergenciaType";
+import { LatLng } from "react-native-maps";
+import InfoAlert from "components/Alerts/InfoAlert";
 
 type ModalDetailNotificationType = {
     portalModal: boolean;
@@ -28,24 +33,83 @@ export default function ModalDetailNotification({
 
     const theme:AppTheme = useTheme() as AppTheme
     const { openVisibleSnackBar } = alertsState()
-    const [rutaIniciada, setRutaIniciada] = useState<boolean>(false)
-    const [loadindRutaIniciada, setLoadindRutaIniciada] = useState<boolean>(false);
     const isTareaSupervisor = notificationSelectActual?.id_asunto_notificacion == 2
+    const [loadingTareaSupervisor, setLoadingTareaSupervisor] = useState<boolean>(false)
+    const [visitaEmergencia, setVisitaEmergencia] = useState<ResponseVisitaEmergenciaType|null>(null)
+    const idVisitaEmergencia = notificationSelectActual?.dataPayload?.idVisitaEmergencia ?? '0'
+    const [loadingButtonWaze, setLoadingButtonWaze] = useState<boolean>(false)
 
-    const handleOnpressRutaWaze = async () => {
-        setLoadindRutaIniciada(true)
+    //obtner la visita emregencia actual
+    const getVisitaEmergencia = async() : Promise<ResponseService<ResponseVisitaEmergenciaType>> => {
+        try {
+            const result = await AJAX(`${URLPIOAPP}/visita/emergencia/${idVisitaEmergencia}`, 'GET')
+            return result
+        } catch (error) {
+            openVisibleSnackBar(`${error}`, 'error')
+            return generateJsonError(`${error}`, 'object')
+        }
+    }
+
+    //obtener editar el estado de inicializacion de ruta a 2 (en Ruta)
+    const putVisitaEmergencia = async(ubicacion:LatLng) : Promise<ResponseService<ResponseVisitaEmergenciaType>> => {
+        try {
+            const result = await AJAX(`${URLPIOAPP}/visita/emergencia/update/${idVisitaEmergencia}`, 'PUT', {
+                id_estado: 2,
+                last_gps_longitude: ubicacion.longitude,
+                last_gps_latitude: ubicacion.latitude
+            })
+            return result
+        } catch (error) {
+            openVisibleSnackBar(`${error}`, 'error')
+            return generateJsonError(`${error}`, 'object')
+        }
+    }
+
+    //funciona par boton de waze
+    const HANDLE_TAP_BUTTON_WAZE = async () => {
         const ubicacionActual = await getUbicacionActual()
-        setLoadindRutaIniciada(false)
         if(!ubicacionActual) return openVisibleSnackBar(`Ooops ocurrio un error al obtener la Ubicacion porfavor verifice permisos y que la ubicacion este activa.`, 'error')
-        setRutaIniciada(true)
-        openWazeNavigation(ubicacionActual,{ latitude: 14.597003, longitude: -90.546725 })
+        //si la ruta ya fue inicada o terminada no volver a actualizar su estado solo actualizar si su estado es 1 
+        if(visitaEmergencia?.id_estado != 1) {
+            visitaEmergencia && openWazeNavigation(ubicacionActual,{ latitude: visitaEmergencia.new_gps_latitude, longitude: visitaEmergencia.new_gps_longitude })
+            return
+        }
+        //actuliazr a esta 2 en ruta
+        const resultIniciarRuta = await putVisitaEmergencia(ubicacionActual)
+        //si falla no actualizar estado ni navegar a waze
+        if(!resultIniciarRuta.status) return
+        setVisitaEmergencia(resultIniciarRuta.data as ResponseVisitaEmergenciaType)
+        openWazeNavigation(ubicacionActual,{ latitude: visitaEmergencia.new_gps_latitude, longitude: visitaEmergencia.new_gps_longitude })
+    }
+
+    //Funcion que se ejcuta al presionar el boton de Waze (VISITA EMERGENCIA)
+    const handleOnpressRutaWaze = async () => {
+        setLoadingButtonWaze(true)
+        await HANDLE_TAP_BUTTON_WAZE()
+        setLoadingButtonWaze(false)
 
     }
 
+    //FUNCION que se ejecuta cuando le das click a llenar formulario (VISITA EMERGENCIA)
     const handleOnpressIngresoVisitaEmergencia = () => {
         handleCloseTogglePortalModal()
-        NavigationService.navigate('SaveVisitas', { idVisitaEmergencia: 1  })
+        NavigationService.navigate('SaveVisitas', { visitaEmergencia: visitaEmergencia ?? null })
     }
+
+    //FUNCION PARA CARGAR LA INFORMACION Y VALIDACIONES DE LA VISITA EMERGENCIA
+    const handleValidVisitaEmergencia = async () => {
+        setLoadingTareaSupervisor(true)
+        const visitaEmergencia = await getVisitaEmergencia()
+        visitaEmergencia.status && setVisitaEmergencia(visitaEmergencia.data as ResponseVisitaEmergenciaType)
+        setLoadingTareaSupervisor(false)
+    }
+
+    const init = async() => {
+        //validar si el id del asunto es igual a 2
+        isTareaSupervisor && await handleValidVisitaEmergencia()
+    }
+
+    useEffect(() => { init() }, [notificationSelectActual])
 
     return (
         <>
@@ -69,18 +133,30 @@ export default function ModalDetailNotification({
                         { 
                             isTareaSupervisor && (
                                 <>
+                                    { visitaEmergencia?.id_estado == 3 && <InfoAlert label="Esta tarea ya fue completada."/> }
+
                                     <ButtonForm 
-                                        label="Iniciar Ruta" 
+                                        // label="Iniciar Ruta"
+                                        label={ 
+                                            visitaEmergencia?.id_estado != 1 
+                                                ? "Ver Ruta"
+                                                : "Iniciar Ruta"
+                                        } 
                                         icon="waze" 
-                                        loading={loadindRutaIniciada}
-                                        disabled={loadindRutaIniciada}
+                                        loading={loadingTareaSupervisor || loadingButtonWaze}
+                                        disabled={loadingTareaSupervisor || loadingButtonWaze || visitaEmergencia?.id_estado == 3}
                                         buttonColor={theme.colors.skyBlue}
                                         onPress={handleOnpressRutaWaze}
                                     />
                                     <ButtonForm 
                                         label="Ingresar visita" 
                                         icon="clipboard-check" 
-                                        disabled={!rutaIniciada}
+                                        loading={loadingTareaSupervisor}
+                                        disabled={
+                                            loadingTareaSupervisor 
+                                                || 
+                                            (visitaEmergencia?.id_estado != 2)
+                                        }
                                         onPress={handleOnpressIngresoVisitaEmergencia}
                                     />
                                 </>

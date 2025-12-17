@@ -11,7 +11,7 @@ type NotificacionAppType = {
     id_notificacion_app: number;
     title: string;
     body: string;
-    dataPayload: object;
+    dataPayload: object|any;
     id_asunto_notificacion: number;
     leido: boolean;
     id_users: string;
