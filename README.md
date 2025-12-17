@@ -16,3 +16,4 @@
     ]
   }
 }
+7. generar clave privada (doc oficial para subirl la clave expo https://docs.expo.dev/push-notifications/fcm-credentials/)

@@ -12,21 +12,25 @@ import { Linking } from "react-native";
 import { getUbicacionActual } from "helpers/ubicacion/ubicacionHelper";
 import alertsState from "helpers/states/alertsState";
 import { openWazeNavigation } from "helpers/Waze/WazeHelper";
+import NotificacionAppType from "types/Notificaciones/NotificacionAppType";
 
 type ModalDetailNotificationType = {
     portalModal: boolean;
-    handleCloseTogglePortalModal: (() => void)
+    handleCloseTogglePortalModal: (() => void);
+    notificationSelectActual: NotificacionAppType|null
 }
 
 export default function ModalDetailNotification({
     portalModal,
-    handleCloseTogglePortalModal
+    handleCloseTogglePortalModal,
+    notificationSelectActual
 }: ModalDetailNotificationType) {
 
     const theme:AppTheme = useTheme() as AppTheme
     const { openVisibleSnackBar } = alertsState()
     const [rutaIniciada, setRutaIniciada] = useState<boolean>(false)
     const [loadindRutaIniciada, setLoadindRutaIniciada] = useState<boolean>(false);
+    const isTareaSupervisor = notificationSelectActual?.id_asunto_notificacion == 2
 
     const handleOnpressRutaWaze = async () => {
         setLoadindRutaIniciada(true)
@@ -55,45 +59,45 @@ export default function ModalDetailNotification({
                         <AvatarImage size={50} img={LOGOAPP}/>
                         <View className="w-full flex-col">
                             <Text style={{ color: theme.colors.primary }}>PIOAPP</Text>
-                            <Text variant="bodySmall">Visita emergencia.</Text>
+                            <Text variant="bodySmall">{ notificationSelectActual?.AsuntoNotificacionModel?.name_asunto ?? ' -- ' }</Text>
                         </View>                        
                     </View>
                 }
                 footer={
                     <View className="w-full flex-col gap-2">
-                        <ButtonForm 
-                            label="Iniciar Ruta" 
-                            icon="waze" 
-                            loading={loadindRutaIniciada}
-                            disabled={loadindRutaIniciada}
-                            buttonColor={theme.colors.skyBlue}
-                            onPress={handleOnpressRutaWaze}
-                        />
-                        <ButtonForm 
-                            label="Ingresar visita" 
-                            icon="clipboard-check" 
-                            disabled={!rutaIniciada}
-                            onPress={handleOnpressIngresoVisitaEmergencia}
-                        />
+
+                        { 
+                            isTareaSupervisor && (
+                                <>
+                                    <ButtonForm 
+                                        label="Iniciar Ruta" 
+                                        icon="waze" 
+                                        loading={loadindRutaIniciada}
+                                        disabled={loadindRutaIniciada}
+                                        buttonColor={theme.colors.skyBlue}
+                                        onPress={handleOnpressRutaWaze}
+                                    />
+                                    <ButtonForm 
+                                        label="Ingresar visita" 
+                                        icon="clipboard-check" 
+                                        disabled={!rutaIniciada}
+                                        onPress={handleOnpressIngresoVisitaEmergencia}
+                                    />
+                                </>
+                            ) 
+                        }
+                
                     </View>
                 }
             >
                 <View className="w-full my-6">
                     <ListItemComponent 
-                        title="Tienda" 
-                        description="RABINAL 1"
+                        title="Titulo" 
+                        description={ notificationSelectActual?.title ?? ' -- ' }
                     />
                     <ListItemComponent 
-                        title="Direccion" 
-                        description="2A. AVENIDA 9-04   ZONA 1  VILLA CANALES GUATEMALA"
-                    />
-                    <ListItemComponent
-                        title="Descripcion"
-                        description="Visita a la tienda Monte rico"
-                    />
-                    <ListItemComponent 
-                        title="Comentario" 
-                        description=" -- "
+                        title="Descripcion" 
+                        description={ notificationSelectActual?.body ?? ' -- ' }
                     />
                 </View> 
             </ModalPortal>

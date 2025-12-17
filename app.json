@@ -60,12 +60,19 @@
         "foregroundImage": "./assets/images/LOGOPINULITO.png",
         "backgroundColor": "#fcb900"
       },
-      "package": "com.anonymous.pioapp"
+      "package": "com.anonymous.pioapp",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ]
     },
     "extra": {
       "eas": {
         "projectId": "d10fa382-0583-4d8e-a439-c1e3fb01ab7d"
       }
-    }
+    },
+    "owner": "digu123"
   }
 }

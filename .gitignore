@@ -25,3 +25,7 @@ android
 # Environment variables
 .env
 *.env
+
+# Services GOOGLE
+google-services.json
+pioappdiego-firebase-adminsdk-fbsvc-7c7682a0b1.json
