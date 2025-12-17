@@ -18,7 +18,11 @@ const appThemeLight:AppTheme = {
         warning: "rgb(150, 73, 0)",
         onWarning: "rgb(255, 255, 255)",
         warningContainer: "rgb(255, 220, 198)",
-        onWarningContainer: "rgb(49, 19, 0)"
+        onWarningContainer: "rgb(49, 19, 0)",
+        skyBlue: "rgb(0, 99, 154)",
+        onSkyBlue: "rgb(255, 255, 255)",
+        skyBlueContainer: "rgb(206, 229, 255)",
+        onSkyBlueContainer: "rgb(0, 29, 50)",
     },
 }
 

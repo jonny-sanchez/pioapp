@@ -17,7 +17,8 @@ type InputProps = {
     inputType?:KeyboardTypeOptions | undefined,
     counterWords?: boolean;
     returnKeyType?: ReturnKeyTypeOptions,
-    onSubmitEditing?: ((e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => void) | undefined
+    onSubmitEditing?: ((e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => void) | undefined;
+    multiline?: boolean | undefined;
 }
 
 export default function InputFormHook({
@@ -33,7 +34,8 @@ export default function InputFormHook({
     inputType,
     counterWords = false,
     returnKeyType,
-    onSubmitEditing
+    onSubmitEditing,
+    multiline
 } : InputProps){
 
     // const theme = useTheme()
@@ -54,6 +56,7 @@ export default function InputFormHook({
                 name={name}
                 render={({ field: { onChange, onBlur, value } }) => (
                     <TextInput
+                      multiline={multiline}
                       keyboardType={inputType}
                       disabled={disabled}
                       mode="flat"

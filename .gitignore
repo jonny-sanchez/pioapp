@@ -21,3 +21,11 @@ android
 
 # Temporary files created by Metro to check the health of the file watcher
 .metro-health-check*
+
+# Environment variables
+.env
+*.env
+
+# Services GOOGLE
+google-services.json
+pioappdiego-firebase-adminsdk-fbsvc-7c7682a0b1.json

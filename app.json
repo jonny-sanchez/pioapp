@@ -19,7 +19,15 @@
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
           "recordAudioAndroid": true
         }
-      ]
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow $(PRODUCT_NAME) to use Face ID."
+        }
+      ],
+      "expo-notifications",
+      "@react-native-firebase/app"
     ],
     "orientation": "portrait",
     "icon": "./assets/images/LOGOPINULITO.png",
@@ -33,22 +41,38 @@
       "**/*"
     ],
     "ios": {
+      "config": {
+        "googleMapsApiKey": "process.env.GOOGLE_MAPS_API_KEY"
+      },
       "supportsTablet": true,
       "entitlements": {
         "com.apple.developer.networking.wifi-info": true
       }
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
+      "config": {
+        "googleMaps": {
+          "apiKey": "process.env.GOOGLE_MAPS_API_KEY"
+        }
+      },
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/LOGOPINULITO.png",
         "backgroundColor": "#fcb900"
       },
-      "package": "com.anonymous.pioapp"
+      "package": "com.anonymous.pioapp",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ]
     },
     "extra": {
       "eas": {
         "projectId": "d10fa382-0583-4d8e-a439-c1e3fb01ab7d"
       }
-    }
+    },
+    "owner": "digu123"
   }
 }

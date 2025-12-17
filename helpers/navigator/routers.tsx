@@ -13,6 +13,8 @@ import ConvivioInvitacion from "pages/dashboard/ConvivioInvitacion"
 import NominaConvivio from "pages/dashboard/NominaConvivio"
 import CrearQrConvivio from "pages/dashboard/NominaConvivio/CrearQrConvivio"
 import CrearProductoConvivio from "pages/dashboard/NominaConvivio/CrearProductoConvivio"
+import ListNotification from "pages/Notifications/ListNotification"
+import PersonalUser from "pages/PersonalUser/PersonalUser"
 
 type RoutersType = {
     name: string;
@@ -135,7 +137,23 @@ const routers = [
         hidden: true,
         icon: '',
         title: 'Crear producto convivio'
-    }
+    },
+    {
+        name: 'Notificaciones',
+        component: ListNotification,
+        default: false,
+        hidden: true,
+        icon: '',
+        title: 'Notificaciones'
+    },
+    {
+        name: 'PersonalUser',
+        component: PersonalUser,
+        default: false,
+        hidden: true,
+        icon: '',
+        title: 'Personal'
+    },
 ] as const satisfies readonly RoutersType[]
 
 export type RouterName = typeof routers[number]['name']

@@ -16,7 +16,11 @@ const appThemeDark:AppTheme = {
         warning: "rgb(255, 183, 134)",
         onWarning: "rgb(80, 36, 0)",
         warningContainer: "rgb(114, 54, 0)",
-        onWarningContainer: "rgb(255, 220, 198)"
+        onWarningContainer: "rgb(255, 220, 198)",
+        skyBlue: "rgb(150, 204, 255)",
+        onSkyBlue: "rgb(0, 51, 83)",
+        skyBlueContainer: "rgb(0, 74, 117)",
+        onSkyBlueContainer: "rgb(206, 229, 255)",
     }
 }
 

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "657658768",
+    "project_id": "pioappdiego",
+    "storage_bucket": "pioappdiego.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "65:6564565:5456",
+        "android_client_info": {
+          "package_name": "com.anonymous.pioapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "DSAF54tgfd65gdfsfsdt4gjn"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

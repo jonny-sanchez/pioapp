@@ -10,6 +10,7 @@ import { logout } from 'helpers/authHelper/authHelper';
 import { getValueStorage } from 'helpers/store/storeApp';
 import menuRouterState, { RouterGrouped } from 'helpers/states/menuRouterState';
 import { currentRouteName, NavigationService } from 'helpers/navigator/navigationScreens';
+import TouchRipple from 'components/Touch/TouchRipple';
 // import { useRoute } from '@react-navigation/native';
 
 export default function DrawerDashboard () {
@@ -54,14 +55,20 @@ export default function DrawerDashboard () {
                 ]}
             >
               <View>
-                <View className='w-full flex flex-row gap-4 items-center py-[30] px-[25]'>
-                    <Avatar.Image size={50} source={require('assets/images/default-user.jpg')} />
-                    <View className='flex-1'>
-                        <Text variant='bodyLarge'>{ `${userSession?.first_name || ''} ${userSession?.first_last_name || ''}` }</Text>
-                        <Text variant='bodySmall' style={{ color: theme.colors.primary }}>{ userSession?.puesto_trabajo || ' -- ' }</Text>
-                        <Text variant='labelSmall' style={{ color: theme.colors.secondary }}>{ userSession?.codigo_user || '--' }</Text>
-                    </View>
-                </View>
+                {/* Personal page info */}
+                <TouchRipple onPress={() => {
+                  setCloseDrawer()
+                  setTimeout(() => NavigationService.navigate("PersonalUser"), 200)
+                }}>
+                  <View className='w-full flex flex-row gap-4 items-center py-[30] px-[25]'>
+                      <Avatar.Image size={50} source={require('assets/images/default-user.jpg')} />
+                      <View className='flex-1'>
+                          <Text variant='bodyLarge'>{ `${userSession?.first_name || ''} ${userSession?.first_last_name || ''}` }</Text>
+                          <Text variant='bodySmall' style={{ color: theme.colors.primary }}>{ userSession?.puesto_trabajo || ' -- ' }</Text>
+                          <Text variant='labelSmall' style={{ color: theme.colors.secondary }}>{ userSession?.codigo_user || '--' }</Text>
+                      </View>
+                  </View>
+                </TouchRipple>
                 
                 {/* Section menu bootom */}
                 {

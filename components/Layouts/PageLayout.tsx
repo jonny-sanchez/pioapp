@@ -8,6 +8,7 @@ type PageLayoutProps = {
     goBack?: boolean;
     menuApp?: boolean;
     themeApp?: boolean;
+    notification?: boolean;
 }
 
 export default function PageLayout({
@@ -15,7 +16,8 @@ export default function PageLayout({
     titleAppBar = '',
     goBack = false,
     menuApp = true,
-    themeApp = true
+    themeApp = true,
+    notification = true
 } : PageLayoutProps) {
 
     return (
@@ -26,6 +28,7 @@ export default function PageLayout({
                 goBack={goBack}
                 menuApp={menuApp}
                 themeApp={themeApp}
+                notification={notification}
             />
             { children }
         </>
