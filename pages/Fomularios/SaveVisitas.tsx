@@ -25,16 +25,17 @@ import ToggleContainerAnimated from "components/Animaciones/ToggleContainerAnima
 import { RouteProp, useRoute } from "@react-navigation/native"
 import CardContent from "components/Cards/CardContent"
 import ListItemComponent from "components/List/ListItemComponent"
+import ResponseVisitaEmergenciaType from "types/VisitaEmergencia/ResponseVisitaEmergenciaType"
 
 type RouteParamasVisitas = {
-    idVisitaEmergencia?:number|undefined
+    visitaEmergencia?:ResponseVisitaEmergenciaType|undefined|null
 }
 
 export default function SaveVisitas(){
 
     const [isVisitaEmergencia, setIsVisitaEmergencia] = useState<boolean>(false)
     const route = useRoute<RouteProp<{ params:RouteParamasVisitas }, 'params'>>();
-    const idVisitaEmergencia = route?.params?.idVisitaEmergencia ?? null 
+    const visitaEmergencia:ResponseVisitaEmergenciaType|null = route?.params?.visitaEmergencia ?? null
     const { openVisibleSnackBar } = alertsState()
     const { metadatosPicture, clearMetadatosPicture } = fotografyState()
 
@@ -103,7 +104,8 @@ export default function SaveVisitas(){
                 uri: fotoCantidadPersonas?.uri || '',
                 type: fotoCantidadPersonas?.mimeType || '',
                 name: fotoCantidadPersonas?.uri?.split('/').pop() || null
-            } : null
+            } : null,
+            ...(visitaEmergencia ? { id_visita_emergencia: visitaEmergencia.id_visita } : {})
         }
     }
 
@@ -205,10 +207,9 @@ export default function SaveVisitas(){
 
     //funciones para visitas emergencia o visitas programadas
     const validateIsVisitaEmergencia = () => {
-        console.log(idVisitaEmergencia)
-        if(!idVisitaEmergencia) return
+        if(!visitaEmergencia) return
         //para seleccionar una tienda el valor es {empresa}-{tienda}
-        resetField('tienda', { defaultValue: '00004-00027' })
+        resetField('tienda', { defaultValue: `${visitaEmergencia.empresa}-${visitaEmergencia.tienda}` })
         resetField('tipo_visita', { defaultValue: 5 })
         setIsVisitaEmergencia(true)
     }
@@ -232,7 +233,11 @@ export default function SaveVisitas(){
     return (
 
         <>
-            <PageLayout titleAppBar="Visitas" goBack={idVisitaEmergencia ? true : false}>
+            <PageLayout 
+                titleAppBar="Visitas" 
+                goBack={visitaEmergencia ? true : false}
+                notification={visitaEmergencia ? false : true}
+            >
 
                 <ScrollViewContainer>
 
@@ -244,17 +249,18 @@ export default function SaveVisitas(){
 
                         <View className="w-full flex-col gap-3.5 mt-5 mb-5">
 
+                            {/* Visita emergencia */}
                             <ToggleContainerAnimated className="w-full" visible={isVisitaEmergencia}>
                                 <CardContent className="w-full">
                                     <ListItemComponent
                                         iconLeft={'calendar'}
                                         title={"Fecha programacion"}
-                                        description={"2025-10-12"}
+                                        description={visitaEmergencia?.fecha_programacion ?? ' -- '}
                                     />
                                     <ListItemComponent
                                         iconLeft={'comment-text-outline'}
                                         title={"Comentario"}
-                                        description={"Supervisar inventario de pollo para que en la casa"}
+                                        description={visitaEmergencia?.comentario ?? ' -- '}
                                         descriptionNumberOfLines={0}
                                     />
                                 </CardContent>

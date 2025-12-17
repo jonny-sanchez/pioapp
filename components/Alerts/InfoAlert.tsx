@@ -16,7 +16,7 @@ export default function InfoAlert({
     const theme = useTheme()
 
     return (
-        <View style={[styleContent]} className="flex-row gap-1">
+        <View style={[styleContent]} className="flex-row gap-1 items-center">
             <IconButton
                 icon="alert-circle"
                 iconColor={theme.colors.onErrorContainer}
