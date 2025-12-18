@@ -45,6 +45,8 @@ export default function ModalDetailNotification({
             const result = await AJAX(`${URLPIOAPP}/visita/emergencia/${idVisitaEmergencia}`, 'GET')
             return result
         } catch (error) {
+            //si sucede un error seria mejor cerrar el modal actual
+            handleCloseTogglePortalModal()
             openVisibleSnackBar(`${error}`, 'error')
             return generateJsonError(`${error}`, 'object')
         }
@@ -60,6 +62,8 @@ export default function ModalDetailNotification({
             })
             return result
         } catch (error) {
+            //si sucede un error seria mejor cerrar el modal actual
+            handleCloseTogglePortalModal()
             openVisibleSnackBar(`${error}`, 'error')
             return generateJsonError(`${error}`, 'object')
         }
