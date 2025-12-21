@@ -1,4 +1,4 @@
-import { requestForegroundPermissionsAsync, getCurrentPositionAsync } from 'expo-location'
+import { requestForegroundPermissionsAsync, getCurrentPositionAsync, getForegroundPermissionsAsync, PermissionStatus } from 'expo-location'
 import { LatLng } from 'react-native-maps'
 
 export const locationPermission = async () => {
@@ -38,3 +38,13 @@ export const getUbicacionActual = async () : Promise<LatLng|null> => {
         ? { latitude: resultLocation.coords.latitude, longitude: resultLocation.coords.longitude } 
         : null
 }
+
+export const getLocationPermission = async () : Promise<PermissionStatus|null> => {
+    try {
+        const { status } = await getForegroundPermissionsAsync();
+        return status;
+    } catch (error) {
+        return null
+    }
+  
+};

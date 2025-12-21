@@ -7,27 +7,92 @@ import ListItemComponent from "components/List/ListItemComponent";
 import ListSubheader from "components/List/ListSubheader";
 import SwitchComponent from "components/Switch/SwitchComponent";
 import TouchRipple from "components/Touch/TouchRipple";
-import { useEffect } from "react";
-import { SwitchChangeEvent, View } from "react-native";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { AppState, SwitchChangeEvent, View } from "react-native";
+import { Modalize } from "react-native-modalize";
 import { Divider, List, Text, useTheme } from "react-native-paper";
 import { AppTheme } from "types/ThemeTypes";
+import ModalizeUser from "./Layouts/ModalizeUser";
+import SkeletonUser from "./Layouts/SkeletonUser";
+import { getCameraPermission, permissionCamera } from "helpers/camara/cameraHelper";
+import { PermissionStatus as PermissionStatusCamara  } from 'expo-image-picker'
+import { PermissionStatus as PermissionStatusLocation } from 'expo-location'
+import { PermissionStatus as PermissionStatusNotification } from 'expo-notifications'
+import { useForm } from "react-hook-form";
+import { getLocationPermission, locationPermission } from "helpers/ubicacion/ubicacionHelper";
+import { getNotificationPermission, notificationPermissionGranted } from "helpers/Notification/NotificationPushHelper";
+import schemaPerfilUser from "helpers/validatesForm/schemaPerfilUser";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Linking from 'expo-linking';
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function PersonalUser() {
 
     const theme:AppTheme = useTheme() as AppTheme
+    const appState = useRef(AppState.currentState);
+    const modalizeRefUser = useRef<Modalize>(null)
+    const [loadingUser, setLoadingUser] = useState<boolean>(false)
+    const onOpenModalizeUser = () => modalizeRefUser.current?.open()
+    const onCloseModalizeUser = () => modalizeRefUser.current?.close()
+    const { control, handleSubmit, reset, resetField, formState: { errors, isValid }, watch } = useForm({
+        resolver: yupResolver(schemaPerfilUser),
+        mode: 'all'
+    })
+    const [permisos, setPermisos] = useState({
+        camera: null as PermissionStatusCamara | null,
+        location: null as PermissionStatusLocation | null,
+        notification: null as PermissionStatusNotification | null,
+        ts: Date.now(),
+    });
 
-    const handleOnChangeUbicacionPermisos = (e:SwitchChangeEvent) => {
-        console.log(e.nativeEvent.value)
+
+    const onPressIconButtonEditImage = () => {
+        onOpenModalizeUser()
     }
 
-    const init = () => {
-        
+    const openSettings = () => Linking.openSettings()
+
+    const onChangeSwitchPermissions = async (value:boolean, type:'location'|'camera'|'notification') => {
+        openSettings()
+        // if(!value) return openSettings()
+        // if(value && type === 'location') await locationPermission()
+        // if(value && type === 'camera') await permissionCamera()
+        // if(value && type === 'notification') await notificationPermissionGranted()
+        // await init()
     }
+
+    const init = async() => {
+        setLoadingUser(true)
+        const camera = await getCameraPermission()
+        const location = await getLocationPermission()
+        const notification = await getNotificationPermission()
+        setPermisos({camera,location,notification, ts: Date.now()})
+        setLoadingUser(false)
+    }
+
+    useEffect(() => {
+        resetField('switch_camara', { defaultValue: permisos.camera === 'granted' })
+        resetField('switch_ubicacion', { defaultValue: permisos.location === 'granted' })
+        resetField('switch_notificaciones', { defaultValue: permisos.notification === 'granted' })
+    }, [permisos.ts])
+
+    useEffect(() => {
+      const sub = AppState.addEventListener('change', nextState => {
+        if (appState.current.match(/inactive|background/) && nextState === 'active') init()
+        appState.current = nextState
+      })
+      return () => sub.remove()
+    }, []);
 
     useEffect(() => { init() }, [])
 
     return (
         <>
+            {/* Modalize para usuario */}
+            <ModalizeUser
+                modalizeRefUser={modalizeRefUser}
+            />
+
             <PageLayout 
                 titleAppBar="Perfil" 
                 menuApp={false}
@@ -36,53 +101,87 @@ export default function PersonalUser() {
                 goBack={true}
             >
                 <ScrollViewContainer>
-                    <View className="my-6 w-full flex-col gap-5">
-
-                        <View className="w-full flex-col items-center">
-                            <View style={{ position: 'relative' }}>
-                                <IconButtomForm icon="pencil" size={10} style={{ position: 'absolute', zIndex: 2, right: -5, top: -5 }}/>
-                                <AvatarImage style={{ marginBottom: 15 }} img={DEFAULT_USER} size={100}/>
+                    {
+                        loadingUser 
+                        ? <SkeletonUser/>
+                        :
+                        <View className="mt-6 mb-12 w-full flex-col gap-5">
+                            <View className="w-full flex-col items-center">
+                                <View style={{ position: 'relative' }}>
+                                    <IconButtomForm 
+                                        icon="pencil" 
+                                        size={13} 
+                                        style={{ position: 'absolute', zIndex: 2, right: -5, top: -5 }}
+                                        onPress={onPressIconButtonEditImage}
+                                    />
+                                    <AvatarImage 
+                                        style={{ marginBottom: 15 }} 
+                                        img={DEFAULT_USER} 
+                                        size={100}
+                                    />
+                                </View>
+                                <Text style={{ color: theme.colors.primary }}>AL5117</Text>
+                                <Text>Diego Alejandro Guevar Cordon</Text>
+                                <Text style={{ color: theme.colors.secondary }}>Desarrollador</Text>
                             </View>
-                            <Text style={{ color: theme.colors.primary }}>AL5117</Text>
-                            <Text>Diego Alejandro Guevar Cordon</Text>
-                            <Text style={{ color: theme.colors.secondary }}>Desarrollador</Text>
-                        </View>
 
-                        <Divider/>
+                            <Divider/>
 
-                        <View className="w-full">
-                            <ListSubheader label="Personal"/>
-                            <TouchRipple onPress={() => {}}>
+                            <View className="w-full">
+                                <ListSubheader label="Personal"/>
+
                                 <ListItemComponent
+                                    onPress={() => {}}
                                     iconLeft="google"
                                     title={"Cuenta google"}
                                     description={"vincular cuenta"}
                                     rightElements={<List.Icon icon={'chevron-right'}/>}
                                 />
-                            </TouchRipple>
-                        </View>
-                        
-                        {/* Configurar permisso */}
-                        <View className="w-full flex-col">
-                            <ListSubheader label="Permisos"/>
-                            <ListItemComponent
-                                title="Ubicacion"
-                                description={"Permisos de ubicacion"}
-                                rightElements={<SwitchComponent onChange={handleOnChangeUbicacionPermisos}/>}
-                            />
-                            <ListItemComponent
-                                title="Camara"
-                                description={"Permisos de camara"}
-                                rightElements={<SwitchComponent onChange={handleOnChangeUbicacionPermisos}/>}
-                            />
-                            <ListItemComponent
-                                title="Notificaciones"
-                                description={"Permisos de notificaciones"}
-                                rightElements={<SwitchComponent onChange={handleOnChangeUbicacionPermisos}/>}
-                            />
+
+                            </View>
+
+                            {/* Configurar permisso */}
+                            <View className="w-full flex-col">
+                                <ListSubheader label="Permisos"/>
+                                <ListItemComponent
+                                    title="Ubicacion"
+                                    description={"Permisos de ubicacion"}
+                                    rightElements={
+                                        <SwitchComponent 
+                                            control={control} 
+                                            name="switch_ubicacion"
+                                            onExternalChange={(value) => onChangeSwitchPermissions(value, 'location')}
+                                        />
+                                    }
+                                />
+                                <ListItemComponent
+                                    title="Camara"
+                                    description={"Permisos de camara"}
+                                    rightElements={
+                                        <SwitchComponent 
+                                            control={control} 
+                                            name="switch_camara"
+                                            onExternalChange={(value) => onChangeSwitchPermissions(value, 'camera')}
+                                        />
+                                    }
+                                />
+                                <ListItemComponent
+                                    title="Notificaciones"
+                                    description={"Permisos de notificaciones"}
+                                    rightElements={
+                                        <SwitchComponent 
+                                            control={control} 
+                                            name="switch_notificaciones"
+                                            onExternalChange={(value) => onChangeSwitchPermissions(value, 'notification')}
+                                        />
+                                    }
+                                />
+                            </View>
+
                         </View>
 
-                    </View>
+                    }
+
                 </ScrollViewContainer>
             </PageLayout>
         </>

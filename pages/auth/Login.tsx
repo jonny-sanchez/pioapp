@@ -18,16 +18,22 @@ import CheckBoxForm from 'components/form/CheckBoxForm';
 import SurfaceTapButton from 'components/container/SurfaceTapButton';
 import { isDeviceReal, uniqueIdDevice } from 'helpers/Device/DeviceHelper';
 import { generateTokenNotificationPush, notificationPermissionGranted } from 'helpers/Notification/NotificationPushHelper';
+import { LOGOPINULITOORIGINAL } from 'assets/Providers/ImageProvider';
+
+type DataFcmType = {
+  idDevice: string|null;
+  exponentPushToken: string|null;
+}
 
 export default function Login() {
 
-  const [idDevice, setIdDevice] = useState<string|null>(null)
-  const [exponentPushToken, setExponentPushToken] = useState<string|null>(null);
+  // const [idDevice, setIdDevice] = useState<string|null>(null)
+  // const [exponentPushToken, setExponentPushToken] = useState<string|null>(null);
   const [isBiometricSupported, setIsBiometricSupported] = useState<boolean>(false);
   const { openVisibleSnackBar } = alertsState()
   const [ loadingLogin, setLoadingLogin ] = useState<boolean>(false)
 
-  const validLogin = async(data: schemaLoginFormValidateType) : Promise<ResponseService> => {
+  const validLogin = async(data: schemaLoginFormValidateType, idDevice:string|null, exponentPushToken:string|null) : Promise<ResponseService> => {
     try {
       const result:ResponseService = await AJAX(`${ URLPIOAPP }/auth/login`, 'POST', {
         ...data,
@@ -50,7 +56,12 @@ export default function Login() {
 
   const submitFormLogin = async(data: schemaLoginFormValidateType) => {
     setLoadingLogin(true)
-    const login = await validLogin(data)
+    const dataFcm = await generateTokenFCM()
+    const login = await validLogin(
+      data, 
+      dataFcm.idDevice, 
+      dataFcm.exponentPushToken
+    )
     setLoadingLogin(false)
     login.status && NavigationService.reset('Home')
     login.status && setValueStorage('user', login.data)
@@ -72,33 +83,38 @@ export default function Login() {
   }
 
   //token de dispositivo para notificaciones push
-  const generateTokenFCM = async () => {
+  const generateTokenFCM = async () : Promise<DataFcmType> => {
     try {
       //validar si el dispositivo es fisico y no es un emulador
       const isDevice:boolean = isDeviceReal()
-      if(!isDevice) return openVisibleSnackBar(`Ooops no se puede recibir notificacion porque estas en un emulador.`, 'warning')
+      if(!isDevice) {
+        openVisibleSnackBar(`Ooops no se puede recibir notificacion porque estas en un emulador.`, 'warning')
+        return { exponentPushToken: null, idDevice: null }
+      }
       //validar permisos para las notificaciones
       const resultNotification:boolean = await notificationPermissionGranted()
-      if(!resultNotification) return
+      if(!resultNotification) return { exponentPushToken: null, idDevice: null }
       //generar token de notificaciones push
       const tokenPushNotification = await generateTokenNotificationPush()
       //obtener el id unico de dispositivo
       const idUniqueDispositivo = await uniqueIdDevice()
-      //setear estados
-      setIdDevice(idUniqueDispositivo)
-      setExponentPushToken(tokenPushNotification)
       //debug
-      console.log(tokenPushNotification)
-      console.log(idUniqueDispositivo)
+      // console.log(tokenPushNotification)
+      // console.log(idUniqueDispositivo)
+      //setear estados
+      return { exponentPushToken: tokenPushNotification, idDevice: idUniqueDispositivo }
+      // setIdDevice(idUniqueDispositivo)
+      // setExponentPushToken(tokenPushNotification)
     } catch (error) {
       openVisibleSnackBar(`${error}`, 'error') 
+      return { exponentPushToken: null, idDevice: null }
     }
   } 
 
   const init = async () => {
     setLoadingLogin(true)
     validRememberCredentials()
-    await generateTokenFCM()
+    // await generateTokenFCM()
     setLoadingLogin(false)
   }
 
@@ -109,7 +125,7 @@ export default function Login() {
   return (
     <FormAdaptiveKeyBoard>
       <View className='flex-1 items-center justify-center px-8'>
-        <BoxImage width={70} height={80} img={require('assets/images/LOGOPINULITOORIGINAL.png')}/>
+        <BoxImage width={70} height={80} img={LOGOPINULITOORIGINAL}/>
         
         <View className='flex flex-col justify-center items-center gap-1 mt-10'>
           <Title>Login</Title>

@@ -6,7 +6,8 @@ type ChipDecorationProps = {
     icon?: string;
     style?: StyleProp<ViewStyle>;
     mode?: "flat" | "outlined" | undefined;
-    onPress?: ((e: GestureResponderEvent) => void) | undefined
+    onPress?: ((e: GestureResponderEvent) => void) | undefined;
+    disabled?: boolean | undefined;
 }
 
 export default function ChipDecoration({
@@ -14,11 +15,12 @@ export default function ChipDecoration({
     icon = '',
     style = {},
     mode = 'outlined',
-    onPress
+    onPress,
+    disabled
 } : ChipDecorationProps){
 
     return (
-        <Chip style={[style]} mode={mode} icon={icon} onPress={onPress}>
+        <Chip style={[style]} mode={mode} icon={icon} onPress={onPress} disabled={disabled}>
             <Text variant="labelSmall">{ title }</Text>
         </Chip>
     )

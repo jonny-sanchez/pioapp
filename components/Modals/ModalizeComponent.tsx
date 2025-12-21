@@ -7,7 +7,8 @@ type ModalizeComponentProps= {
     children?: React.ReactNode;
     modalizeRef?: any;
     title?: string;
-    footerComponent?: React.ReactNode
+    footerComponent?: React.ReactNode;
+    heightModalizeSreen?: number;
     // onOpen?: () => void;
 }
 
@@ -15,7 +16,8 @@ export default function ModalizeComponent({
     children,
     modalizeRef,
     title = '',
-    footerComponent
+    footerComponent,
+    heightModalizeSreen = 0.80
     // onOpen = () => {}
 } : ModalizeComponentProps){
 
@@ -29,7 +31,7 @@ export default function ModalizeComponent({
             <Modalize 
                 handlePosition='inside'
                 ref={modalizeRef}
-                modalHeight={height * 0.80}
+                modalHeight={height * heightModalizeSreen}
                 modalStyle={{ backgroundColor: theme.colors.background }}
                 handleStyle={{ backgroundColor: theme.colors.outline }}
                 scrollViewProps={{ 
