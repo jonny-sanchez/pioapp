@@ -1,11 +1,24 @@
+import { AuthorizationHeaders } from "constants/Authorization/AuthorizationConstant";
 import { logout } from "helpers/authHelper/authHelper";
 import { NavigationService } from "helpers/navigator/navigationScreens";
 import { validateConnectionInternetActive } from "helpers/network/internetHelper";
 import { getValueStorage } from "helpers/store/storeApp";
+import { UserSessionType } from "types/auth/UserSessionType";
+import { AuthHedearsType } from "types/Request/AuthorizationTypes";
+import MethodRequestType from "types/Request/MethodRequestType";
 
 // export const URLPIOAPP = `http://192.168.0.46:5000/api`
 // export const URLPIOAPP = `http://10.0.2.2:5000/api`
+
+//local pruva PORT
+// export const URLPIOAPP = `https://1n42gnjd-5000.use2.devtunnels.ms/api`
+
+//Produccion
 export const URLPIOAPP = `https://services.sistemaspinulito.com/pioapi`
+
+//variables para authentication con basic auth
+export const BASIC_AUTH_USERNAME = process.env.EXPO_PUBLIC_BASIC_AUTH_USERNAME
+export const BASIC_AUTH_PASSWORD = process.env.EXPO_PUBLIC_BASIC_AUTH_PASSWORD
 
 export const timeout = function(s:number)
 {
@@ -18,11 +31,12 @@ export const timeout = function(s:number)
 
 export async function AJAX(
     url: string = '',
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS' = 'GET',
+    method:MethodRequestType = 'GET',
     uploadData:any = null,
     formData = false,
     blob:boolean = false,
-    headers:any = null
+    headers:any = null,
+    authorization:AuthHedearsType = 'bearer'
 ) {
 
     try {
@@ -31,10 +45,16 @@ export async function AJAX(
 
         if(!resultInternetActive) NavigationService.navigate('InternetFail')
 
-        const user = getValueStorage('user')
+        const user = getValueStorage('user') as UserSessionType
         // const user = { token: '' }
 
         const api_token = (user?.token ?? null) || ''
+
+        let valueHeaderAuth = AuthorizationHeaders[authorization]({
+            api_token: api_token,
+            basic_username: BASIC_AUTH_USERNAME,
+            basic_password: BASIC_AUTH_PASSWORD,
+        })
 
         const fetchResponse = fetch(`${ url }`, {
             method,
@@ -45,7 +65,8 @@ export async function AJAX(
                 }),
                 // 'Cookie': 'PHPSESSID=jnps6kvd7kp5lf0h7j0b6anivg',
                 // 'X-CSRF-TOKEN': `${csrf_token}`,
-                'Authorization': `Bearer ${api_token}`,
+                // 'Authorization': `Bearer ${api_token}`,
+                'Authorization': valueHeaderAuth,
                 ...headers
             },
             ...(uploadData ? { body: formData ? uploadData : JSON.stringify(uploadData) } : {})
@@ -54,7 +75,7 @@ export async function AJAX(
         const response:Response = await Promise.race([fetchResponse, timeout(30)]) as Response
         const data:object | any = blob ? await response.blob() : await response.json()
 
-        if(response.status == 401) logout()
+        if(response.status == 401 && authorization === 'bearer') logout()
 
         if(!response.ok) throw new Error(data?.message || 'Internal Server error response.')
 

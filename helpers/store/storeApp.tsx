@@ -22,6 +22,10 @@ const optionsStorage = {
     convivio: {
         nameStorage: 'convivioStorage',
         valueDefault: null
+    },
+    biometrico: {
+        nameStorage: 'biometricStorage',
+        valueDefault: null
     }
 }
 

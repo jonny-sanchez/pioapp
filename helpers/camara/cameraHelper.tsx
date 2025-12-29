@@ -1,4 +1,4 @@
-import { requestCameraPermissionsAsync, launchCameraAsync } from 'expo-image-picker'
+import { requestCameraPermissionsAsync, launchCameraAsync, getCameraPermissionsAsync, CameraPermissionResponse, PermissionStatus } from 'expo-image-picker'
 
 export const permissionCamera = async () => {
 
@@ -25,3 +25,13 @@ export const openCamera = async () => {
     return img ? img : null
 
 }
+
+export const getCameraPermission = async () : Promise<PermissionStatus|null> => {
+  try {
+    const { status } = await getCameraPermissionsAsync();
+    return status; // 'granted' | 'denied' | 'undetermined'
+  } catch (error) {
+    return null
+  }
+  
+};

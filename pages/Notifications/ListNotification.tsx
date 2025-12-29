@@ -7,7 +7,7 @@ import ListSubheader from "components/List/ListSubheader";
 import TouchRipple from "components/Touch/TouchRipple";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
-import { Badge, Icon, Text, useTheme } from "react-native-paper";
+import { ActivityIndicator, Badge, Icon, Text, useTheme } from "react-native-paper";
 import { AppTheme } from "types/ThemeTypes";
 import ModalDetailNotification from "./Layouts/ModalDetailNotification";
 import { getValueStorage } from "helpers/store/storeApp";
@@ -23,18 +23,26 @@ import TextInfo from "components/typografy/TextInfo";
 import Title from "components/typografy/Title";
 import NotificationLayout from "./Layouts/NotificationLayout";
 import SkeletonNotifications from "./Layouts/SkeletonNotifications";
+import SkeletonPreviousNotification from "./Layouts/SkeletonPreviousNotification";
+
+type NotisFilterType = 'hoy'|'anteriores'
 
 export default function ListNotification () {
 
     const theme:AppTheme = useTheme() as AppTheme
     const { openVisibleSnackBar } = alertsState()
+    const [chargeNotisPrevious, setChargeNotisPrevious] = useState<boolean>(false)
     const { notificacionesToday, loadingNotificationToday, setloadingNotificationToday } = notificationState()
     const [notificationSelectActual, setNotificationSelectActual] = useState<NotificacionAppType|null>(null)
+    const [responseNotificationsPrevious, setResponseNotificationsPrevious] = useState<ResponseService<NotificacionAppType[]>|null>(null);
     // const [accordionHoy, setAccordionHoy] = useState<boolean>(true);
     const [portalModal, setPortalModal] = useState<boolean>(false);
     const notificacionesHoyNoLeidas:number = notificacionesToday?.filter(({ leido }) => !leido)?.length ?? 0
-    const [chipSelect, setChipSelect] = useState<'hoy'|'anteriores'>('hoy')
+    const notificacionesPreviousNoLeidas:number = responseNotificationsPrevious?.data?.filter(({ leido }) => !leido)?.length ?? 0
+    const [chipSelect, setChipSelect] = useState<NotisFilterType>('hoy')
     const notisNoLeidasText = notificacionesHoyNoLeidas > 0 ? `(${notificacionesHoyNoLeidas})` : ''
+    const notisNoleidasPreviousText = notificacionesPreviousNoLeidas > 0 ? `(${notificacionesPreviousNoLeidas})` : ''
+
 
     // const handleToggleAccordionHoy = () => setAccordionHoy(!accordionHoy)
 
@@ -52,10 +60,36 @@ export default function ListNotification () {
         }
     }
 
-    const handleOpenTogglePortalModal = async (data:NotificacionAppType) => {
+    const getPreviousNotifications = async () : Promise<ResponseService<NotificacionAppType[]>> => {
+        try {
+            const result = await AJAX(`${URLPIOAPP}/notificaciones/previous`)
+            return result
+        } catch (error) {
+            openVisibleSnackBar(`${error}`, 'error')
+            return generateJsonError(`${error}`, 'array')
+        }
+    }
+
+    const handleOpenTogglePortalModal = async (data:NotificacionAppType, typeNoti:NotisFilterType = 'hoy') => {
         setNotificationSelectActual({...data})
         setPortalModal(true)
-        !data.leido && await postMarkedReadNotification(data.id_notificacion_app)
+        if(data.leido) return
+        //marcar como leido una notificacion
+        const result = await postMarkedReadNotification(data.id_notificacion_app)
+        //setear estado solo de las de notificaciones "anteriores"
+        if(typeNoti === 'hoy') return
+        result.status && setResponseNotificationsPrevious(prevState => {
+            if (!prevState) return prevState
+            const notisActualizadas = prevState.data?.map(item => 
+              item.id_notificacion_app === data.id_notificacion_app 
+                ? { ...item, leido: true } 
+                : item
+            )
+            return {
+              ...prevState,
+              data: notisActualizadas
+            }
+      })
     }
 
     const getTokenAuth = () : string => {
@@ -68,6 +102,17 @@ export default function ListNotification () {
         const token = getTokenAuth()
         initSocketNotification(token)
     }
+
+    const onChangeChipSelect = async () => {
+        if(chipSelect === 'hoy') return
+        if(responseNotificationsPrevious) return
+        setChargeNotisPrevious(true)
+        const resultPreviousNotification = await getPreviousNotifications()
+        setResponseNotificationsPrevious(resultPreviousNotification)
+        setChargeNotisPrevious(false)
+    }
+
+    useEffect(() => { onChangeChipSelect() }, [chipSelect])
 
     useEffect(() => {
         init()
@@ -117,21 +162,31 @@ export default function ListNotification () {
                                     style={{ color: theme.colors.primary, marginBottom: 15, }}
                                 >
                                     { chipSelect === 'hoy' && `Hoy ${ notisNoLeidasText }` }
-                                    { chipSelect === 'anteriores' && `Anteriores` }
+                                    { chipSelect === 'anteriores' && `Anteriores ${ notisNoleidasPreviousText }` }
                                 </Text>
 
                                 { chipSelect === 'hoy' && 
                                     <NotificationLayout 
                                         notifications={notificacionesToday} 
-                                        onPressNoti={(item) => handleOpenTogglePortalModal(item)}
+                                        onPressNoti={(item) => handleOpenTogglePortalModal(item, 'hoy')}
                                     /> 
                                 }
 
                                 { chipSelect === 'anteriores' && 
-                                    <NotificationLayout 
-                                        notifications={[]} 
-                                        onPressNoti={(item) => handleOpenTogglePortalModal(item)}
-                                    /> 
+                                    (
+                                        chargeNotisPrevious 
+                                            ? 
+                                            // <View className="w-full flex-row items-center justify-center gap-2" style={{ marginTop: 20 }}>
+                                            //     <Text>...cargando</Text>
+                                            //     <ActivityIndicator animating={true} size={20}/>
+                                            // </View>
+                                            <SkeletonPreviousNotification/>
+                                            : 
+                                            <NotificationLayout 
+                                                notifications={responseNotificationsPrevious?.data ?? []} 
+                                                onPressNoti={(item) => handleOpenTogglePortalModal(item, 'anteriores')}
+                                            />                     
+                                    )
                                 }
 
                             </View>

@@ -17,17 +17,37 @@ import { getValueStorage, setValueStorage } from 'helpers/store/storeApp';
 import CheckBoxForm from 'components/form/CheckBoxForm';
 import SurfaceTapButton from 'components/container/SurfaceTapButton';
 import { isDeviceReal, uniqueIdDevice } from 'helpers/Device/DeviceHelper';
-import { generateTokenNotificationPush, notificationPermissionGranted } from 'helpers/Notification/NotificationPushHelper';
+import { generateTokenNotificationPush, getNotificationPermission, notificationPermissionGranted } from 'helpers/Notification/NotificationPushHelper';
+import { LOGOPINULITOORIGINAL } from 'assets/Providers/ImageProvider';
+import { authenticateBiometric, checkBiometricStatus } from 'helpers/Biometric/BiometricHelper';
+import { BiometricStatus } from 'types/Biometric/BiometricTypes';
+import globalState from 'helpers/states/globalState';
+import BiometricStorageType from 'types/Biometric/BiometricStorageType';
+import { UserSessionType } from 'types/auth/UserSessionType';
+import { RouteProp, useRoute } from '@react-navigation/native';
+
+type DataFcmType = {
+  idDevice: string|null;
+  exponentPushToken: string|null;
+}
+
+type ParamsRouteLogin = {
+  biometricAutomatic?: boolean;
+}
 
 export default function Login() {
 
-  const [idDevice, setIdDevice] = useState<string|null>(null)
-  const [exponentPushToken, setExponentPushToken] = useState<string|null>(null);
-  const [isBiometricSupported, setIsBiometricSupported] = useState<boolean>(false);
+  // const [idDevice, setIdDevice] = useState<string|null>(null)
+  // const [exponentPushToken, setExponentPushToken] = useState<string|null>(null);
+  const [biometricStatus, setBiometricStatus] = useState<BiometricStatus>();
   const { openVisibleSnackBar } = alertsState()
   const [ loadingLogin, setLoadingLogin ] = useState<boolean>(false)
+  const { setOpenScreenLoading, setCloseScreenLoading } = globalState()
+  const route = useRoute<RouteProp<{ params:ParamsRouteLogin }, 'params'>>();
+  const biometricAutomatic:boolean = route.params?.biometricAutomatic ?? true;
+  
 
-  const validLogin = async(data: schemaLoginFormValidateType) : Promise<ResponseService> => {
+  const validLogin = async(data: schemaLoginFormValidateType, idDevice:string|null, exponentPushToken:string|null) : Promise<ResponseService> => {
     try {
       const result:ResponseService = await AJAX(`${ URLPIOAPP }/auth/login`, 'POST', {
         ...data,
@@ -43,6 +63,30 @@ export default function Login() {
     }
   }
 
+  const postLoginBiometric = async (user:number, idDevice:string|null, exponentPushToken:string|null) : Promise<ResponseService<UserSessionType>> => {
+    try {
+      const result = await AJAX(
+        `${URLPIOAPP}/auth/biometric`,
+        'POST',
+        { 
+          user,
+          ...(idDevice && exponentPushToken ? { 
+            id_unique_device: idDevice,
+            exponent_push_token: exponentPushToken
+          } : {})
+        },
+        false,
+        false,
+        null,
+        'basic'
+      )
+      return result
+    } catch (error) {
+      openVisibleSnackBar(`${error}`, 'error')
+      return generateJsonError(`${error}`, 'object')
+    }
+  }
+
   const { control, handleSubmit, formState: { errors }, resetField } = useForm({
     resolver: yupResolver(schemaLoginFormValidate),
     mode: 'all'
@@ -50,7 +94,12 @@ export default function Login() {
 
   const submitFormLogin = async(data: schemaLoginFormValidateType) => {
     setLoadingLogin(true)
-    const login = await validLogin(data)
+    const dataFcm = await generateTokenFCM()
+    const login = await validLogin(
+      data, 
+      dataFcm.idDevice, 
+      dataFcm.exponentPushToken
+    )
     setLoadingLogin(false)
     login.status && NavigationService.reset('Home')
     login.status && setValueStorage('user', login.data)
@@ -72,35 +121,93 @@ export default function Login() {
   }
 
   //token de dispositivo para notificaciones push
-  const generateTokenFCM = async () => {
+  const generateTokenFCM = async () : Promise<DataFcmType> => {
     try {
       //validar si el dispositivo es fisico y no es un emulador
       const isDevice:boolean = isDeviceReal()
-      if(!isDevice) return openVisibleSnackBar(`Ooops no se puede recibir notificacion porque estas en un emulador.`, 'warning')
+      if(!isDevice) {
+        openVisibleSnackBar(`Ooops no se puede recibir notificacion porque estas en un emulador.`, 'warning')
+        return { exponentPushToken: null, idDevice: null }
+      }
       //validar permisos para las notificaciones
-      const resultNotification:boolean = await notificationPermissionGranted()
-      if(!resultNotification) return
+      const resultNotification = await getNotificationPermission()
+      if(resultNotification !== 'granted') return { exponentPushToken: null, idDevice: null }
       //generar token de notificaciones push
       const tokenPushNotification = await generateTokenNotificationPush()
       //obtener el id unico de dispositivo
       const idUniqueDispositivo = await uniqueIdDevice()
-      //setear estados
-      setIdDevice(idUniqueDispositivo)
-      setExponentPushToken(tokenPushNotification)
       //debug
-      console.log(tokenPushNotification)
-      console.log(idUniqueDispositivo)
+      // console.log(tokenPushNotification)
+      // console.log(idUniqueDispositivo)
+      //setear estados
+      return { exponentPushToken: tokenPushNotification, idDevice: idUniqueDispositivo }
+      // setIdDevice(idUniqueDispositivo)
+      // setExponentPushToken(tokenPushNotification)
     } catch (error) {
       openVisibleSnackBar(`${error}`, 'error') 
+      return { exponentPushToken: null, idDevice: null }
     }
   } 
 
+  //datos biometricos
+  const validBiometricEnable = async () => {
+    const status = await checkBiometricStatus()
+    setBiometricStatus(status)
+  }
+
+  //biometric auth
+  const getConfigBiometric = () : BiometricStorageType|null => {
+    const biometric = getValueStorage('biometrico') as BiometricStorageType
+    return biometric
+  }
+
+  //auth by biometric
+  const AUTHBIOMETRIC = async () : Promise<boolean> => {
+    const resultBiometricAuth = await authenticateBiometric()
+    return resultBiometricAuth.success
+  }
+
+  //inicio session login Biometrico
+  const loginBiometric = async(type:'button'|'automatic') => {
+    const resultConfigBiometrico = getConfigBiometric()
+    if(!resultConfigBiometrico) {
+      if(type === 'button') openVisibleSnackBar(`Porfavor configura el biometrico en tu cuenta primero.`, 'warning')
+      return
+    }
+    setOpenScreenLoading()
+    const authBio = await AUTHBIOMETRIC()
+    if(authBio) {
+      const dataFcm = await generateTokenFCM()
+      const login = await postLoginBiometric(
+        Number(resultConfigBiometrico?.id_users ?? '0'), 
+        dataFcm.idDevice, 
+        dataFcm.exponentPushToken
+      )
+      login.status && NavigationService.reset('Home')
+      login.status && setValueStorage('user', login.data)
+    }
+    setCloseScreenLoading()
+  }
+
+  //validar si tiene configurada la huella entonces mostrarla
+  const biometricFocusLogin = async () => {
+    const config = getConfigBiometric()
+    if(!config || !biometricStatus?.enrolled || !biometricStatus.hasHardware || !biometricAutomatic) return
+    await loginBiometric('automatic')
+  }
+
   const init = async () => {
     setLoadingLogin(true)
+    await notificationPermissionGranted()
+    //vaidar si el dispositivo tiene huella disponible
+    await validBiometricEnable()
     validRememberCredentials()
-    await generateTokenFCM()
     setLoadingLogin(false)
   }
+
+  useEffect(() => {
+    biometricFocusLogin()
+  }, [biometricStatus])
 
   useEffect(()=> {
     init()
@@ -109,7 +216,7 @@ export default function Login() {
   return (
     <FormAdaptiveKeyBoard>
       <View className='flex-1 items-center justify-center px-8'>
-        <BoxImage width={70} height={80} img={require('assets/images/LOGOPINULITOORIGINAL.png')}/>
+        <BoxImage width={70} height={80} img={LOGOPINULITOORIGINAL}/>
         
         <View className='flex flex-col justify-center items-center gap-1 mt-10'>
           <Title>Login</Title>
@@ -165,14 +272,19 @@ export default function Login() {
             onPress={()=>NavigationService.navigate('Marcaje')}
             disabled={loadingLogin}
           /> */}
-          {/* <SurfaceTapButton 
+          <SurfaceTapButton 
             icon='fingerprint'
             title='Huella'
-            visible={isBiometricSupported}
-          /> */}
+            onPress={() => loginBiometric('button')}
+            //tambien agregar validacion que este solo debe aparveer si el dispositov tiene activado el biometrico
+            visible={biometricStatus?.enrolled && biometricStatus?.hasHardware}
+            disabled={loadingLogin}
+          />
           {/* <SurfaceTapButton 
             icon='face-recognition'
             title='Facial'
+            visible={biometricStatus?.supportedTypes?.includes('FaceID') ?? false}
+            disabled={loadingLogin}
           /> */}
         </View>
 

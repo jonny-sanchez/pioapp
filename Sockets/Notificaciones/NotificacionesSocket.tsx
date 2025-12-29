@@ -14,6 +14,7 @@ export const initSocketNotification = async (token:string) => {
         socket = null
     }
 
+    //validar conexion a internet
     const resultInternetActive = await validateConnectionInternetActive()
     if(!resultInternetActive) NavigationService.navigate('InternetFail')
 

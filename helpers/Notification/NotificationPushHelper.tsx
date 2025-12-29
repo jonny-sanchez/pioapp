@@ -2,7 +2,8 @@ import {
     getPermissionsAsync, 
     requestPermissionsAsync, 
     getExpoPushTokenAsync,
-    setNotificationHandler 
+    setNotificationHandler,
+    PermissionStatus 
 } from 'expo-notifications'
 import Constants from 'expo-constants';
 
@@ -32,3 +33,13 @@ export const configureNotificationHandler  = () => {
       }),
     })
 }
+
+export const getNotificationPermission = async () : Promise<PermissionStatus|null> => {
+  try {
+    const { status } = await getPermissionsAsync();
+    return status;
+  } catch (error) {
+    return null
+  }
+  
+};
