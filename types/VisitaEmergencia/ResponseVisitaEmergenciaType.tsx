@@ -18,6 +18,7 @@ type ResponseVisitaEmergenciaType = {
     userUpdatedAt: number | null;
     createdAt: string; 
     updatedAt: string;
+    ingreso_visita_valid: boolean;
 }
 
 export default ResponseVisitaEmergenciaType

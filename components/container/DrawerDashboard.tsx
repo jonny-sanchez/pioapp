@@ -98,7 +98,7 @@ export default function DrawerDashboard () {
                 <ButtonForm 
                   onPress={()=>{
                     setCloseDrawer()
-                    logout()
+                    logout(false)
                     // setTimeout(() => NavigationService.reset('Login'), 200)
                   }}
                   label='Cerrar sesion'

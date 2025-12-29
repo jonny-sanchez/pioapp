@@ -9,6 +9,7 @@ type ModalizeComponentProps= {
     title?: string;
     footerComponent?: React.ReactNode;
     heightModalizeSreen?: number;
+    onOpen?(): void;
     // onOpen?: () => void;
 }
 
@@ -17,7 +18,8 @@ export default function ModalizeComponent({
     modalizeRef,
     title = '',
     footerComponent,
-    heightModalizeSreen = 0.80
+    heightModalizeSreen = 0.80,
+    onOpen
     // onOpen = () => {}
 } : ModalizeComponentProps){
 
@@ -31,6 +33,7 @@ export default function ModalizeComponent({
             <Modalize 
                 handlePosition='inside'
                 ref={modalizeRef}
+                onOpen={onOpen}
                 modalHeight={height * heightModalizeSreen}
                 modalStyle={{ backgroundColor: theme.colors.background }}
                 handleStyle={{ backgroundColor: theme.colors.outline }}

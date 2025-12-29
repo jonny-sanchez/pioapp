@@ -139,6 +139,11 @@ export default function ModalDetailNotification({
                                 <>
                                     { visitaEmergencia?.id_estado == 3 && <InfoAlert label="Esta tarea ya fue completada."/> }
 
+                                    { !visitaEmergencia?.ingreso_visita_valid 
+                                        && 
+                                        <InfoAlert label={`Esta tarea esta programada \n para la fecha ${visitaEmergencia?.fecha_programacion?.split('T')[0] ?? " -- "} \n debes completarla ese dia.`}/> 
+                                    }
+
                                     <ButtonForm 
                                         // label="Iniciar Ruta"
                                         label={ 
@@ -148,7 +153,7 @@ export default function ModalDetailNotification({
                                         } 
                                         icon="waze" 
                                         loading={loadingTareaSupervisor || loadingButtonWaze}
-                                        disabled={loadingTareaSupervisor || loadingButtonWaze || visitaEmergencia?.id_estado == 3}
+                                        disabled={loadingTareaSupervisor || loadingButtonWaze || visitaEmergencia?.id_estado == 3 || !visitaEmergencia?.ingreso_visita_valid}
                                         buttonColor={theme.colors.skyBlue}
                                         onPress={handleOnpressRutaWaze}
                                     />
@@ -160,6 +165,8 @@ export default function ModalDetailNotification({
                                             loadingTareaSupervisor 
                                                 || 
                                             (visitaEmergencia?.id_estado != 2)
+                                                || 
+                                            !visitaEmergencia?.ingreso_visita_valid
                                         }
                                         onPress={handleOnpressIngresoVisitaEmergencia}
                                     />

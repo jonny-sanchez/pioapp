@@ -23,6 +23,7 @@ import TextInfo from "components/typografy/TextInfo";
 import Title from "components/typografy/Title";
 import NotificationLayout from "./Layouts/NotificationLayout";
 import SkeletonNotifications from "./Layouts/SkeletonNotifications";
+import SkeletonPreviousNotification from "./Layouts/SkeletonPreviousNotification";
 
 type NotisFilterType = 'hoy'|'anteriores'
 
@@ -175,15 +176,16 @@ export default function ListNotification () {
                                     (
                                         chargeNotisPrevious 
                                             ? 
-                                            <View className="w-full flex-row items-center justify-center gap-2" style={{ marginTop: 20 }}>
-                                                <Text>...cargando</Text>
-                                                <ActivityIndicator animating={true} size={20}/>
-                                            </View>
+                                            // <View className="w-full flex-row items-center justify-center gap-2" style={{ marginTop: 20 }}>
+                                            //     <Text>...cargando</Text>
+                                            //     <ActivityIndicator animating={true} size={20}/>
+                                            // </View>
+                                            <SkeletonPreviousNotification/>
                                             : 
                                             <NotificationLayout 
                                                 notifications={responseNotificationsPrevious?.data ?? []} 
                                                 onPressNoti={(item) => handleOpenTogglePortalModal(item, 'anteriores')}
-                                            /> 
+                                            />                     
                                     )
                                 }
 

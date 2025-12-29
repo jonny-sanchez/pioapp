@@ -25,15 +25,21 @@ import schemaPerfilUser from "helpers/validatesForm/schemaPerfilUser";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Linking from 'expo-linking';
 import { useFocusEffect } from "@react-navigation/native";
+import { onOpenModalize } from "helpers/Modalize/ModalizeHelper";
+import ModalizeBiometric from "./Layouts/ModalizeBiometric";
+import { checkBiometricStatus } from "helpers/Biometric/BiometricHelper";
+import { BiometricStatus } from "types/Biometric/BiometricTypes";
+import alertsState from "helpers/states/alertsState";
 
 export default function PersonalUser() {
 
     const theme:AppTheme = useTheme() as AppTheme
     const appState = useRef(AppState.currentState);
     const modalizeRefUser = useRef<Modalize>(null)
+    const modalizeRefBiometric = useRef<Modalize>(null)
     const [loadingUser, setLoadingUser] = useState<boolean>(false)
-    const onOpenModalizeUser = () => modalizeRefUser.current?.open()
-    const onCloseModalizeUser = () => modalizeRefUser.current?.close()
+    const [biometricStatus, setBiometricStatus] = useState<BiometricStatus|null>(null)
+    const { openVisibleSnackBar } = alertsState()
     const { control, handleSubmit, reset, resetField, formState: { errors, isValid }, watch } = useForm({
         resolver: yupResolver(schemaPerfilUser),
         mode: 'all'
@@ -43,11 +49,16 @@ export default function PersonalUser() {
         location: null as PermissionStatusLocation | null,
         notification: null as PermissionStatusNotification | null,
         ts: Date.now(),
-    });
-
+    })
 
     const onPressIconButtonEditImage = () => {
-        onOpenModalizeUser()
+        onOpenModalize(modalizeRefUser)
+    }
+
+    const onPressListBiometric = () => {
+        if(!biometricStatus?.enrolled) 
+            return openVisibleSnackBar(`Ooops. primero debes configurar un biometrico en tu dispositivo.`, 'warning')
+        onOpenModalize(modalizeRefBiometric)
     }
 
     const openSettings = () => Linking.openSettings()
@@ -63,10 +74,12 @@ export default function PersonalUser() {
 
     const init = async() => {
         setLoadingUser(true)
+        const statusBiometric = await checkBiometricStatus()
         const camera = await getCameraPermission()
         const location = await getLocationPermission()
         const notification = await getNotificationPermission()
         setPermisos({camera,location,notification, ts: Date.now()})
+        setBiometricStatus(statusBiometric)
         setLoadingUser(false)
     }
 
@@ -93,6 +106,11 @@ export default function PersonalUser() {
                 modalizeRefUser={modalizeRefUser}
             />
 
+            {/* Modalize para biometrico */}
+            <ModalizeBiometric
+                modalizeRefBiometric={modalizeRefBiometric}
+            />
+
             <PageLayout 
                 titleAppBar="Perfil" 
                 menuApp={false}
@@ -108,12 +126,12 @@ export default function PersonalUser() {
                         <View className="mt-6 mb-12 w-full flex-col gap-5">
                             <View className="w-full flex-col items-center">
                                 <View style={{ position: 'relative' }}>
-                                    <IconButtomForm 
+                                    {/* <IconButtomForm 
                                         icon="pencil" 
                                         size={13} 
                                         style={{ position: 'absolute', zIndex: 2, right: -5, top: -5 }}
                                         onPress={onPressIconButtonEditImage}
-                                    />
+                                    /> */}
                                     <AvatarImage 
                                         style={{ marginBottom: 15 }} 
                                         img={DEFAULT_USER} 
@@ -130,13 +148,24 @@ export default function PersonalUser() {
                             <View className="w-full">
                                 <ListSubheader label="Personal"/>
 
-                                <ListItemComponent
+                                {/* <ListItemComponent
                                     onPress={() => {}}
                                     iconLeft="google"
                                     title={"Cuenta google"}
                                     description={"vincular cuenta"}
                                     rightElements={<List.Icon icon={'chevron-right'}/>}
-                                />
+                                /> */}
+                                {
+                                    biometricStatus?.hasHardware && (
+                                        <ListItemComponent
+                                            onPress={onPressListBiometric}
+                                            iconLeft="fingerprint"
+                                            title={"Biometrico"}
+                                            description={"Configurar biometrico"}
+                                            rightElements={<List.Icon icon={'chevron-right'}/>}
+                                        />
+                                    )
+                                }
 
                             </View>
 
