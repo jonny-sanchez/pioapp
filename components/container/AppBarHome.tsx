@@ -1,8 +1,9 @@
 // import * as React from 'react';
-import { Appbar, useTheme  } from 'react-native-paper';
+import { Appbar, Text, useTheme  } from 'react-native-paper';
 import globalState from 'helpers/states/globalState';
 import { NavigationService } from 'helpers/navigator/navigationScreens';
 import { AppTheme } from 'types/ThemeTypes';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 type AppBarHomeProps = {
     title?: string;
@@ -25,6 +26,22 @@ export default function AppBarHome({
 
     const theme:AppTheme = useTheme() as AppTheme
 
+    const styleAppBar = StyleSheet.create({
+        noti_aviso: {
+            position: 'absolute',
+            top: 3, 
+            right: 5, 
+            zIndex: 1, 
+            width: 23, 
+            height: 23, 
+            borderRadius: 8, 
+            backgroundColor: theme.colors.error, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center'
+        }
+    })
+
     return (
         <Appbar.Header>
             {
@@ -41,11 +58,16 @@ export default function AppBarHome({
             {/* bell-badge-outline */}
             { 
                 notification && 
+                <View style={{ position: 'relative' }}>
+                    {/* <Pressable onPress={() => NavigationService.navigate('Notificaciones')} style={styleAppBar.noti_aviso}>
+                        <Text variant='bodySmall' style={{ color: theme.colors.background }}>9+</Text>
+                    </Pressable> */}
                     <Appbar.Action 
                         onPress={() => NavigationService.navigate('Notificaciones')} 
                         icon={'bell-outline'} 
-                        iconColor={theme.colors.error}
-                    /> 
+                        // iconColor={theme.colors.error}
+                    />
+                </View> 
             }
             { 
                 menuApp && 

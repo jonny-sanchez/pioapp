@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "763302326702",
-    "project_id": "pioappdiego",
-    "storage_bucket": "pioappdiego.firebasestorage.app"
+    "project_number": "1030028450866",
+    "project_id": "pioapp-9b7de",
+    "storage_bucket": "pioapp-9b7de.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:763302326702:android:ff5cddc005d3167e68183f",
+        "mobilesdk_app_id": "1:1030028450866:android:f81ba28eb636c6cb35302b",
         "android_client_info": {
           "package_name": "com.anonymous.pioapp"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA4Kdp1vAEyBG7GkIC2Qs5n6wZ_8ALjMXA"
+          "current_key": "AIzaSyDHEv58yMTm20dj5-NlrT7lEzAy64iagNY"
         }
       ],
       "services": {
