@@ -17,8 +17,10 @@ import MethodRequestType from "types/Request/MethodRequestType";
 export const URLPIOAPP = `https://services.sistemaspinulito.com/pioapi`
 
 //variables para authentication con basic auth
-export const BASIC_AUTH_USERNAME = process.env.EXPO_PUBLIC_BASIC_AUTH_USERNAME
-export const BASIC_AUTH_PASSWORD = process.env.EXPO_PUBLIC_BASIC_AUTH_PASSWORD
+// export const BASIC_AUTH_USERNAME = process.env.EXPO_PUBLIC_BASIC_AUTH_USERNAME
+// export const BASIC_AUTH_PASSWORD = process.env.EXPO_PUBLIC_BASIC_AUTH_PASSWORD
+export const BASIC_AUTH_USERNAME = 'pioapp'
+export const BASIC_AUTH_PASSWORD = 'Pioapp12200107!'
 
 export const timeout = function(s:number)
 {
@@ -36,14 +38,24 @@ export async function AJAX(
     formData = false,
     blob:boolean = false,
     headers:any = null,
-    authorization:AuthHedearsType = 'bearer'
+    authorization:AuthHedearsType = 'bearer',
+    timeout:number = 30
 ) {
+
+    //timeout 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => {
+      controller.abort(); //CORTA la petición
+    }, timeout * 1000);
 
     try {
         //validar intenert antes de comenzar el fetch
         const resultInternetActive = await validateConnectionInternetActive()
 
-        if(!resultInternetActive) NavigationService.navigate('InternetFail')
+        if(!resultInternetActive) {
+            NavigationService.navigate('InternetFail')
+            throw new Error("Sin conexión a internet");
+        }
 
         const user = getValueStorage('user') as UserSessionType
         // const user = { token: '' }
@@ -58,6 +70,7 @@ export async function AJAX(
 
         const fetchResponse = fetch(`${ url }`, {
             method,
+            signal: controller.signal,
             headers: {
                 'Accept': 'application/json',
                 ...(blob === false && !formData && {
@@ -72,7 +85,8 @@ export async function AJAX(
             ...(uploadData ? { body: formData ? uploadData : JSON.stringify(uploadData) } : {})
         })
 
-        const response:Response = await Promise.race([fetchResponse, timeout(30)]) as Response
+        // const response:Response = await Promise.race([fetchResponse, timeout(30)]) as Response
+        const response:Response = await fetchResponse as Response
         const data:object | any = blob ? await response.blob() : await response.json()
 
         if(response.status == 401 && authorization === 'bearer') logout()
@@ -83,7 +97,14 @@ export async function AJAX(
         
     } catch (error:any) { 
 
+        if (error.name === 'AbortError') 
+            throw new Error(`Lo sentimos la consulta tardo ${timeout} segundos!, intente de nuevo.`);
+
         throw error
+
+    } finally {
+        //limpiar timeout para evitar fugas de memoria
+        clearTimeout(timeoutId)
     }
 
 }

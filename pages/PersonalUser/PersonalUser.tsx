@@ -30,6 +30,8 @@ import ModalizeBiometric from "./Layouts/ModalizeBiometric";
 import { checkBiometricStatus } from "helpers/Biometric/BiometricHelper";
 import { BiometricStatus } from "types/Biometric/BiometricTypes";
 import alertsState from "helpers/states/alertsState";
+import { getValueStorage } from "helpers/store/storeApp";
+import { UserSessionType } from "types/auth/UserSessionType";
 
 export default function PersonalUser() {
 
@@ -39,6 +41,7 @@ export default function PersonalUser() {
     const modalizeRefBiometric = useRef<Modalize>(null)
     const [loadingUser, setLoadingUser] = useState<boolean>(false)
     const [biometricStatus, setBiometricStatus] = useState<BiometricStatus|null>(null)
+    const [userSession, setUserSession] = useState<UserSessionType>()
     const { openVisibleSnackBar } = alertsState()
     const { control, handleSubmit, reset, resetField, formState: { errors, isValid }, watch } = useForm({
         resolver: yupResolver(schemaPerfilUser),
@@ -72,8 +75,14 @@ export default function PersonalUser() {
         // await init()
     }
 
+    const getUserStorage = () => {
+        const user = getValueStorage('user') as UserSessionType
+        setUserSession(user)
+    }
+
     const init = async() => {
         setLoadingUser(true)
+        getUserStorage()
         const statusBiometric = await checkBiometricStatus()
         const camera = await getCameraPermission()
         const location = await getLocationPermission()
@@ -138,9 +147,13 @@ export default function PersonalUser() {
                                         size={100}
                                     />
                                 </View>
-                                <Text style={{ color: theme.colors.primary }}>AL5117</Text>
-                                <Text>Diego Alejandro Guevar Cordon</Text>
-                                <Text style={{ color: theme.colors.secondary }}>Desarrollador</Text>
+                                <Text style={{ color: theme.colors.primary }}>{ userSession?.codigo_user ?? " -- " }</Text>
+                                <Text>
+                                    { 
+                                        `${userSession?.first_name??""} ${userSession?.second_name??""} ${userSession?.first_last_name??""} ${userSession?.second_last_name??""}` 
+                                    }
+                                </Text>
+                                <Text style={{ color: theme.colors.secondary }}>{ userSession?.puesto_trabajo??"--" }</Text>
                             </View>
 
                             <Divider/>
@@ -148,13 +161,15 @@ export default function PersonalUser() {
                             <View className="w-full">
                                 <ListSubheader label="Personal"/>
 
-                                {/* <ListItemComponent
-                                    onPress={() => {}}
-                                    iconLeft="google"
-                                    title={"Cuenta google"}
+                                <ListItemComponent
+                                    onPress={() => {
+                                        openVisibleSnackBar(`Proximamente en actualizaciones mas recientes.`, 'normal')
+                                    }}
+                                    iconLeft="microsoft"
+                                    title={"Cuenta office 365"}
                                     description={"vincular cuenta"}
                                     rightElements={<List.Icon icon={'chevron-right'}/>}
-                                /> */}
+                                />
                                 {
                                     biometricStatus?.hasHardware && (
                                         <ListItemComponent

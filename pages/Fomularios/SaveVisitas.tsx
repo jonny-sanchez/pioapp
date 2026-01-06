@@ -90,7 +90,7 @@ export default function SaveVisitas(){
             phone_gps_longitude: metadatosPicture?.coords?.longitude || null,
             phone_gps_latitude: metadatosPicture?.coords?.latitude || null,
             name_original_image: metadatosPicture?.nameImg || null,
-            comentario: dataForm?.comentario || null,
+            comentario: dataForm?.comentario ?? "",
             foto_visita: { 
                 uri: metadatosPicture.imgUri,
                 type: metadatosPicture.mimeType,
@@ -142,7 +142,10 @@ export default function SaveVisitas(){
     // const [valueRadioBtn, setValueRadioBtn] = useState('');
 
     const { control, handleSubmit, reset, resetField, formState: { errors } } = useForm({
-        resolver: yupResolver(schemaNwVisitaFormValidate(isCantidadPersonas ? true : false)),
+        resolver: yupResolver(schemaNwVisitaFormValidate(
+            isCantidadPersonas ? true : false,
+            visitaEmergencia ? true : false
+        )),
         mode: 'all'
     })
 
@@ -283,7 +286,7 @@ export default function SaveVisitas(){
 
                             <DropdownForm
                                 label="Tipo Visita"
-                                data={tipoVisitas}
+                                data={visitaEmergencia ? tipoVisitas : tipoVisitas.filter(({ value }) => value != 5 )}
                                 control={control}
                                 name="tipo_visita"
                                 errors={errors}

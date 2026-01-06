@@ -137,9 +137,12 @@ export default function ModalDetailNotification({
                         { 
                             isTareaSupervisor && (
                                 <>
-                                    { visitaEmergencia?.id_estado == 3 && <InfoAlert label="Esta tarea ya fue completada."/> }
+                                    { (visitaEmergencia?.id_estado == 3 && !loadingTareaSupervisor)
+                                        && 
+                                        <InfoAlert label="Esta tarea ya fue completada."/> 
+                                    }
 
-                                    { !visitaEmergencia?.ingreso_visita_valid 
+                                    { (!visitaEmergencia?.ingreso_visita_valid && !loadingTareaSupervisor)
                                         && 
                                         <InfoAlert label={`Esta tarea esta programada \n para la fecha ${visitaEmergencia?.fecha_programacion?.split('T')[0] ?? " -- "} \n debes completarla ese dia.`}/> 
                                     }
@@ -153,7 +156,15 @@ export default function ModalDetailNotification({
                                         } 
                                         icon="waze" 
                                         loading={loadingTareaSupervisor || loadingButtonWaze}
-                                        disabled={loadingTareaSupervisor || loadingButtonWaze || visitaEmergencia?.id_estado == 3 || !visitaEmergencia?.ingreso_visita_valid}
+                                        disabled={
+                                            loadingTareaSupervisor 
+                                                || 
+                                            loadingButtonWaze 
+                                                || 
+                                            visitaEmergencia?.id_estado == 3 
+                                                || 
+                                            !visitaEmergencia?.ingreso_visita_valid
+                                        }
                                         buttonColor={theme.colors.skyBlue}
                                         onPress={handleOnpressRutaWaze}
                                     />

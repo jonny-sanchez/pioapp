@@ -14,7 +14,8 @@ export default function ListItemComponent({
     rippleColor,
     leftElements,
     descriptionNumberOfLines,
-    onPress
+    onPress,
+    disabled
 } : ListItemComponentType) {
 
     return (
@@ -29,6 +30,7 @@ export default function ListItemComponent({
               description={description}
               descriptionStyle={[ descriptionStyle ]}
               descriptionNumberOfLines={descriptionNumberOfLines}
+              disabled={disabled}
               left={props => (
                 <>
                     {iconLeft && <List.Icon {...props} icon={iconLeft}/>}

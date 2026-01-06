@@ -13,7 +13,8 @@ type ListItemComponentType = {
     rippleColor?: ColorValue | undefined;
     leftElements?: React.ReactNode;
     descriptionNumberOfLines?: number | undefined;
-    onPress?: (((event: GestureResponderEvent) => void) & ((e: GestureResponderEvent) => void) & ((e: GestureResponderEvent) => void)) | undefined
+    onPress?: (((event: GestureResponderEvent) => void) & ((e: GestureResponderEvent) => void) & ((e: GestureResponderEvent) => void)) | undefined;
+    disabled?: boolean | undefined;
 }
 
 export default ListItemComponentType
