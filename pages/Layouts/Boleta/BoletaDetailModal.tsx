@@ -54,7 +54,7 @@ export default function BoletaDetailModal({ visible, boleta, onDismiss }: Boleta
             <Modal
                 visible={visible}
                 onDismiss={onDismiss}
-                dismissable={false}
+                dismissable={true}
                 contentContainerStyle={{
                     backgroundColor: theme.colors.surface,
                     margin: 20,

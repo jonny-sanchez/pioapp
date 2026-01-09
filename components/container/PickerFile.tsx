@@ -6,6 +6,7 @@ import { locationPermission, getLocation } from "helpers/ubicacion/ubicacionHelp
 import { useTheme, Icon, IconButton } from "react-native-paper";
 import globalState from "helpers/states/globalState";
 import fotografyState from "helpers/states/fotografyState";
+import alertsState from "helpers/states/alertsState";
 
 type PickerFileProps = {
     disabled?: boolean;
@@ -17,6 +18,8 @@ export default function PickerFile({
 
     const theme = useTheme()
 
+    const { openVisibleSnackBar } = alertsState()
+
     const { setOpenScreenLoading, setCloseScreenLoading } = globalState()
 
     const { metadatosPicture, setMetadatosPicture, clearMetadatosPicture } = fotografyState()
@@ -25,11 +28,11 @@ export default function PickerFile({
 
         const cameraPermisos = await permissionCamera()
 
-        if(!cameraPermisos) return
+        if(!cameraPermisos) return openVisibleSnackBar(`Ooops. ocurrio un error con los permisos de camara.`, 'error')
 
         const locationPermisos = await locationPermission()
 
-        if(!locationPermisos) return
+        if(!locationPermisos) return openVisibleSnackBar(`Ooops. ocurrio un error con los permisos de ubicacion.`, 'error')
 
         setOpenScreenLoading()
 
@@ -39,7 +42,7 @@ export default function PickerFile({
 
         setCloseScreenLoading()
 
-        if(!resultImg || !resultLocation) return
+        if(!resultImg || !resultLocation) return openVisibleSnackBar(`Ooops. ocurrio un error al obtener los datos de imagen.`, 'error')
 
         setMetadatosPicture(
             resultImg?.uri || '',

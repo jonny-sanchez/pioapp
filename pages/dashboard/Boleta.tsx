@@ -2,7 +2,7 @@ import ScrollViewContainer from "components/container/ScrollViewContainer"
 import { View } from "react-native"
 import { Text, useTheme, IconButton } from "react-native-paper"
 import PageLayout from "components/Layouts/PageLayout"
-import PeriodoType from "types/PeriodoType"
+import PeriodoType, { SelectPeriodoType } from "types/PeriodoType"
 import BoletaType from "types/BoletaType"
 import { useState, useEffect } from "react"
 import FormAdaptiveKeyBoard from "components/container/FormAdaptiveKeyBoard"
@@ -32,7 +32,7 @@ export default function Boleta() {
     const [showDetailModal, setShowDetailModal] = useState(false)
     const [isProcessingSignature, setIsProcessingSignature] = useState(false)
     const [showFirmaDialog, setShowFirmaDialog] = useState(false)
-    const [pendingPeriodoId, setPendingPeriodoId] = useState<number | null>(null)
+    const [pendingPeriodoId, setPendingPeriodoId] = useState<SelectPeriodoType | null>(null)
 
     const { control, handleSubmit, reset, resetField, watch, formState: { errors } } = useForm({
         // resolver: yupResolver(schemaListRutasForm),
@@ -111,9 +111,9 @@ export default function Boleta() {
         }
     }
 
-    const verificarFirmaBoleta = async (periodoId: number): Promise<ResponseService<VerificacionFirmaResponse>> => {
+    const verificarFirmaBoleta = async (periodoId: number, tipo:number): Promise<ResponseService<VerificacionFirmaResponse>> => {
         try {
-            const result: ResponseService<VerificacionFirmaResponse> = await AJAX(`${URLPIOAPP}/nomina/firma-boleta/existe?id_periodo=${periodoId}`, 'GET')
+            const result: ResponseService<VerificacionFirmaResponse> = await AJAX(`${URLPIOAPP}/nomina/firma-boleta/existe?id_periodo=${periodoId}&tipo=${tipo}`, 'GET')
             return result
         } catch (error: any) {
             openVisibleSnackBar(`Error al verificar firma: ${error}`, 'error')
@@ -121,9 +121,9 @@ export default function Boleta() {
         }
     }
 
-    const getBoleta = async (periodoId: number): Promise<ResponseService<BoletaType>> => {
+    const getBoleta = async (periodoId: number, tipo:number): Promise<ResponseService<BoletaType>> => {
         try {
-            const result: ResponseService<BoletaType> = await AJAX(`${URLPIOAPP}/nomina/boleta/detalle-completo?id_periodo=${periodoId}`, 'GET')
+            const result: ResponseService<BoletaType> = await AJAX(`${URLPIOAPP}/nomina/boleta/detalle-completo?id_periodo=${periodoId}&tipo=${tipo}`, 'GET')
             return result
         } catch (error: any) {
             openVisibleSnackBar(`Error al obtener la boleta: ${error}`, 'error')
@@ -156,15 +156,16 @@ export default function Boleta() {
         return { longitude, latitude, ip };
     };
 
-    const firmarBoleta = async (periodoId: number, gpsLongitude?: number, gpsLatitude?: number, ipDispositivo?: string): Promise<ResponseService<FirmaExitosaResponse>> => {
+    const firmarBoleta = async (periodoId: number, tipo:number, gpsLongitude?: number, gpsLatitude?: number, ipDispositivo?: string): Promise<ResponseService<FirmaExitosaResponse>> => {
         try {
             const requestBody = {
                 id_periodo: periodoId,
+                tipo: tipo,
                 phone_gps_longitude: gpsLongitude || null,
                 phone_gps_latitude: gpsLatitude || null,
                 ip_dispositivo: ipDispositivo || null
             };
-
+            // console.log(requestBody)
             const result: ResponseService<FirmaExitosaResponse> = await AJAX(`${URLPIOAPP}/nomina/firma-boleta/firmar`, 'POST', requestBody)
             return result
         } catch (error: any) {
@@ -191,11 +192,19 @@ export default function Boleta() {
         setOpenScreenLoading()
 
         try {
-            const resultBoleta = await getBoleta(data.periodo)
+
+            //ordernar idPeriodo y tipo
+            const objectPeriodo = data.periodo.split('-') ?? []
+            const idPeriodo:number = Number(objectPeriodo[0]) ?? 0
+            const tipo:number = Number(objectPeriodo[1]) ?? 0
+
+            const resultBoleta = await getBoleta(idPeriodo, tipo)
 
             if (resultBoleta.status && resultBoleta.data) {
                 let boletaFinal = normalizeBoleta(resultBoleta.data)
-                const resultVerificacion = await verificarFirmaBoleta(data.periodo)
+                const resultVerificacion = await verificarFirmaBoleta(idPeriodo, tipo)
+
+                // console.log(resultVerificacion)
 
                 if (resultVerificacion.status && resultVerificacion.data) {
                     const { existe, firma } = resultVerificacion.data
@@ -213,7 +222,10 @@ export default function Boleta() {
                         setBoleta(boletaFinal)
                     } else {
                         setCloseScreenLoading()
-                        setPendingPeriodoId(data.periodo)
+                        setPendingPeriodoId({
+                            idPeriodo: idPeriodo,
+                            tipo: tipo
+                        })
                         setShowFirmaDialog(true)
                         return
                     }
@@ -254,7 +266,7 @@ export default function Boleta() {
         setIsProcessingSignature(true)
 
         try {
-            const resultBoleta = await getBoleta(pendingPeriodoId)
+            const resultBoleta = await getBoleta(pendingPeriodoId.idPeriodo, pendingPeriodoId.tipo)
             
 
             if (resultBoleta.status && resultBoleta.data) {
@@ -265,7 +277,7 @@ export default function Boleta() {
                 const { longitude, latitude, ip } = await capturarDatosDispositivo();
 
                 openVisibleSnackBar('Procesando firma...', 'warning')
-                const resultFirma = await firmarBoleta(pendingPeriodoId, longitude || undefined, latitude || undefined, ip || undefined)
+                const resultFirma = await firmarBoleta(pendingPeriodoId.idPeriodo, pendingPeriodoId.tipo, longitude || undefined, latitude || undefined, ip || undefined)
 
                 if (resultFirma.status && resultFirma.data) {
                     const firmaData = resultFirma.data
@@ -323,7 +335,7 @@ export default function Boleta() {
                                     label="Quincena"
                                     data={periodo.map((item) => ({
                                         label: item.nombrePeriodo,
-                                        value: item.idPeriodo
+                                        value: `${item.idPeriodo}-${item.tipo}`
                                     }))}
                                 />
                                 <ButtonForm

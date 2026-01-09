@@ -45,6 +45,13 @@ export interface BoletaType {
     neto: number;
     liquido: number;
     firma: FirmaType;
+    tipo:number
+}
+
+export enum TipoPeriodoEnum {
+    QUINCENA = 1,
+    AGUINALDO = 2,
+    BONO14 = 3
 }
 
 export default BoletaType;
