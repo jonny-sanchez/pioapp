@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Card, Chip, Divider, useTheme, IconButton } from 'react-native-paper';
-import { BoletaType } from 'types/BoletaType';
+import { BoletaType, TipoPeriodoEnum } from 'types/BoletaType';
 import { AppTheme } from 'types/ThemeTypes';
 import ButtonForm from 'components/form/ButtonForm';
 import { formatCurrency } from 'helpers/currency/currencyHelper';
@@ -19,10 +19,10 @@ export default function BoletaCard({ boleta, onVerBoleta, onVerDetalle }: Boleta
     const theme = useTheme() as AppTheme;
 
     return (
-        <Card className="mb-4 mx-2" style={{ backgroundColor: theme.colors.surface }}>
-            <Card.Content className="p-4">
+        <Card className="mb-4 w-full" style={{ backgroundColor: theme.colors.surface }}>
+            <Card.Content>
                 {/* Mes y Total */}
-                <View className="flex-row justify-between items-center mb-4">
+                <View className="flex-row justify-between items-center mb-4" style={{ padding: 5 }}>
                     <View>
                         <Text style={{ color: theme.colors.onSurface, fontSize: 24, fontWeight: 'bold' }}>
                             {boleta.periodo.nombre}
@@ -70,7 +70,7 @@ export default function BoletaCard({ boleta, onVerBoleta, onVerDetalle }: Boleta
                     >
                         <View>
                             <Text style={{ color: theme.colors.onPrimaryContainer, fontWeight: '600' }}>
-                                Salario Ordinario
+                                { TipoPeriodoEnum.QUINCENA == boleta.tipo ? `Salario Ordinario` : `Anticipo`} 
                             </Text>
                             <Text style={{ color: theme.colors.onPrimaryContainer, fontSize: 13 }}>
                                 {formatCurrency(boleta.ingresos?.salarioOrdinario || 0)}
@@ -152,7 +152,7 @@ export default function BoletaCard({ boleta, onVerBoleta, onVerDetalle }: Boleta
 
                 {/* Botones de acción */}
                 <View className="flex-row justify-between mt-4">
-                    <View className="flex-1 mr-2">
+                    <View className="flex-1">
                         <ButtonForm
                             label="VER BOLETA"
                             icon="file-document-outline"
