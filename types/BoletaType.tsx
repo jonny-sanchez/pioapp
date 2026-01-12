@@ -8,6 +8,7 @@ export interface IngresosType {
 }
 
 export interface DescuentosType {
+    anticipo: number;
     igss: number;
     isr: number;
     ahorro: number;
