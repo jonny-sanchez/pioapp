@@ -2,7 +2,7 @@ import { LOGOAPP } from "assets/Providers/ImageProvider";
 import AvatarImage from "components/Avatars/AvatarImage";
 import ScrollViewContainer from "components/container/ScrollViewContainer";
 import React from "react";
-import { View } from "react-native";
+import { Animated, Falsy, RecursiveArray, RegisteredStyle, View, ViewStyle } from "react-native";
 import { Divider, Modal, Portal, Text, useTheme } from "react-native-paper";
 import { AppTheme } from "types/ThemeTypes";
 
@@ -11,10 +11,11 @@ type ModalPortalType = {
     visible?: boolean;
     onDismiss?: (() => void) | undefined;
     paddingContainer?: number; 
-    maxHeightContainer?: number;
+    maxHeightContainer?: number|`${number}%`;
     heightContainer?: number;
     header?: React.ReactNode;
     footer?: React.ReactNode;
+    contentContainerStyle?: false | "" | RegisteredStyle<ViewStyle> | Animated.Value | Animated.AnimatedInterpolation<string | number> | Animated.WithAnimatedObject<ViewStyle> | Animated.WithAnimatedArray<Falsy | ViewStyle | RegisteredStyle<ViewStyle> | RecursiveArray<Falsy | ViewStyle | RegisteredStyle<ViewStyle>> | readonly (Falsy | ViewStyle | RegisteredStyle<ViewStyle>)[]> | null | undefined
 }
 
 export default function ModalPortal({
@@ -25,7 +26,8 @@ export default function ModalPortal({
     maxHeightContainer = 500,
     heightContainer = 500,
     header,
-    footer
+    footer,
+    contentContainerStyle
 } : ModalPortalType) {
 
     const theme:AppTheme = useTheme() as AppTheme
@@ -44,7 +46,8 @@ export default function ModalPortal({
                             borderRadius: 10,
                             maxHeight: maxHeightContainer,
                             height: heightContainer
-                        }
+                        },
+                        contentContainerStyle
                     ]}
                 >
                     {

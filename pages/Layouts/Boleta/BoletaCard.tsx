@@ -7,6 +7,7 @@ import ButtonForm from 'components/form/ButtonForm';
 import { formatCurrency } from 'helpers/currency/currencyHelper';
 import { getMonthFromPeriod } from 'helpers/periods/periodHelper';
 import { getStatusColor, getStatusTextColor, getStatusText } from 'helpers/theme/themeHelper';
+import { formatString } from './BoletaHelper';
 
 interface BoletaCardProps {
     boleta: BoletaType;
@@ -70,7 +71,8 @@ export default function BoletaCard({ boleta, onVerBoleta, onVerDetalle }: Boleta
                     >
                         <View>
                             <Text style={{ color: theme.colors.onPrimaryContainer, fontWeight: '600' }}>
-                                { TipoPeriodoEnum.QUINCENA == boleta.tipo ? `Salario Ordinario` : `Anticipo`} 
+                                Salario Ordinario
+                                {/* { TipoPeriodoEnum.QUINCENA == boleta.tipo ? `Salario Ordinario` : `Anticipo`}  */}
                             </Text>
                             <Text style={{ color: theme.colors.onPrimaryContainer, fontSize: 13 }}>
                                 {formatCurrency(boleta.ingresos?.salarioOrdinario || 0)}
@@ -105,38 +107,22 @@ export default function BoletaCard({ boleta, onVerBoleta, onVerDetalle }: Boleta
                                     Descuentos
                                 </Text>
                             </View>
-                            {boleta.descuentos.igss > 0 && (
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Text style={{ color: theme.colors.onSurfaceVariant, flex: 1, flexShrink: 1 }}>IGSS</Text>
-                                    <Text style={{ color: theme.colors.success, marginLeft: 8 }}>
-                                        -{formatCurrency(boleta.descuentos.igss)}
-                                    </Text>
-                                </View>
-                            )}
-                            {boleta.descuentos.isr > 0 && (
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Text style={{ color: theme.colors.onSurfaceVariant, flex: 1, flexShrink: 1 }}>ISR</Text>
-                                    <Text style={{ color: theme.colors.success, marginLeft: 8 }}>
-                                        -{formatCurrency(boleta.descuentos.isr)}
-                                    </Text>
-                                </View>
-                            )}
-                            {boleta.descuentos.ahorro > 0 && (
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Text style={{ color: theme.colors.onSurfaceVariant, flex: 1, flexShrink: 1 }}>Ahorro</Text>
-                                    <Text style={{ color: theme.colors.success, marginLeft: 8 }}>
-                                        -{formatCurrency(boleta.descuentos.ahorro)}
-                                    </Text>
-                                </View>
-                            )}
-                            {boleta.descuentos.seguro > 0 && (
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Text style={{ color: theme.colors.onSurfaceVariant, flex: 1, flexShrink: 1 }}>Seguro</Text>
-                                    <Text style={{ color: theme.colors.success, marginLeft: 8 }}>
-                                        -{formatCurrency(boleta.descuentos.seguro)}
-                                    </Text>
-                                </View>
-                            )}
+                            {
+                                Object.entries(boleta.descuentos).map(([key, value]) => (
+                                    <React.Fragment key={key}>
+                                        {
+                                            (value && key !== 'totalDescuentos') > 0 && (
+                                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                    <Text style={{ color: theme.colors.onSurfaceVariant, flex: 1, flexShrink: 1 }}>{ formatString(key) }</Text>
+                                                    <Text style={{ color: theme.colors.success, marginLeft: 8 }}>
+                                                        -{formatCurrency(value)}
+                                                    </Text>
+                                                </View>
+                                            )
+                                        }
+                                    </React.Fragment>
+                                ))
+                            }
                         </View>
                     )}
 

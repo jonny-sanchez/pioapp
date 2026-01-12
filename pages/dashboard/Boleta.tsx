@@ -60,6 +60,7 @@ export default function Boleta() {
                 totalIngresos: boleta.ingresos?.totalIngresos || 0
             },
             descuentos: {
+                anticipo: boleta.descuentos.anticipo || 0,
                 igss: boleta.descuentos?.igss || 0,
                 isr: boleta.descuentos?.isr || 0,
                 ahorro: boleta.descuentos?.ahorro || 0,
