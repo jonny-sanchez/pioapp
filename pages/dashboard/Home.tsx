@@ -2,13 +2,14 @@ import { View } from 'react-native'
 // import { BottomNavKey from 'helpers/navigator/bottomNavigator'
 import BoxImage from 'components/container/BoxImage'
 import PageLayout from 'components/Layouts/PageLayout'
-import { useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { generateJsonError, ResponseService } from 'types/RequestType'
 import { AJAX, URLPIOAPP } from 'helpers/http/ajax'
 import alertsState from 'helpers/states/alertsState'
 import globalState from 'helpers/states/globalState'
 import { orderRoutersMenu } from 'helpers/Global/HomeGlobalHelper'
 import menuRouterState from 'helpers/states/menuRouterState'
+import { useFocusEffect } from '@react-navigation/native'
 
 export type PermissionMenuType = {
     id_permission_menu?: number;
@@ -28,6 +29,7 @@ export default function Home(){
     const { openVisibleSnackBar } = alertsState()
     const { setOpenScreenLoading, setCloseScreenLoading } = globalState()
     const { setRouterMenu } = menuRouterState()
+    const didInit = useRef(false);
 
     const getMenusPermisssion = async():Promise<ResponseService<PermissionMenuType[]>> => {
         try {
@@ -48,7 +50,16 @@ export default function Home(){
         setCloseScreenLoading()
     }
 
-    useEffect(() => { initalize() }, [])
+    // useEffect(() => { initalize() }, [])
+
+    useFocusEffect(
+      useCallback(() => {
+        if (!didInit.current) {
+          initalize()
+          didInit.current = true;
+        }
+      }, [])
+    );
 
     return (
         <>  
