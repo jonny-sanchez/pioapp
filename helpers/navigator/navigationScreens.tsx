@@ -20,8 +20,12 @@ export const NavigationService = {
   },
 
   reset: (name: RouterName, params: object | null | undefined = null) => {
+    const isValidAuthNavigation:boolean = (name === 'Login' || name === 'Home')
     if(navigationGlobal.isReady()) {
-      navigationGlobal.reset({ index: 0, routes: [{ name, params }] })
+      navigationGlobal.reset({ index: isValidAuthNavigation ? 0 : 1, routes: [
+        ...(isValidAuthNavigation ? [] : [ { name: 'Home' } ]),
+        { name, params }
+      ] })
     }
   },
 

@@ -4,6 +4,7 @@ import BoxImage from "components/container/BoxImage"
 import { LOGOPINULITOORIGINAL } from "assets/Providers/ImageProvider"
 import ProgressBarItem from "components/Progress/ProgressBarItem"
 import { useEffect, useState } from "react"
+import BoxImageAnimatedFloat from "components/Animaciones/BoxImageAnimatedFloat"
 
 type PageLoadingInitProps = {
     loading: boolean;
@@ -31,9 +32,10 @@ export default function PageLoadingInit({
     useEffect(() => { handleProgressInit() }, [])
 
     return (
-        <View className="flex-1 w-full items-center justify-center gap-5" style={{ backgroundColor: theme.colors.background }}>
-            <BoxImage width={70} height={80} img={LOGOPINULITOORIGINAL}/>
-            <ProgressBarItem width={110} height={7} progress={progressLoading}/>
+        <View className="flex-1 w-full items-center justify-center gap-10" style={{ backgroundColor: theme.colors.background }}>
+            <BoxImageAnimatedFloat width={70} height={80} img={LOGOPINULITOORIGINAL}/>
+            {/* <BoxImage width={70} height={80} img={LOGOPINULITOORIGINAL}/> */}
+            <ProgressBarItem width={120} height={10} style={{ borderRadius: 3 }} progress={progressLoading}/>
         </View>
     )
 }
