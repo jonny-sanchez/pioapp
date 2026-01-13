@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { Modal, Portal, Card, Divider, Button, IconButton, useTheme } from 'react-native-paper';
-import { BoletaType } from 'types/BoletaType';
+import { BoletaType, TipoPeriodoEnum } from 'types/BoletaType';
 import { AppTheme } from 'types/ThemeTypes';
 import ButtonForm from 'components/form/ButtonForm';
 import { formatCurrency } from 'helpers/currency/currencyHelper';
 import { formatDateGT } from 'helpers/periods/periodHelper';
 import { getStatusText } from 'helpers/theme/themeHelper';
-import { descargarBoletaPDF } from 'helpers/pdf/pdfHelper';
+import { descargarBoletaPDF, descargarBoletaPDFBono14AndAguinaldo } from 'helpers/pdf/pdfHelper';
 import alertsState from 'helpers/states/alertsState';
 import { BOLETA_MESSAGES } from 'constants/boletaConstants';
 import CardContent from 'components/Cards/CardContent';
@@ -38,7 +38,13 @@ export default function BoletaDetailModal({ visible, boleta, onDismiss }: Boleta
         openVisibleSnackBar(BOLETA_MESSAGES.WARNING.DESCARGANDO_PDF, 'warning');
 
         try {
-            const success = await descargarBoletaPDF(boleta.periodo.id, boleta.empleado.codigo);
+            let success = false
+
+            if(TipoPeriodoEnum.QUINCENA == boleta.tipo)
+                success = await descargarBoletaPDF(boleta.periodo.id, boleta.empleado.codigo);
+            
+            if(TipoPeriodoEnum.BONO14 == boleta.tipo || TipoPeriodoEnum.AGUINALDO == boleta.tipo)
+                success = await descargarBoletaPDFBono14AndAguinaldo(boleta.periodo.fechaFin, boleta.empleado.codigo, boleta.tipo)
 
             if (success) {
                 openVisibleSnackBar(BOLETA_MESSAGES.SUCCESS.PDF_DESCARGADO, 'success');
