@@ -8,9 +8,9 @@ import { AuthHedearsType } from "types/Request/AuthorizationTypes";
 import MethodRequestType from "types/Request/MethodRequestType";
 
 // export const URLPIOAPP = `http://192.168.0.46:5000/api`
-// export const URLPIOAPP = `http://10.0.2.2:5000/api`
 
 //local pruva PORT
+// export const URLPIOAPP = `http://10.0.2.2:5000/api`
 export const URLPIOAPP = `https://1n42gnjd-5000.use2.devtunnels.ms/api`
 
 //Produccion

@@ -18,7 +18,7 @@ export default function SnackBarAlert() {
         normal: undefined
     }
 
-    const { visibleSnackBar, closeVisibleSnackBar, message, typeAlert } = alertsState()
+    const { visibleSnackBar, closeVisibleSnackBar, message, typeAlert, snackbarKey } = alertsState()
 
     // const [visible, setVisible] = useState<boolean>(true);
 
@@ -27,6 +27,7 @@ export default function SnackBarAlert() {
     return (
         <View className="absolute bottom-5 w-full z-50">
             <Snackbar
+                key={snackbarKey}
                 style={( optionColor[typeAlert] && { backgroundColor: optionColor[typeAlert] })}
                 visible={visibleSnackBar}
                 onDismiss={closeVisibleSnackBar}
