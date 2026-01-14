@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Modal, Portal, Text, useTheme, Avatar, Drawer } from 'react-native-paper';
 import globalState from 'helpers/states/globalState';
-import { View, Animated, Dimensions, StyleSheet, TouchableWithoutFeedback  } from 'react-native';
+import { View, Animated, Dimensions, StyleSheet, TouchableWithoutFeedback, ScrollView  } from 'react-native';
 import ButtonForm from 'components/form/ButtonForm';
 // import bottomNavigation from 'helpers/navigator/bottomNavigator';
 // import { NavigationService, currentRouteName } from 'helpers/navigator/navigationScreens';
@@ -11,11 +11,12 @@ import { getValueStorage } from 'helpers/store/storeApp';
 import menuRouterState, { RouterGrouped } from 'helpers/states/menuRouterState';
 import { currentRouteName, NavigationService } from 'helpers/navigator/navigationScreens';
 import TouchRipple from 'components/Touch/TouchRipple';
+import DrawerSkeleton from 'components/Skeletons/DrawerSkeleton';
 // import { useRoute } from '@react-navigation/native';
 
 export default function DrawerDashboard () {
 
-    const { drawer, setCloseDrawer, indexNavigation } = globalState()
+    const { drawer, setCloseDrawer, indexNavigation, loadingMenuInit } = globalState()
     
     const { routerMenu } = menuRouterState()
 
@@ -54,7 +55,7 @@ export default function DrawerDashboard () {
                   },
                 ]}
             >
-              <View>
+              <View className='flex-1'>
                 {/* Personal page info */}
                 <TouchRipple onPress={() => {
                   setCloseDrawer()
@@ -71,27 +72,38 @@ export default function DrawerDashboard () {
                 </TouchRipple>
                 
                 {/* Section menu bootom */}
-                {
-                  Object.entries(routerMenu as RouterGrouped).map(([key, value], index) => (
-                    <Drawer.Section key={index} className='w-full' title={key}>
+                <View className='w-full' style={{ flex: 1 }}>
+                  <ScrollView style={{ flex: 1 }}>
+                  
+                  {loadingMenuInit ? (
+                    <DrawerSkeleton/>
+                  ) : (
+                    <>
                       {
-                        value.map((elRouter, i) => (
-                          <Drawer.Item
-                            key={i}
-                            label={elRouter?.title || ''}
-                            icon={elRouter?.icon}
-                            disabled={elRouter.name === currentRouteName}
-                            active={elRouter.name === currentRouteName}
-                            onPress={() => {
-                              setCloseDrawer()
-                              setTimeout(() => NavigationService.reset(elRouter.name), 200)
-                            }}
-                          />
+                        Object.entries(routerMenu as RouterGrouped).map(([key, value], index) => (
+                          <Drawer.Section key={index} className='w-full' title={key}>
+                            {
+                              value.map((elRouter, i) => (
+                                <Drawer.Item
+                                  key={i}
+                                  label={elRouter?.title || ''}
+                                  icon={elRouter?.icon}
+                                  disabled={elRouter.name === currentRouteName}
+                                  active={elRouter.name === currentRouteName}
+                                  onPress={() => {
+                                    setCloseDrawer()
+                                    setTimeout(() => NavigationService.reset(elRouter.name), 200)
+                                  }}
+                                />
+                              ))
+                            }
+                          </Drawer.Section>
                         ))
                       }
-                    </Drawer.Section>
-                  ))
-                }
+                    </>
+                  )}
+                  </ScrollView>
+                </View>
 
               </View>      
               <View className='w-full py-[30] px-[25]'>

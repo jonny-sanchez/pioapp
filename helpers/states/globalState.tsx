@@ -12,6 +12,8 @@ type GlobalState = {
   setCloseScreenLoading: () => void;
   indexNavigation?: any;
   setIndexNavigation: (newIndex:number) => void;
+  loadingMenuInit: boolean;
+  setLoadingMenuInit: (newLoadingMenuInit:boolean) => void;
 };
 
 const globalState = create<GlobalState>((set)=>({
@@ -29,7 +31,9 @@ const globalState = create<GlobalState>((set)=>({
     setOpenScreenLoading: () => set({ screenLoading: true }),
     setCloseScreenLoading: () => set({ screenLoading: false }),
     indexNavigation: 0,
-    setIndexNavigation: (newIndex:number = 0) => set({ indexNavigation: newIndex })
+    setIndexNavigation: (newIndex:number = 0) => set({ indexNavigation: newIndex }),
+    loadingMenuInit: false,
+    setLoadingMenuInit: (newLoadingMenuInit) => set({ loadingMenuInit: newLoadingMenuInit })
 }))
 
 export default globalState

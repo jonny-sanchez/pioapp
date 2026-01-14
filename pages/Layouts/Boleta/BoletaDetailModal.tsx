@@ -122,10 +122,12 @@ export default function BoletaDetailModal({ visible, boleta, onDismiss }: Boleta
                                         {boleta.periodo.rango || 'N/A'}
                                     </Text>
                                 </View>
-                                <View className="flex-row justify-between">
-                                    <Text style={{ color: theme.colors.onSurfaceVariant }}>Días Trabajados:</Text>
-                                    <Text style={{ color: theme.colors.onSurface, fontWeight: '500' }}>{boleta.diasTrabajados || 0}</Text>
-                                </View>
+                                {boleta.diasTrabajados > 0 && (
+                                    <View className="flex-row justify-between">
+                                        <Text style={{ color: theme.colors.onSurfaceVariant }}>Días Trabajados:</Text>
+                                        <Text style={{ color: theme.colors.onSurface, fontWeight: '500' }}>{boleta.diasTrabajados || 0}</Text>
+                                    </View>
+                                )}
                                 <View className="flex-row justify-between">
                                     <Text style={{ color: theme.colors.onSurfaceVariant }}>Estado:</Text>
                                     <Text style={{
