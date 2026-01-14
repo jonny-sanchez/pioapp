@@ -28,9 +28,9 @@ export default function BoletaCard({ boleta, onVerBoleta, onVerDetalle }: Boleta
                         <Text style={{ color: theme.colors.onSurface, fontSize: 24, fontWeight: 'bold' }}>
                             {boleta.periodo.nombre}
                         </Text>
-                        <Text style={{ color: theme.colors.onSurface, fontSize: 18 }}>
+                        {/* <Text style={{ color: theme.colors.onSurface, fontSize: 18 }}>
                             Total: {formatCurrency(boleta.liquido || 0)}
-                        </Text>
+                        </Text> */}
                         <Chip
                             mode="flat"
                             textStyle={{

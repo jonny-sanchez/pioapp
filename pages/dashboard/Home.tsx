@@ -27,7 +27,7 @@ export type PermissionMenuType = {
 export default function Home(){
 
     const { openVisibleSnackBar } = alertsState()
-    const { setOpenScreenLoading, setCloseScreenLoading } = globalState()
+    const { setOpenScreenLoading, setCloseScreenLoading, setLoadingMenuInit } = globalState()
     const { setRouterMenu } = menuRouterState()
     const didInit = useRef(false);
 
@@ -42,12 +42,14 @@ export default function Home(){
     }
 
     const initalize = async() => {
-        setOpenScreenLoading()
+        setLoadingMenuInit(true)
+        // setOpenScreenLoading()
         const resultPermisos = await getMenusPermisssion()
         const dataOrder:any = orderRoutersMenu(resultPermisos.data as PermissionMenuType[])
         // console.log(dataOrder)
         setRouterMenu(dataOrder)
-        setCloseScreenLoading()
+        // setCloseScreenLoading()
+        setLoadingMenuInit(false)
     }
 
     // useEffect(() => { initalize() }, [])
