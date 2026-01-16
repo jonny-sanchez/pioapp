@@ -348,7 +348,7 @@ export default function SaveVisitas(){
 
                             <InputFormHook 
                                 control={control} 
-                                maxLength={100}
+                                maxLength={250}
                                 name="comentario" 
                                 placeholder="Ingrese un comentario" 
                                 label="Comentario"
