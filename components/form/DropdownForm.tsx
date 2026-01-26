@@ -1,5 +1,5 @@
 import { Dropdown } from 'react-native-element-dropdown';
-import { useTheme, HelperText } from 'react-native-paper'
+import { useTheme, HelperText, Text, ActivityIndicator } from 'react-native-paper'
 import { Controller } from 'react-hook-form'
 import { View } from 'react-native'
 import Option from 'types/Dropdown/Option';
@@ -15,6 +15,12 @@ type DropdownFormProps = {
     onChangeExtra?: (item: any) => void;
     onFocus?: (() => void) | undefined;
     loading?: boolean;
+    loadingFooter?:boolean;
+    onEndReached?: ((info: {
+        distanceFromEnd: number;
+    }) => void) | null | undefined;
+    searchQuery?: ((keyword: string, labelValue: string) => boolean) | undefined;
+    onChangeText?: ((search: string) => void) | undefined;
 }
 
 export default function DropdownForm({
@@ -27,11 +33,14 @@ export default function DropdownForm({
     disable = false,
     onChangeExtra,
     onFocus,
-    loading
+    loading,
+    loadingFooter = false,
+    onEndReached,
+    searchQuery,
+    onChangeText
 } : DropdownFormProps){
     
     const theme = useTheme()
-
     const errorMessage = errors[name || ""]?.message || ""
 
     return (
@@ -44,12 +53,16 @@ export default function DropdownForm({
                         disable={disable}
                         mode='modal'
                         // data={data}
-                        data={loading ? [ { value: '', label: '...Cargando' } ] : data}
+                        // data={loading ? [ { value: '', label: '...Cargando' } ] : data}
+                        // data={loading ? [] : data}
+                        data={data}
                         value={value ?? ""}
                         valueField='value'
-                        placeholder={label}
+                        placeholder={loading ? '...Cargando' : label}
                         labelField='label'
                         search
+                        searchQuery={searchQuery}
+                        onChangeText={onChangeText}
                         searchPlaceholder='Buscar...'
                         // onChange={onChange}
                         onChange={item => {
@@ -82,6 +95,44 @@ export default function DropdownForm({
                             borderTopEndRadius: 4,
                             borderTopStartRadius: 4,
                             ...(disable && {opacity: 0.5})
+                        }}
+
+                        // renderRightIcon={() => loading ? <ActivityIndicator size="small" /> : null}
+
+                        flatListProps={{ 
+                            onEndReached: onEndReached,
+                            onEndReachedThreshold: 1,
+                            ListFooterComponent: () => {
+                                if(loadingFooter) return (
+                                    <View style={{ padding: 24 }}>
+                                        <ActivityIndicator size={'small'}/>
+                                    </View>
+                                )
+                            },
+
+                            ListEmptyComponent: () => {
+                                if(loading) return (
+                                    <View style={{ padding: 24 }}>
+                                        <ActivityIndicator size={'small'}/>
+                                    </View>
+                                    // <View style={{ padding: 24, alignItems: 'center', gap: 15 }}>
+                                    //     <HelperText type='info'>Cargando opciones…</HelperText>
+                                    //     <ActivityIndicator size="large" color={theme.colors.primary} />
+                                    // </View>
+                                )
+
+                                if(data.length <= 0 && !loadingFooter) return (
+                                    <View style={{ padding: 24, alignItems: 'center' }}>
+                                        <Text>No hay ninguna opcion.</Text>
+                                    </View>
+                                )
+
+                                if(!loadingFooter) return (
+                                  <View style={{ padding: 24, alignItems: 'center' }}>
+                                    <Text>No se encontraron resultados</Text>
+                                  </View>
+                                )
+                            }
                         }}
                     />
                 )}

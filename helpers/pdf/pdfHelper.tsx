@@ -1,5 +1,5 @@
 import { Linking } from 'react-native';
-import { BOLETA_AGUINALDO_PDF_URL, BOLETA_BONO14_PDF_URL, BOLETA_PDF_BASE_URL } from 'constants/boletaConstants';
+import { BOLETA_AGUINALDO_PDF_URL, BOLETA_BONO14_PDF_URL, BOLETA_PDF_BASE_URL, BOLETA_VACACION_PDF_URL } from 'constants/boletaConstants';
 import { TipoPeriodoEnum } from 'types/BoletaType';
 
 /**
@@ -57,6 +57,24 @@ export const descargarBoletaPDFBono14AndAguinaldo = async(fechaFinPeriodo:string
         const [YEAR, MONTH, DAY] = fechaFinPeriodo.split('/').map(Number)
 
         const url = `${TipoPeriodoEnum.BONO14 == tipo ? BOLETA_BONO14_PDF_URL : BOLETA_AGUINALDO_PDF_URL}?aliasCodigo=${aliasCodigo}&anio=${YEAR}`
+        
+        const supported = await Linking.canOpenURL(url);
+        
+        if (supported) {
+            await Linking.openURL(url);
+            return true;
+        }
+        
+        return false;
+    } catch (error) {
+        return false;
+    }
+}
+
+export const descargarBoletaVacacion = async(aliasEmpleado:string, idAusencia:number): Promise<boolean> => {
+    try {
+        const codEmpleado = Number(aliasEmpleado.substring(2))
+        const url = `${BOLETA_VACACION_PDF_URL}?codEmpleado=${codEmpleado}&idAusencia=${idAusencia}`
         
         const supported = await Linking.canOpenURL(url);
         

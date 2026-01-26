@@ -52,7 +52,32 @@ export interface BoletaType {
 export enum TipoPeriodoEnum {
     QUINCENA = 1,
     AGUINALDO = 2,
-    BONO14 = 3
+    BONO14 = 3,
+    VACACION = 4
+}
+
+// Tipos para la respuesta de verificación de firma
+export interface FirmaExistente {
+    id_firma_boleta_pago: string;
+    fecha_firma: string;
+    valido: boolean;
+}
+
+export interface VerificacionFirmaResponse {
+    existe: boolean;
+    firma?: FirmaExistente;
+}
+
+// Tipo para la respuesta de firma exitosa
+export interface FirmaExitosaResponse {
+    id_firma_boleta_pago: string;
+    id_firma_boleta_pdv: number;
+    empleado: string;
+    periodo: string;
+    monto_liquido: number;
+    fecha_firma: string;
+    hash_boleta_firmada: string;
+    firma_uuid: string;
 }
 
 export default BoletaType;

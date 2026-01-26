@@ -7,7 +7,7 @@ import ButtonForm from 'components/form/ButtonForm';
 import { formatCurrency } from 'helpers/currency/currencyHelper';
 import { formatDateGT } from 'helpers/periods/periodHelper';
 import { getStatusText } from 'helpers/theme/themeHelper';
-import { descargarBoletaPDF, descargarBoletaPDFBono14AndAguinaldo } from 'helpers/pdf/pdfHelper';
+import { descargarBoletaPDF, descargarBoletaPDFBono14AndAguinaldo, descargarBoletaVacacion } from 'helpers/pdf/pdfHelper';
 import alertsState from 'helpers/states/alertsState';
 import { BOLETA_MESSAGES } from 'constants/boletaConstants';
 import CardContent from 'components/Cards/CardContent';
@@ -45,6 +45,9 @@ export default function BoletaDetailModal({ visible, boleta, onDismiss }: Boleta
             
             if(TipoPeriodoEnum.BONO14 == boleta.tipo || TipoPeriodoEnum.AGUINALDO == boleta.tipo)
                 success = await descargarBoletaPDFBono14AndAguinaldo(boleta.periodo.fechaFin, boleta.empleado.codigo, boleta.tipo)
+
+            if(TipoPeriodoEnum.VACACION == boleta.tipo)
+                success = await descargarBoletaVacacion(boleta.empleado.codigo, boleta.numeroBoleta)
 
             if (success) {
                 openVisibleSnackBar(BOLETA_MESSAGES.SUCCESS.PDF_DESCARGADO, 'success');

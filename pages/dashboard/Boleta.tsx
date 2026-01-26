@@ -3,7 +3,7 @@ import { View } from "react-native"
 import { Text, useTheme, IconButton } from "react-native-paper"
 import PageLayout from "components/Layouts/PageLayout"
 import PeriodoType, { SelectPeriodoType } from "types/PeriodoType"
-import BoletaType from "types/BoletaType"
+import BoletaType, { FirmaExitosaResponse, VerificacionFirmaResponse } from "types/BoletaType"
 import { useState, useEffect } from "react"
 import FormAdaptiveKeyBoard from "components/container/FormAdaptiveKeyBoard"
 import DropdownForm from "components/form/DropdownForm"
@@ -19,6 +19,11 @@ import DialogComponent from "components/Modals/DialogComponent"
 import { AppTheme } from "types/ThemeTypes"
 import { locationPermission, getLocation } from "helpers/ubicacion/ubicacionHelper"
 import { getDeviceIPAddress } from "helpers/network/networkHelper"
+import { TipoBoletaType } from "types/Apis/TipoBoleta/TipoBoletaType"
+import { getAllTipoBoleta } from "Apis/TipoBoleta/TipoBoletaApi"
+import { yupResolver } from "@hookform/resolvers/yup"
+import schemaBoletaFilter from "helpers/validatesForm/schemaBoletaFilter"
+import DropdownPeriodosLoading from "pages/Boleta/Layouts/DropdownPeriodosLoading"
 
 export default function Boleta() {
 
@@ -33,13 +38,17 @@ export default function Boleta() {
     const [isProcessingSignature, setIsProcessingSignature] = useState(false)
     const [showFirmaDialog, setShowFirmaDialog] = useState(false)
     const [pendingPeriodoId, setPendingPeriodoId] = useState<SelectPeriodoType | null>(null)
+    //estados para dropdown para tipos boletas
+    const [responseTipoBoleta, setResponseTipoBoleta] = useState<ResponseService<TipoBoletaType[]>>()
+    const [loadingTipoBoleta, setLoadingTipoBoleta] = useState<boolean>(false)
 
-    const { control, handleSubmit, reset, resetField, watch, formState: { errors } } = useForm({
-        // resolver: yupResolver(schemaListRutasForm),
+    const { control, handleSubmit, reset, resetField, watch, formState: { errors, isValid } } = useForm({
+        resolver: yupResolver(schemaBoletaFilter),
         mode: 'all'
     })
 
     const selectedPeriodo = watch('periodo')
+    const selectedTipoPeriodo = watch('id_tipo_boleta')
 
     const normalizeBoleta = (boleta: BoletaType): BoletaType => {
         return {
@@ -76,31 +85,7 @@ export default function Boleta() {
                 valido: boleta.firma?.valido || false
             }
         }
-    }
-
-    // Tipos para la respuesta de verificación de firma
-    interface FirmaExistente {
-        id_firma_boleta_pago: string;
-        fecha_firma: string;
-        valido: boolean;
-    }
-
-    interface VerificacionFirmaResponse {
-        existe: boolean;
-        firma?: FirmaExistente;
-    }
-
-    // Tipo para la respuesta de firma exitosa
-    interface FirmaExitosaResponse {
-        id_firma_boleta_pago: string;
-        id_firma_boleta_pdv: number;
-        empleado: string;
-        periodo: string;
-        monto_liquido: number;
-        fecha_firma: string;
-        hash_boleta_firmada: string;
-        firma_uuid: string;
-    }
+    }    
 
     const getPeriodos = async (): Promise<ResponseService<PeriodoType[]>> => {
         try {
@@ -190,9 +175,8 @@ export default function Boleta() {
             return
         }
 
-        setOpenScreenLoading()
-
         try {
+            setOpenScreenLoading()
 
             //ordernar idPeriodo y tipo
             const objectPeriodo = data.periodo.split('-') ?? []
@@ -201,47 +185,37 @@ export default function Boleta() {
 
             const resultBoleta = await getBoleta(idPeriodo, tipo)
 
-            if (resultBoleta.status && resultBoleta.data) {
-                let boletaFinal = normalizeBoleta(resultBoleta.data)
-                const resultVerificacion = await verificarFirmaBoleta(idPeriodo, tipo)
+            if(!(resultBoleta.status && resultBoleta.data)) throw new Error(`No se encontró boleta para el período seleccionado`);
+            
+            let boletaFinal = normalizeBoleta(resultBoleta.data)
+            const resultVerificacion = await verificarFirmaBoleta(idPeriodo, tipo)
 
-                // console.log(resultVerificacion)
+            if(!(resultVerificacion.status && resultVerificacion.data)) throw new Error(`Error al verificar el estado de la boleta`);
+        
+            const { existe, firma } = resultVerificacion.data
 
-                if (resultVerificacion.status && resultVerificacion.data) {
-                    const { existe, firma } = resultVerificacion.data
-
-                    if (existe && firma) {
-                        boletaFinal = {
-                            ...boletaFinal,
-                            firma: {
-                                idFirmaBoleta: firma.id_firma_boleta_pago,
-                                fechaFirma: firma.fecha_firma,
-                                valido: firma.valido
-                            }
-                        }
-                        openVisibleSnackBar('Boleta cargada correctamente', 'success')
-                        setBoleta(boletaFinal)
-                    } else {
-                        setCloseScreenLoading()
-                        setPendingPeriodoId({
-                            idPeriodo: idPeriodo,
-                            tipo: tipo
-                        })
-                        setShowFirmaDialog(true)
-                        return
+            if (existe && firma) {
+                boletaFinal = {
+                    ...boletaFinal,
+                    firma: {
+                        idFirmaBoleta: firma.id_firma_boleta_pago,
+                        fechaFirma: firma.fecha_firma,
+                        valido: firma.valido
                     }
-                } else {
-                    openVisibleSnackBar('Error al verificar el estado de la boleta', 'error')
-                    return
                 }
-            } else {
-                openVisibleSnackBar('No se encontró boleta para el período seleccionado', 'error')
-            }
-        } catch (error) {
-            openVisibleSnackBar('Error al procesar la boleta', 'error')
-        }
+                openVisibleSnackBar('Boleta cargada correctamente', 'success')
+                setBoleta(boletaFinal)
+                return
+            } 
 
-        setCloseScreenLoading()
+            setPendingPeriodoId({ idPeriodo: idPeriodo, tipo: tipo })
+            setShowFirmaDialog(true)
+    
+        } catch (error) {
+            openVisibleSnackBar(`${error}`, 'error')
+        } finally {
+            setCloseScreenLoading()
+        }
     }
 
     const handleVerBoleta = (boleta: BoletaType) => {
@@ -312,8 +286,21 @@ export default function Boleta() {
         openVisibleSnackBar('Operación cancelada', 'warning')
     }
 
+    const onFocusTipoBoleta = async () => {
+        if(responseTipoBoleta?.status) return
+        setLoadingTipoBoleta(true)
+        const response = await getAllTipoBoleta()
+        setResponseTipoBoleta(response)
+        setLoadingTipoBoleta(false)
+    }
+
+    const onPressButtonGenerarBoleta = async () => {
+        reset()
+        setBoleta(null)
+    }
+
     useEffect(() => {
-        loadPeriodos()
+        // loadPeriodos()
     }, [])
 
     return (
@@ -328,36 +315,66 @@ export default function Boleta() {
                                     color: theme.colors.onSurface,
                                     fontSize: 14
                                 }}>
-                                    Consultar por quincena
+                                    Consultar boleta pago
                                 </Text>
-                                <DropdownForm
-                                    control={control}
-                                    name="periodo"
-                                    label="Quincena"
-                                    data={periodo.map((item) => ({
-                                        label: item.nombrePeriodo,
-                                        value: `${item.idPeriodo}-${item.tipo}`
-                                    }))}
-                                />
-                                <ButtonForm
-                                    label="Consultar boleta"
-                                    icon="file-search-outline"
-                                    disabled={!selectedPeriodo}
-                                    onPress={handleSubmit(onSubmit)}
-                                />
+                                { !boleta && (
+                                    <>
+                                        <DropdownForm
+                                            loading={loadingTipoBoleta}
+                                            control={control}
+                                            name="id_tipo_boleta"
+                                            label="Tipo Boleta"
+                                            data={responseTipoBoleta?.data?.map((el) => ({
+                                                label: el.name,
+                                                value: el.id_tipo_boleta
+                                            }))}
+                                            onFocus={onFocusTipoBoleta}
+                                            onChangeExtra={() => resetField('periodo', { defaultValue: '' })}
+                                            errors={errors}
+                                        />
+                                        <DropdownPeriodosLoading
+                                            control={control}
+                                            selectedTipoPeriodo={selectedTipoPeriodo}
+                                            errors={errors}
+                                        />
+                                        {/* <DropdownForm
+                                            // loading
+                                            disable={!(selectedTipoPeriodo)}
+                                            control={control}
+                                            name="periodo"
+                                            label="Quincena"
+                                            data={periodo.map((item) => ({
+                                                label: item.nombrePeriodo,
+                                                value: `${item.idPeriodo}-${item.tipo}`
+                                            }))}
+                                        /> */}
+                                        <ButtonForm
+                                            label="Consultar boleta"
+                                            icon="file-search-outline"
+                                            disabled={!isValid}
+                                            onPress={handleSubmit(onSubmit)}
+                                        />
+                                    </>
+                                ) }
                             </View>
                         </FormAdaptiveKeyBoard>
 
                         {/* Boleta encontrada */}
                         {boleta ? (
-                            <View>
+                            <View className="mb-10">
                                 <BoletaCard
                                     boleta={boleta}
                                     onVerBoleta={handleVerBoleta}
                                     onVerDetalle={handleVerDetalle}
                                 />
+                                <ButtonForm 
+                                    label="Generar otra boleta" 
+                                    icon="reload" 
+                                    buttonColor={theme.colors.onSurfaceVariant}
+                                    onPress={onPressButtonGenerarBoleta}
+                                />
                             </View>
-                        ) : selectedPeriodo && !isProcessingSignature ? (
+                        ) : isValid && !isProcessingSignature ? (
                             <View className="px-4">
                                 <Text
                                     style={{ color: theme.colors.onSurfaceVariant }}
