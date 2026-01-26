@@ -20,7 +20,7 @@ export default function BoletaCard({ boleta, onVerBoleta, onVerDetalle }: Boleta
     const theme = useTheme() as AppTheme;
 
     return (
-        <Card className="mb-4 w-full" style={{ backgroundColor: theme.colors.surface }}>
+        <Card className="mb-4 w-full" style={{ backgroundColor: theme.colors.surface, paddingVertical: 10 }}>
             <Card.Content>
                 {/* Mes y Total */}
                 <View className="flex-row justify-between items-center mb-4" style={{ padding: 5 }}>

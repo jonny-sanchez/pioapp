@@ -9,6 +9,8 @@ export const BOLETA_BONO14_PDF_URL = 'http://sistema.grupopinulito.com:81/nomina
 
 export const BOLETA_AGUINALDO_PDF_URL = 'http://sistema.grupopinulito.com:81/nomina/reports/formats/boletaAguinaldoConfirmada.php'
 
+export const BOLETA_VACACION_PDF_URL = 'http://sistema.grupopinulito.com:81/nomina/reports/formatosRH/reporteVacaciones.php'
+
 // Mensajes de la aplicación
 export const BOLETA_MESSAGES = {
     // Mensajes de éxito

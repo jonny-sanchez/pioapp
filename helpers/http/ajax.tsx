@@ -11,10 +11,10 @@ import MethodRequestType from "types/Request/MethodRequestType";
 
 //local pruva PORT
 // export const URLPIOAPP = `http://10.0.2.2:5000/api`
-// export const URLPIOAPP = `https://1n42gnjd-5000.use2.devtunnels.ms/api`
+export const URLPIOAPP = `https://1n42gnjd-5000.use2.devtunnels.ms/api`
 
 //Produccion
-export const URLPIOAPP = `https://services.sistemaspinulito.com/pioapi`
+// export const URLPIOAPP = `https://services.sistemaspinulito.com/pioapi`
 
 //variables para authentication con basic auth
 // export const BASIC_AUTH_USERNAME = process.env.EXPO_PUBLIC_BASIC_AUTH_USERNAME
@@ -117,4 +117,13 @@ export const FormDataGenerate = (data:object) => {
         )
     )
     return formData
+}
+
+export const ParamsDataGenerate = (params:object) => {
+    const query = new URLSearchParams(
+        Object.entries(params)
+            .filter(([_, v]) => v !== undefined && v !== null && v !== '')
+            .map(([k, v]) => [k, String(v)])
+        ).toString()
+    return query
 }
