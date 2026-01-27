@@ -21,6 +21,7 @@ type DropdownFormProps = {
     }) => void) | null | undefined;
     searchQuery?: ((keyword: string, labelValue: string) => boolean) | undefined;
     onChangeText?: ((search: string) => void) | undefined;
+    onBlurExtra?: () => void;
 }
 
 export default function DropdownForm({
@@ -37,7 +38,8 @@ export default function DropdownForm({
     loadingFooter = false,
     onEndReached,
     searchQuery,
-    onChangeText
+    onChangeText,
+    onBlurExtra
 } : DropdownFormProps){
     
     const theme = useTheme()
@@ -69,7 +71,10 @@ export default function DropdownForm({
                             onChange(item.value)
                             if(onChangeExtra) onChangeExtra(item)
                         }}
-                        onBlur={onBlur}
+                        onBlur={() => {
+                            onBlur()
+                            onBlurExtra && onBlurExtra()
+                        }}
                         onFocus={onFocus}
                         // onChange={item => setValue(item?.value || "")}
                         containerStyle={{ backgroundColor: theme.colors.background }}
@@ -101,7 +106,7 @@ export default function DropdownForm({
 
                         flatListProps={{ 
                             onEndReached: onEndReached,
-                            onEndReachedThreshold: 1,
+                            onEndReachedThreshold: 0.6,
                             ListFooterComponent: () => {
                                 if(loadingFooter) return (
                                     <View style={{ padding: 24 }}>
