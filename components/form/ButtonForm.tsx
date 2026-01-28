@@ -10,6 +10,7 @@ type ButtonFormProps = {
     style?: StyleProp<ViewStyle>;
     buttonColor?: string;
     className?: string;
+    textColor?: string | undefined;
 }
 
 export default function ButtonForm({
@@ -20,7 +21,8 @@ export default function ButtonForm({
     disabled = false,
     style = { },
     buttonColor,
-    className = ''
+    className = '',
+    textColor
 } : ButtonFormProps){
 
     const theme = useTheme()
@@ -34,7 +36,12 @@ export default function ButtonForm({
             icon={`${icon}`} 
             onPress={onPress} 
             buttonColor={buttonColor}
-            style={[ style, { borderRadius: 5, paddingVertical: 8 } ]}
+            contentStyle={{ paddingVertical: 8 }}
+            style={[ { 
+                borderRadius: 5, 
+                // paddingVertical: 8
+            }, style ]}
+            textColor={textColor}
         > 
             { label }
             {/* { marginVertical: 8, marginHorizontal: 8, padding: 0 } */}

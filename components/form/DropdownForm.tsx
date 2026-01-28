@@ -3,6 +3,7 @@ import { useTheme, HelperText, Text, ActivityIndicator } from 'react-native-pape
 import { Controller } from 'react-hook-form'
 import { View } from 'react-native'
 import Option from 'types/Dropdown/Option';
+import React from 'react';
 
 type DropdownFormProps = {
     label?: string;
@@ -22,6 +23,7 @@ type DropdownFormProps = {
     searchQuery?: ((keyword: string, labelValue: string) => boolean) | undefined;
     onChangeText?: ((search: string) => void) | undefined;
     onBlurExtra?: () => void;
+    renderFooterFlatList?: React.ReactNode;
 }
 
 export default function DropdownForm({
@@ -39,7 +41,8 @@ export default function DropdownForm({
     onEndReached,
     searchQuery,
     onChangeText,
-    onBlurExtra
+    onBlurExtra,
+    renderFooterFlatList
 } : DropdownFormProps){
     
     const theme = useTheme()
@@ -77,7 +80,7 @@ export default function DropdownForm({
                         }}
                         onFocus={onFocus}
                         // onChange={item => setValue(item?.value || "")}
-                        containerStyle={{ backgroundColor: theme.colors.background }}
+                        containerStyle={{ backgroundColor: theme.colors.background, marginBottom: 20 }}
                         // itemContainerStyle={{ backgroundColor: theme.colors.surfaceVariant }}
                         itemTextStyle={{ color: theme.colors.onBackground }}
                         activeColor={theme.colors.surfaceVariant}
@@ -108,6 +111,10 @@ export default function DropdownForm({
                             onEndReached: onEndReached,
                             onEndReachedThreshold: 0.6,
                             ListFooterComponent: () => {
+                                if(renderFooterFlatList && !loading && data.length > 0) return (
+                                    renderFooterFlatList
+                                )
+
                                 if(loadingFooter) return (
                                     <View style={{ padding: 24 }}>
                                         <ActivityIndicator size={'small'}/>
