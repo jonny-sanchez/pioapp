@@ -21,12 +21,10 @@ export default function ModalizeDetalleArticulosLayout({
 } : ModalizeDetalleArticulosLayoutType) {
 
     const { openVisibleSnackBar } = alertsState()
-
     const  { rutaDetalle, loadingSkeletetonArticulos, setLoadingSkeletetonArticulos } = detalleArticulosState()
-
     const [articulosRuta, setArticulosRuta] = useState<ArticuloRutaType[]>([]);
-
     const [totalCantidadArticulos, setTotalCantidadArticulos] = useState<number>(0)
+    const [isAtTop, setIsAtTop] = useState(true);
 
     const getArticulos = async (id_pedido: number | null, serie:string|null):Promise<ResponseService<ArticuloRutaType[]>> => {
         try {
@@ -66,6 +64,15 @@ export default function ModalizeDetalleArticulosLayout({
     return (
         <>
             <ModalizeComponent
+                panGestureEnabled={isAtTop}
+                closeOnOverlayTap={true}
+                scrollViewProps={{
+                    onScroll: (e) => {
+                        const y = e.nativeEvent.contentOffset.y;
+                        setIsAtTop(y <= 0);
+                    },
+                    scrollEventThrottle: 16
+                }}
                 modalizeRef={modalizeRef}
                 title="Detalle de ruta"
                 footerComponent={

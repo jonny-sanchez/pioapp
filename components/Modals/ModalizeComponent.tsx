@@ -1,5 +1,5 @@
 import TextInfo from 'components/typografy/TextInfo';
-import { TouchableOpacity, Dimensions, View, Keyboard } from 'react-native';
+import { TouchableOpacity, Dimensions, View, Keyboard, Animated, ScrollViewProps } from 'react-native';
 import { Modalize } from 'react-native-modalize'
 import { useTheme, Divider } from 'react-native-paper';
 
@@ -10,6 +10,9 @@ type ModalizeComponentProps= {
     footerComponent?: React.ReactNode;
     heightModalizeSreen?: number;
     onOpen?(): void;
+    panGestureEnabled?: boolean | undefined;
+    scrollViewProps?: Animated.AnimatedProps<ScrollViewProps> | undefined;
+    closeOnOverlayTap?: boolean | undefined;
     // onOpen?: () => void;
 }
 
@@ -19,7 +22,10 @@ export default function ModalizeComponent({
     title = '',
     footerComponent,
     heightModalizeSreen = 0.80,
-    onOpen
+    onOpen,
+    panGestureEnabled,
+    scrollViewProps,
+    closeOnOverlayTap
     // onOpen = () => {}
 } : ModalizeComponentProps){
 
@@ -31,6 +37,8 @@ export default function ModalizeComponent({
         <>  
             {/* <TouchableOpacity onPress={onOpen}/> */}
             <Modalize 
+                closeOnOverlayTap={closeOnOverlayTap}
+                panGestureEnabled={panGestureEnabled}
                 handlePosition='inside'
                 ref={modalizeRef}
                 onOpen={onOpen}
@@ -40,7 +48,8 @@ export default function ModalizeComponent({
                 scrollViewProps={{ 
                     contentContainerStyle: { padding: 25 },
                     keyboardShouldPersistTaps: 'handled',
-                    keyboardDismissMode: 'on-drag'
+                    keyboardDismissMode: 'on-drag',
+                    ...scrollViewProps
                 }}
                 HeaderComponent={
                     <>
