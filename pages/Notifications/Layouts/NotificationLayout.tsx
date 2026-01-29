@@ -67,10 +67,10 @@ export default function NotificationLayout({
                     )}
                 />
                 :
-                <View className="w-full flex-col items-center justify-center gap-3.5" style={{ marginTop: 55 }}>
+                <View className="w-full flex-col items-center justify-center gap-3.5" style={{ marginTop: 80 }}>
                     <Icon source={'bell-off-outline'} size={60}/>
-                    <Title>Aviso</Title>
-                    <TextInfo>Hoy no hay notificaciones</TextInfo>
+                    <Title>Notificaciones</Title>
+                    <TextInfo style={{ textAlign: 'center', paddingHorizontal: 35 }}>No tienes ninguna notificacion. Aqui se mostraran todo el listado de las mismas.</TextInfo>
                 </View>
             }
         </>

@@ -10,13 +10,13 @@ export default function DrawerSkeleton() {
 
     return (
       <>
-          <View className="w-full flex flex-col px-6 gap-2" style={{ position: 'absolute' }}>
-            <View className="mb-2 mt-4">
+          <View className="w-full flex flex-col px-3 gap-2" style={{ position: 'absolute' }}>
+            <View className="mb-2 mt-4 ml-4">
                 <Skeleton width={75} height={30} colorMode={colorMode}/>
             </View>
             {
                 Array(7).fill(null).map((el, index) => (
-                    <Skeleton key={index} colorMode={colorMode} width={'100%'} height={50}/>
+                    <Skeleton key={index} colorMode={colorMode} radius={'round'} width={'100%'} height={50}/>
                 ))
             }
           </View>

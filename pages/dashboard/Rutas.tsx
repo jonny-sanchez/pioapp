@@ -157,7 +157,7 @@ export default function Rutas() {
                     (valueDateFilterRuta || valueUbicacionesRuta) ? false : true
                 } 
                 icon="filter-remove" 
-                label="Limpiar Filtros" 
+                // label="Limpiar Filtros" 
                 visible={visibleFab}
             />
 
