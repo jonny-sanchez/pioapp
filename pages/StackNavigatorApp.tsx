@@ -24,7 +24,8 @@ export default function StackNavigatorApp({
               cardStyle: { backgroundColor: theme.colors.background },
               gestureEnabled: true,
               gestureDirection: 'horizontal',
-              animation: 'slide_from_right' 
+              animation: 'slide_from_right',
+              gestureResponseDistance: 65
             }}
         >
           { 

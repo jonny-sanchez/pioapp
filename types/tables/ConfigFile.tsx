@@ -4,4 +4,5 @@ export default interface ConfigFile {
   search?: boolean;
   render?: any; 
   numeric?: boolean | undefined;
+  renderEncabezado?: any;
 }

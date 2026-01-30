@@ -11,7 +11,10 @@ const configTableRecepccionRutas = (
     theme: MD3Theme,
     onOpenModalize: () => void,
     setArticuloRecepccion: (param:ArticuloRutaType | null) => void,
-    loadingRecepcion: boolean = false
+    loadingRecepcion: boolean = false,
+    articulosRecepccionDetalle:ArticuloRutaType[],
+    onPressCheckBoxSelectAll:(value:boolean)=>void
+    // onChangeSelectAllProducts:(value:boolean) => void
 ) => {
 
     return [
@@ -28,6 +31,21 @@ const configTableRecepccionRutas = (
         {
             data: null,
             name: 'Cantidad',
+            renderEncabezado: () => { return (
+                <View className="flex flex-row items-center justify-between" style={{ width: '99%' }}>
+                    <Text variant="bodySmall" style={{ color: theme.colors.outline }}>Cantidad</Text>
+                    <View className="">
+                        <CheckBoxForm
+                            className=""
+                            disabled={loadingRecepcion || articulosRecepccionDetalle.length <= 0}
+                            control={control}
+                            name="select_all_products"
+                            onPress={onPressCheckBoxSelectAll}
+                            // onChangeExtra={onChangeSelectAllProducts}
+                        />
+                    </View>
+                </View>
+            ) },
             render: (data:ArticuloRutaType) => { return (
                     <View className="flex flex-row justify-between w-full">
 

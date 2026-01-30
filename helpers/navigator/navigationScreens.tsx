@@ -1,4 +1,4 @@
-import { createNavigationContainerRef } from '@react-navigation/native'
+import { createNavigationContainerRef, StackActions } from '@react-navigation/native'
 import { RouterName } from './routers'
 
 export const navigationGlobal: any = createNavigationContainerRef()
@@ -22,11 +22,26 @@ export const NavigationService = {
   reset: (name: RouterName, params: object | null | undefined = null) => {
     const isValidAuthNavigation:boolean = (name === 'Login' || name === 'Home')
     if(navigationGlobal.isReady()) {
-      navigationGlobal.reset({ index: isValidAuthNavigation ? 0 : 1, routes: [
-        ...(isValidAuthNavigation ? [] : [ { name: 'Home' } ]),
-        { name, params }
-      ] })
+      // navigationGlobal.reset({ index: isValidAuthNavigation ? 0 : 1, routes: [
+      //   ...(isValidAuthNavigation ? [] : [ { name: 'Home' } ]),
+      //   { name, params }
+      // ] })
+      navigationGlobal.reset({
+        index: 0,
+        routes: [{ name, params }]
+      })
     }
+  },
+
+  replace: (name: RouterName, params?: any) => { 
+    if (navigationGlobal.isReady()) { 
+      // console.log(currentRouteName) 
+      if(currentRouteName == 'Home') { 
+        navigationGlobal.navigate(name, params) 
+        return 
+      } 
+      navigationGlobal.dispatch(StackActions.replace(name, params)) 
+    } 
   },
 
   updateCurrentRouteName: () => {

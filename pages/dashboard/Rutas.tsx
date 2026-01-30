@@ -1,5 +1,5 @@
 import ScrollViewContainer from "components/container/ScrollViewContainer"
-import { View } from "react-native"
+import { ScrollView, View } from "react-native"
 import DataTableInfo from "components/tables/DataTableInfo"
 import configTableRutas from "helpers/tables/configTableRutas"
 import { useEffect, useRef, useState } from "react"
@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import schemaListRutasForm from "helpers/validatesForm/schemaListRutasForm"
 import DropdownForm from "components/form/DropdownForm"
-import { formatDate } from "helpers/fechas/fechasHelper"
+import { formatDate, formatDateEsShort } from "helpers/fechas/fechasHelper"
 import { generateJsonError, ResponseService } from "types/RequestType"
 import RutasListType from "types/Rutas/RutasListType"
 import QueryParamsRutasType from "types/Rutas/QueryParamsRutasType"
@@ -26,34 +26,28 @@ import ModalizeDetalleArticulosLayout from "pages/Layouts/Rutas/ModalizeDetalleA
 import detalleArticulosState from "helpers/states/detalleArticulosState"
 import { AppTheme } from "types/ThemeTypes"
 import { useTheme } from "react-native-paper"
+import ChipDecoration from "components/decoration/ChipDecoration"
+import ToggleContainerAnimated from "components/Animaciones/ToggleContainerAnimated"
 
 export default function Rutas() {
 
     const theme:AppTheme = useTheme() as AppTheme
 
     const { openVisibleSnackBar } = alertsState()
-
     const { setOpenScreenLoading, setCloseScreenLoading } = globalState()
-
     const [queryParamsRutas, setQueryParamsRutas] = useState<QueryParamsRutasType>({
         fecha_entrega: '',
         empresa: '',
         tienda: ''
     })
-
     const [rutas, setRutas] = useState<RutasListType[]>([])
-
     const [optionsTiendasRuta, setOptionsTiendaRuta] = useState<Option[]>([])
-
     const [loadingTiendasRuta, setLoadingTiendasRuta] = useState<boolean>(false)
-
     const [visibleFab, setVisibleFab] = useState<boolean>(true); 
-
     const [reloadRutas, setReloadRutas] = useState<boolean>(false)
-
     const offsetY = useRef(0);
-
     const modalizeRefDetalleArticulos = useRef<Modalize>(null)
+    const scrollChipRef = useRef<ScrollView>(null)
         
     const onOpenModalizeDetalleArticulos = () => modalizeRefDetalleArticulos.current?.open()
     
@@ -67,7 +61,6 @@ export default function Rutas() {
     })
 
     const valueDateFilterRuta = watch('date')
-
     const valueUbicacionesRuta = watch('ubicaciones')
 
     const getRutas = async():Promise<ResponseService<RutasListType[]>> => {
@@ -125,11 +118,23 @@ export default function Rutas() {
         setLoadingTiendasRuta(false)
     }
 
-    const handlePressFabFilter = () => {
+    // const handlePressFabFilter = () => {
+    //     reset()
+    //     setRutas([])
+    //     setOptionsTiendaRuta([])
+    //     setQueryParamsRutas({ fecha_entrega: '', empresa: '', tienda: '' })
+    // }
+
+    const cleanDataRuta = () => {
         reset()
         setRutas([])
         setOptionsTiendaRuta([])
         setQueryParamsRutas({ fecha_entrega: '', empresa: '', tienda: '' })
+    }
+
+    const getNameTiendaByCode = (codTienda:string) : string => {
+        const result = optionsTiendasRuta?.find(({ value })=> value === codTienda) ?? null
+        return result?.label ?? ' -- '
     }
 
     useEffect(() => {
@@ -138,6 +143,8 @@ export default function Rutas() {
         const empresa:string = arrayValueTienda[0] || ''
         const tienda:string = arrayValueTienda[1] || ''
         setQueryParamsRutas({fecha_entrega, empresa, tienda})
+        //resetear scroll horizontal de los chip
+        scrollChipRef.current?.scrollTo({ x: 0, animated: true })
     }, [valueDateFilterRuta, valueUbicacionesRuta])
 
     useEffect(() => {
@@ -151,7 +158,7 @@ export default function Rutas() {
                 modalizeRef={modalizeRefDetalleArticulos}
             />
 
-            <FabFloating 
+            {/* <FabFloating 
                 onPress={handlePressFabFilter} 
                 disabled={
                     (valueDateFilterRuta || valueUbicacionesRuta) ? false : true
@@ -159,13 +166,47 @@ export default function Rutas() {
                 icon="filter-remove" 
                 // label="Limpiar Filtros" 
                 visible={visibleFab}
-            />
+            /> */}
 
             <PageLayout titleAppBar="Rutas">
 
                 <ScrollViewContainer onScroll={(e) => handleScroll(e, offsetY, visibleFab, setVisibleFab)}>
                     <FormAdaptiveKeyBoard>
                         <View className="w-full flex-col gap-3.5 my-5">
+
+                            {/* Chip de filtros */}
+                            <ScrollView
+                                ref={scrollChipRef}
+                                horizontal
+                                showsHorizontalScrollIndicator={false}
+                                // contentContainerStyle={{ paddingRight: 12 }}
+                            >
+                                {
+                                    (valueDateFilterRuta || valueUbicacionesRuta) && (
+                                        <View className="w-full flex flex-row gap-3 py-2.5">
+                                            <ToggleContainerAnimated visible={valueDateFilterRuta ? true : false}>
+                                                <ChipDecoration 
+                                                    onPress={() => {}}  
+                                                    title={`${valueDateFilterRuta ? formatDateEsShort(valueDateFilterRuta) : ' -- '}`} 
+                                                    icon="calendar"
+                                                    closeIcon="close"
+                                                    onClose={() => cleanDataRuta() }
+                                                />
+                                            </ToggleContainerAnimated>
+                                            <ToggleContainerAnimated visible={valueUbicacionesRuta ? true : false}>
+                                                <ChipDecoration 
+                                                    onPress={() => {}} 
+                                                    title={`${getNameTiendaByCode(valueUbicacionesRuta ?? '')}`} 
+                                                    icon="store"
+                                                    closeIcon="close"
+                                                    onClose={() => resetField('ubicaciones', { defaultValue: '' })}
+                                                />
+                                            </ToggleContainerAnimated>
+                                        </View>
+                                    )
+                                }
+                            </ScrollView>
+
                             <DatePickerForm 
                                 control={control} 
                                 name="date"
@@ -192,7 +233,8 @@ export default function Rutas() {
                                 data={rutas}
                                 groupField="tienda_nombre"
                                 onPressRow={(data:RutasListType) => {
-                                    setRutaDetalle({...data})
+                                    // setRutaDetalle({...data})
+                                    setRutaDetalle(data)
                                     onOpenModalizeDetalleArticulos()
                                 }}
                             />
