@@ -92,7 +92,8 @@ export default function DrawerDashboard () {
                                   active={elRouter.name === currentRouteName}
                                   onPress={() => {
                                     setCloseDrawer()
-                                    setTimeout(() => NavigationService.reset(elRouter.name), 200)
+                                    // setTimeout(() => NavigationService.reset(elRouter.name), 200)
+                                    setTimeout(() => NavigationService.replace(elRouter.name), 200)
                                   }}
                                 />
                               ))

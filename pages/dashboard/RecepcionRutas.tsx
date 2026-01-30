@@ -39,18 +39,17 @@ export default function RecepcionRutas() {
 
     const onCloseModalizeUpdate = () => modalizeRef.current?.close()
 
-    const { control, handleSubmit, reset, resetField, formState: { errors } } = useForm({
+    const { control, handleSubmit, reset, resetField, formState: { errors }, watch,  } = useForm({
         // resolver: yupResolver(schemaListRutasForm),
         mode: 'all'
     })
-
     const [loadingRecepcion, setLoadingRecepcion] = useState<boolean>(false)
-
     const [visibleDialogConfirmRecepcion, setVisibleDialogConfirmRecepcion] = useState<boolean>(false)
-
     const [articulosRecepccion, setArticulosRecepccion] = useState<DataArticulosRutaType | null>(null) 
-
     const [payloadRecepcion, setPayloadRecepcion] = useState<DataArticulosRutaType|null>(null);
+    const valueSelectAllProducts = watch('select_all_products')
+    const watchControlForm = watch()
+    const controlFormCheckBoxRef = useRef(false)
 
     const postUploadRecepcion = async(body:DataArticulosRutaType) : Promise<ResponseService<any>> => {
         try {
@@ -125,18 +124,63 @@ export default function RecepcionRutas() {
     const handleValueScannerRuta = async():Promise<any> => {
         if(!(valueScannedQr?.data || null)) return
 
-        setOpenScreenLoading()
+        try {
+            //limpiar checkboxes de productos cada que cargue un nuevo
+            reset()
 
-        const JsonValueQr:QrRecepccionObjectType = JSON.parse(valueScannedQr.data)
-        
-        const resultMercanciaRuta = await getMercanciaRuta(JsonValueQr) 
+            setOpenScreenLoading()
+            const JsonValueQr:QrRecepccionObjectType = JSON.parse(valueScannedQr.data)
+            const resultMercanciaRuta = await getMercanciaRuta(JsonValueQr) 
+            setArticulosRecepccion({...resultMercanciaRuta.data, tienda_nombre: JsonValueQr.nombre_tienda} as DataArticulosRutaType)
+            clearValueScannedQr()   
+        } catch (error) {
+            openVisibleSnackBar(`${error}`, 'error')
+        }finally {
+            setCloseScreenLoading()
+        }
 
-        setArticulosRecepccion({...resultMercanciaRuta.data, tienda_nombre: JsonValueQr.nombre_tienda} as DataArticulosRutaType)
-
-        setCloseScreenLoading()
-
-        clearValueScannedQr()
     }
+
+    const onPressCheckBoxSelectAll = (value:boolean) => {
+        // const articulosReset = articulosRecepccion?.detalle?.reduce<Record<string, boolean>>((acc, el) => {
+        //     acc[el.codigo_articulo] = value
+        //     return acc
+        // }, {})
+        // reset(articulosReset)
+        if((articulosRecepccion?.detalle ?? []).length <= 0) return
+        controlFormCheckBoxRef.current = true
+        articulosRecepccion?.detalle?.forEach(
+            ({ codigo_articulo }) => {
+                const current = watchControlForm?.[codigo_articulo]
+                current != value && resetField(`${codigo_articulo}`, { defaultValue: value })
+            }
+        )
+        setTimeout(() => {
+            controlFormCheckBoxRef.current = false    
+        }, 500);
+        
+    }
+
+    const onChangeFormWatch = (data:any) => {
+        if(controlFormCheckBoxRef.current) return
+        const {select_all_products, ...restData} = data
+        if(Object.keys(restData ?? {}).length <= 0) return
+        /**
+         * 1. si todos estan seleccionados que se seleccione el boton para seleccionar todos
+         * 2. si alguno no esta seleccionado se deselecciona el checkbox  
+         */
+        let isSelectAll = true
+        Object.entries(restData).forEach(([key, value]) => {
+            if(!value) isSelectAll = value as boolean
+        })
+        //si el valor es el mismo no setear su valor
+        if(select_all_products != isSelectAll)
+            resetField('select_all_products', { defaultValue: isSelectAll })
+    }
+
+    useEffect(() => { onChangeFormWatch(watchControlForm) }, [watchControlForm])
+
+    // useEffect(() => { valueSelectAllProducts != undefined && onChangeSelectAllProducts(valueSelectAllProducts) }, [valueSelectAllProducts])
 
     useEffect(() => { handleValueScannerRuta() }, [valueScannedQr])
 
@@ -163,7 +207,7 @@ export default function RecepcionRutas() {
 
             <PageLayout titleAppBar="Recepción"> 
                 <ScrollViewContainer>
-                    <View className="flex-1 my-5 flex-col gap-10">
+                    <View className="flex-1 my-5 flex-col gap-10" style={{ marginBottom: 50 }}>
 
                         <ContainerScannerQr listadoArticulosRuta={articulosRecepccion} disabled={loadingRecepcion}/>
 
@@ -179,7 +223,10 @@ export default function RecepcionRutas() {
                                         theme,
                                         onOpenModalizeUpdate,
                                         setArticuloRecepccion,
-                                        loadingRecepcion
+                                        loadingRecepcion,
+                                        articulosRecepccion?.detalle || [],
+                                        onPressCheckBoxSelectAll
+                                        // onChangeSelectAllProducts
                                     )
                                 }
                                 // onPressRow={(data:ArticuloDetalleType) => {

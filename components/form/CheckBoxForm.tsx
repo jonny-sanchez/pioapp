@@ -1,5 +1,5 @@
 import { Controller } from "react-hook-form";
-import { View } from 'react-native'
+import { StyleProp, View, ViewStyle } from 'react-native'
 import { Checkbox } from 'react-native-paper'
 
 type CheckBoxFormProps = {
@@ -10,6 +10,9 @@ type CheckBoxFormProps = {
     disabled?: boolean;
     color?: string;
     positionLabel?: "trailing" | "leading" | undefined;
+    className?: string | undefined;
+    style?: StyleProp<ViewStyle>;
+    onPress?: (value:boolean) => void|undefined
 }
 
 export default function CheckBoxForm({
@@ -19,7 +22,10 @@ export default function CheckBoxForm({
     onChangeExtra,
     disabled = false,
     color,
-    positionLabel = 'trailing'
+    positionLabel = 'trailing',
+    className = 'w-full',
+    style,
+    onPress
 } : CheckBoxFormProps) {
 
     return (
@@ -29,8 +35,9 @@ export default function CheckBoxForm({
                 control={control}
                 defaultValue={false}
                 render={({ field: { onChange, value } }) => (
-                    <View className="w-full">
+                    <View className={className}>
                         <Checkbox.Item 
+                            style={style}
                             color={color}
                             disabled={disabled}
                             mode="android"
@@ -39,6 +46,7 @@ export default function CheckBoxForm({
                             status={value ? "checked" : "unchecked"}
                             onPress={() => {
                                 const newValue = !value
+                                onPress && onPress(newValue)
                                 onChange(newValue)
                                 if(onChangeExtra) onChangeExtra(newValue)
                             }}

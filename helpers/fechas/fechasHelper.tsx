@@ -4,3 +4,12 @@ export const formatDate = (date: Date) => {
   const day = String(date.getDate()).padStart(2, '0')
   return `${year}-${month}-${day}`
 }
+
+export const formatDateEsShort = (date: Date | string) => {
+    const d = new Date(date)
+    return d.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+    })
+}

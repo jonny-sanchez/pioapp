@@ -75,11 +75,13 @@ export default function DropdownPeriodosLoading({
 
     const searchDropdown = (search:string) => {
         if (searchTimeout.current) clearTimeout(searchTimeout.current)
+        setLoadingInit(true)
         // console.log(search)
         // if(!search) return
         // console.log(search)
         // console.log('hola mundo')
         searchTimeout.current = setTimeout(() => {
+            setLoadingInit(false)
             clearDropdown()
             setSearch(search)
         }, 300)
@@ -156,7 +158,7 @@ export default function DropdownPeriodosLoading({
                                     loading={loadingFooter} 
                                     disabled={loadingFooter}
                                     buttonColor={theme.colors.background}
-                                    onPress={() => onEndReached(true) }
+                                    onPress={() => onEndReached(search ? false : true) }
                                     textColor={theme.colors.outline}
                                     style={{ borderRadius: 0 }}
                                 />
