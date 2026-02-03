@@ -107,6 +107,9 @@ export default function RecepcionRutas() {
         
         resultRecepccionUpload.status && setArticulosRecepccion(null)
 
+        //limpiar checkboxes
+        resultRecepccionUpload.status && resetDataCheckbox(false)
+
         setLoadingRecepcion(false)
 
     }
@@ -121,12 +124,22 @@ export default function RecepcionRutas() {
         }
     }
 
+    const resetDataCheckbox = (value:boolean) => {
+        const articulosReset = articulosRecepccion?.detalle?.reduce<Record<string, boolean>>((acc, el) => {
+            acc[el.codigo_articulo] = value
+            return acc
+        }, {})
+        reset(articulosReset)
+    }
+
     const handleValueScannerRuta = async():Promise<any> => {
         if(!(valueScannedQr?.data || null)) return
 
         try {
             //limpiar checkboxes de productos cada que cargue un nuevo
-            reset()
+            // reset()
+            // resetField('select_all_products', { defaultValue: false })
+            resetDataCheckbox(false)
 
             setOpenScreenLoading()
             const JsonValueQr:QrRecepccionObjectType = JSON.parse(valueScannedQr.data)

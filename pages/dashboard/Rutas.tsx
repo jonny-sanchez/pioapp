@@ -28,6 +28,12 @@ import { AppTheme } from "types/ThemeTypes"
 import { useTheme } from "react-native-paper"
 import ChipDecoration from "components/decoration/ChipDecoration"
 import ToggleContainerAnimated from "components/Animaciones/ToggleContainerAnimated"
+import rutasState from "helpers/states/rutasState"
+import ModalizeMapViewLayout from "pages/Layouts/Rutas/ModalizeMapViewLayout"
+import { onOpenModalize } from "helpers/Modalize/ModalizeHelper"
+import { getLocation, getUbicacionActual } from "helpers/ubicacion/ubicacionHelper"
+import { getTiendaByCodigo, TiendaModuloType } from "Apis/TiendasModulo/TiendasModuloApi"
+import { LatLng } from "react-native-maps"
 
 export default function Rutas() {
 
@@ -40,13 +46,15 @@ export default function Rutas() {
         empresa: '',
         tienda: ''
     })
-    const [rutas, setRutas] = useState<RutasListType[]>([])
+    // const [rutas, setRutas] = useState<RutasListType[]>([])
+    const { rutas, setRutas } = rutasState()
     const [optionsTiendasRuta, setOptionsTiendaRuta] = useState<Option[]>([])
     const [loadingTiendasRuta, setLoadingTiendasRuta] = useState<boolean>(false)
     const [visibleFab, setVisibleFab] = useState<boolean>(true); 
     const [reloadRutas, setReloadRutas] = useState<boolean>(false)
     const offsetY = useRef(0);
     const modalizeRefDetalleArticulos = useRef<Modalize>(null)
+    const modalizeRefMapView = useRef<Modalize>(null)
     const scrollChipRef = useRef<ScrollView>(null)
         
     const onOpenModalizeDetalleArticulos = () => modalizeRefDetalleArticulos.current?.open()
@@ -54,14 +62,15 @@ export default function Rutas() {
     // const onCloseModalizeDetalleArticulos = () => modalizeRefDetalleArticulos.current?.close()
 
     const { setRutaDetalle } = detalleArticulosState()
-
     const { control, handleSubmit, reset, resetField, formState: { errors }, watch } = useForm({
             resolver: yupResolver(schemaListRutasForm),
             mode: 'all'
     })
-
     const valueDateFilterRuta = watch('date')
     const valueUbicacionesRuta = watch('ubicaciones')
+    //variables para ruta navegacion
+    const [rutaNav, setRutaNav] = useState<TiendaModuloType>()
+    const [location, setLocation] = useState<LatLng>()
 
     const getRutas = async():Promise<ResponseService<RutasListType[]>> => {
         try {
@@ -89,6 +98,8 @@ export default function Rutas() {
 
     const stateHandleSetRutas = async() => {
         const result = await getRutas()
+        //recepcion... 1 es ya recepcionada y 0 no recepcionada
+        // console.log(result)
         setRutas(result.data as RutasListType[])
     }
 
@@ -101,13 +112,13 @@ export default function Rutas() {
         setCloseScreenLoading()
     }
 
-    const reloadRutasController = async ():Promise<any> => {
-        setReloadRutas(true)
+    // const reloadRutasController = async ():Promise<any> => {
+    //     setReloadRutas(true)
 
-        await stateHandleSetRutas()
+    //     await stateHandleSetRutas()
 
-        setReloadRutas(false)
-    }
+    //     setReloadRutas(false)
+    // }
 
     const onFocusDropdownTiendas = async() => {
         if(!queryParamsRutas.fecha_entrega) return
@@ -137,6 +148,26 @@ export default function Rutas() {
         return result?.label ?? ' -- '
     }
 
+    const onPressBtnWaze = async(ruta:RutasListType) => {
+        try {
+            setOpenScreenLoading()
+            const ubicacionActual = await getUbicacionActual()
+            if(!ubicacionActual) throw new Error(`Ooops ocurrio un error al obtener la Ubicacion porfavor verifice permisos y que la ubicacion este activa.`); 
+            const result = await getTiendaByCodigo({ codigo_empresa: ruta.empresa, codigo_tienda: ruta.tienda }, false) 
+            if(!result.status) throw new Error(`${result.message}`)
+            if(!result.data?.latitud || !result.data?.altitud) throw new Error(`Oooops. direccion de la tienda no disponible.`);
+            //setear estados para pasar a modalize navegacion
+            setRutaNav(result.data)
+            setLocation(ubicacionActual)
+            //setear estados para pasar a modalize navegacion
+            onOpenModalize(modalizeRefMapView)   
+        } catch (error) {
+            openVisibleSnackBar(`${error}`, 'error')
+        } finally {
+            setCloseScreenLoading()
+        }
+    }
+
     useEffect(() => {
         const fecha_entrega = valueDateFilterRuta ? formatDate(new Date(valueDateFilterRuta)) : null
         const arrayValueTienda:string[] = valueUbicacionesRuta?.split('-') || []
@@ -151,9 +182,17 @@ export default function Rutas() {
         renderRutas()
     }, [queryParamsRutas])
 
+    useEffect(() => { 
+        setRutas([])
+    }, [])
+
     return (
         <>
-
+            <ModalizeMapViewLayout
+                modalizeRef={modalizeRefMapView}
+                rutaNav={rutaNav}
+                location={location}
+            />
             <ModalizeDetalleArticulosLayout
                 modalizeRef={modalizeRefDetalleArticulos}
             />
@@ -227,8 +266,9 @@ export default function Rutas() {
                                 pagination={true}
                                 configTable={configTableRutas(
                                     theme,
-                                    reloadRutasController,
-                                    reloadRutas
+                                    // reloadRutasController,
+                                    // reloadRutas
+                                    onPressBtnWaze
                                 )}
                                 data={rutas}
                                 groupField="tienda_nombre"

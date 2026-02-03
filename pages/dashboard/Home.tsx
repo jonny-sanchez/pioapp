@@ -10,6 +10,9 @@ import globalState from 'helpers/states/globalState'
 import { orderRoutersMenu } from 'helpers/Global/HomeGlobalHelper'
 import menuRouterState from 'helpers/states/menuRouterState'
 import { useFocusEffect } from '@react-navigation/native'
+import { initSocketGlobal } from 'Sockets/Global/GlobalSocket'
+import { getValueStorage } from 'helpers/store/storeApp'
+import { UserSessionType } from 'types/auth/UserSessionType'
 
 export type PermissionMenuType = {
     id_permission_menu?: number;
@@ -62,6 +65,11 @@ export default function Home(){
         }
       }, [])
     );
+
+    useEffect(() => {
+        const user = getValueStorage('user') as UserSessionType
+        initSocketGlobal(user?.token ?? "")
+    }, [])
 
     return (
         <>  
