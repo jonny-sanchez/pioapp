@@ -8,6 +8,11 @@ type NotificationStateType = {
     updateLeidoById: (data: NotificacionAppType) => void;
     loadingNotificationToday: boolean;
     setloadingNotificationToday: (newLoadingNotificationToday:boolean) => void;
+    //conteo de notificacion badge notis
+    countNotificacions: number;
+    setCountNotificacions: (nwCountNotificacions:number) => void;
+    restCountNotificacions: () => void;
+    sumCountNotificacions: () => void;
 }
 
 const notificationState = create<NotificationStateType>((set)=>({
@@ -28,7 +33,12 @@ const notificationState = create<NotificationStateType>((set)=>({
         })
     ),
     loadingNotificationToday: false,
-    setloadingNotificationToday: (newLoadingNotificationToday) => set({ loadingNotificationToday: newLoadingNotificationToday })
+    setloadingNotificationToday: (newLoadingNotificationToday) => set({ loadingNotificationToday: newLoadingNotificationToday }),
+    //conteo de notificacion badge notis
+    countNotificacions: 0,
+    setCountNotificacions: (nwCountNotificacions) => set({ countNotificacions: nwCountNotificacions }),
+    restCountNotificacions: () => set((state) => ({ countNotificacions: state.countNotificacions - 1 })),
+    sumCountNotificacions: () => set((state) => ({ countNotificacions: state.countNotificacions + 1 }))
 }))
 
 export default notificationState

@@ -8,8 +8,9 @@ import { AppTheme } from "types/ThemeTypes"
 
 const configTableRutas = (
     theme: AppTheme,
-    reloadRutasController: () => Promise<any>,
-    reloadRutas: boolean
+    // reloadRutasController: () => Promise<any>,
+    // reloadRutas: boolean,
+    onPressBtnWaze: (ruta:RutasListType) => void
 ) => [
     {
         data: 'no_ruta',
@@ -29,6 +30,7 @@ const configTableRutas = (
                     backgroundColor: data.recepccionada != 0 ? theme.colors.success : theme.colors.warning, 
                 }}
                 size={30}
+                trigger={data?.animated??undefined}
             />
         )
     },
@@ -46,11 +48,17 @@ const configTableRutas = (
                 />
                 <IconButtomForm
                     style={{ margin: 0 }}
+                    icon="navigation"
+                    containerColor={theme.colors.skyBlue}
+                    onPress={() => onPressBtnWaze(data)}
+                />
+                {/* <IconButtomForm
+                    style={{ margin: 0 }}
                     icon="reload"  
                     onPress={ () => reloadRutasController() }
                     loading={reloadRutas}
                     disabled={reloadRutas || data.recepccionada != 0}
-                />
+                /> */}
             </View>
         )
     }

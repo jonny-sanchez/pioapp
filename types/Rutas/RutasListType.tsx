@@ -15,6 +15,7 @@ type RutasListType = {
     serie: string;
     codigo_empleado_piloto: number;
     recepccionada?: number;
+    animated?: boolean;
 }
 
 export default RutasListType

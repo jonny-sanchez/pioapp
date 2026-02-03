@@ -24,7 +24,7 @@ export const handleSocketConnection = (socket: Socket) => {
     // Error de conexión
     socket.on("connect_error", (err) => {
         console.log("Error de conexión al socket:", err.message);
-        alertsState.getState().openVisibleSnackBar(`Error de conexión al socket: ${err.message}`, 'error')
+        // alertsState.getState().openVisibleSnackBar(`Error de conexión al socket: ${err.message}`, 'error')
     });
 
     // Timeout de conexión

@@ -195,6 +195,7 @@ export default function ModalDetailNotification({
                     />
                     <ListItemComponent 
                         title="Descripcion" 
+                        descriptionNumberOfLines={0}
                         description={ notificationSelectActual?.body ?? ' -- ' }
                     />
                 </View> 

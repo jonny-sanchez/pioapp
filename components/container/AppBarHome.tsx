@@ -1,9 +1,10 @@
 // import * as React from 'react';
-import { Appbar, Text, useTheme  } from 'react-native-paper';
+import { Appbar, Badge, Text, useTheme  } from 'react-native-paper';
 import globalState from 'helpers/states/globalState';
 import { NavigationService } from 'helpers/navigator/navigationScreens';
 import { AppTheme } from 'types/ThemeTypes';
 import { Pressable, StyleSheet, View } from 'react-native';
+import notificationState from 'helpers/states/notificationState';
 
 type AppBarHomeProps = {
     title?: string;
@@ -23,18 +24,19 @@ export default function AppBarHome({
 } : AppBarHomeProps){
 
     const { dark, setDark, setOpenDrawer } = globalState()
+    const { countNotificacions } = notificationState()
 
     const theme:AppTheme = useTheme() as AppTheme
 
     const styleAppBar = StyleSheet.create({
         noti_aviso: {
             position: 'absolute',
-            top: 3, 
+            top: 10, 
             right: 5, 
             zIndex: 1, 
-            width: 23, 
-            height: 23, 
-            borderRadius: 8, 
+            // width: 23, 
+            // height: 23, 
+            // borderRadius: 8, 
             backgroundColor: theme.colors.error, 
             display: 'flex', 
             alignItems: 'center', 
@@ -62,6 +64,13 @@ export default function AppBarHome({
                     {/* <Pressable onPress={() => NavigationService.navigate('Notificaciones')} style={styleAppBar.noti_aviso}>
                         <Text variant='bodySmall' style={{ color: theme.colors.background }}>9+</Text>
                     </Pressable> */}
+                    <Badge 
+                        style={styleAppBar.noti_aviso} 
+                        onPress={() => NavigationService.navigate('Notificaciones')}
+                        visible={countNotificacions > 0}
+                    >
+                        { countNotificacions > 9 ? '9+' : countNotificacions }
+                    </Badge>
                     <Appbar.Action 
                         onPress={() => NavigationService.navigate('Notificaciones')} 
                         icon={'bell-outline'} 
