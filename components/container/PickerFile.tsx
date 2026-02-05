@@ -8,6 +8,7 @@ import globalState from "helpers/states/globalState";
 import fotografyState from "helpers/states/fotografyState";
 import alertsState from "helpers/states/alertsState";
 import TouchRipple from "components/Touch/TouchRipple";
+import { ImageOptimizerService } from "helpers/Images/ImageOptimizerService";
 
 type PickerFileProps = {
     disabled?: boolean;
@@ -19,7 +20,7 @@ export default function PickerFile({
 
     const theme = useTheme()
 
-    const { openVisibleSnackBar } = alertsState()
+    const { openVisibleSnackBar, closeVisibleSnackBar } = alertsState()
 
     const { setOpenScreenLoading, setCloseScreenLoading } = globalState()
 
@@ -46,15 +47,21 @@ export default function PickerFile({
             const resultLocation:any = await getLocation()
 
             if(!resultImg || !resultLocation) throw new Error(`Ooops. ocurrio un error al obtener los datos de imagen.`);
+
+            openVisibleSnackBar(`Optimizando imagen...`, 'normal')
+            const resultImageOptimizaded = await ImageOptimizerService.optimize(resultImg?.uri)
+            closeVisibleSnackBar()
             
             setMetadatosPicture(
-                resultImg?.uri || '',
+                resultImageOptimizaded.uri,
+                // resultImg?.uri || '',
                 //fecha orginal cuando se tomo la foto {DateTimeOriginal}
                 //para ubicacion usar {GPSLongitude} y {GPSLatitude}
                 resultImg?.exif || null,
                 //para mostrar ubicacion usar {longitude} y {latitude}
                 resultLocation?.coords || null,
-                resultImg?.mimeType || '',
+                // resultImg?.mimeType || '',
+                resultImageOptimizaded.mimeType,
                 resultImg?.uri?.split('/').pop() || ''
             )
             
