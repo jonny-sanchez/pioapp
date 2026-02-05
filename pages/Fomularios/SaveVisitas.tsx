@@ -141,7 +141,7 @@ export default function SaveVisitas(){
 
     // const [valueRadioBtn, setValueRadioBtn] = useState('');
 
-    const { control, handleSubmit, reset, resetField, formState: { errors } } = useForm({
+    const { control, handleSubmit, reset, resetField, formState: { errors, isValid } } = useForm({
         resolver: yupResolver(schemaNwVisitaFormValidate(
             isCantidadPersonas ? true : false,
             visitaEmergencia ? true : false
@@ -361,7 +361,7 @@ export default function SaveVisitas(){
                                 <ButtonForm 
                                     icon="content-save"
                                     loading={isLodingForm} 
-                                    disabled={isLodingForm}
+                                    disabled={isLodingForm||(!isValid)}
                                     onPress={handleSubmit(submitFormNwVisita)} 
                                     label="Guardar"
                                     buttonColor={theme.colors.error}

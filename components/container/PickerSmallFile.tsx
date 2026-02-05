@@ -5,6 +5,7 @@ import { openCamera, permissionCamera } from 'helpers/camara/cameraHelper'
 import { useEffect, useState } from 'react'
 import alertsState from 'helpers/states/alertsState'
 import TouchRipple from 'components/Touch/TouchRipple'
+import { ImageOptimizerService } from 'helpers/Images/ImageOptimizerService'
 
 type PickerSmallFileProps = {
     disabled?: boolean;
@@ -20,7 +21,7 @@ export default function PickerSmallFile({
 
     const { setOpenScreenLoading, setCloseScreenLoading } = globalState()
 
-    const { openVisibleSnackBar } = alertsState()
+    const { openVisibleSnackBar, closeVisibleSnackBar } = alertsState()
 
     const [ foto, setFoto ] = useState<any>(null)
 
@@ -37,6 +38,13 @@ export default function PickerSmallFile({
             const resultImg:any = await openCamera()
 
             if(!resultImg) throw new Error(`Ooops. ocurrio un error al obtener la imagen.`);
+
+            openVisibleSnackBar(`Optimizando imagen...`, 'normal')
+            const resultImageOptimizaded = await ImageOptimizerService.optimize(resultImg?.uri)
+            closeVisibleSnackBar()
+
+            resultImg.uri = resultImageOptimizaded.uri
+            resultImg.mimeType = resultImageOptimizaded.mimeType
 
             setFoto(resultImg)
 
