@@ -8,7 +8,7 @@ export let currentRouteName:string = "";
 export const NavigationService = {
 
   navigate: (name: RouterName, params?: any) => {
-    if(navigationGlobal.isReady()) {
+    if(navigationGlobal.isReady() && currentRouteName !== name) {
       navigationGlobal.navigate(name, params)
     }
   },
@@ -20,8 +20,8 @@ export const NavigationService = {
   },
 
   reset: (name: RouterName, params: object | null | undefined = null) => {
-    const isValidAuthNavigation:boolean = (name === 'Login' || name === 'Home')
-    if(navigationGlobal.isReady()) {
+    // const isValidAuthNavigation:boolean = (name === 'Login' || name === 'Home')
+    if(navigationGlobal.isReady() && currentRouteName !== name) {
       // navigationGlobal.reset({ index: isValidAuthNavigation ? 0 : 1, routes: [
       //   ...(isValidAuthNavigation ? [] : [ { name: 'Home' } ]),
       //   { name, params }
@@ -34,7 +34,7 @@ export const NavigationService = {
   },
 
   replace: (name: RouterName, params?: any) => { 
-    if (navigationGlobal.isReady()) { 
+    if (navigationGlobal.isReady() && currentRouteName !== name) { 
       // console.log(currentRouteName) 
       if(currentRouteName == 'Home') { 
         navigationGlobal.navigate(name, params) 

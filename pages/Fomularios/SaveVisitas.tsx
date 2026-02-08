@@ -27,6 +27,9 @@ import CardContent from "components/Cards/CardContent"
 import ListItemComponent from "components/List/ListItemComponent"
 import ResponseVisitaEmergenciaType from "types/VisitaEmergencia/ResponseVisitaEmergenciaType"
 import SkeletonSaveVisitas from "./Layouts/SkeletonSaveVisitas"
+import { getTiendas } from "Apis/TiendasModulo/TiendasModuloApi"
+import { getTiposVisitas } from "Apis/TipoVisitas/TipoVisitasApi"
+import { postCreateVisita } from "Apis/Visitas/VisitasApi"
 
 type RouteParamasVisitas = {
     visitaEmergencia?:ResponseVisitaEmergenciaType|undefined|null
@@ -40,38 +43,34 @@ export default function SaveVisitas(){
     const { openVisibleSnackBar } = alertsState()
     const { metadatosPicture, clearMetadatosPicture } = fotografyState()
     const [ renderInit, setRenderInit ] = useState<boolean>(false)
-
-    const getTiendas = async():Promise<ResponseService<any[]>> => {
-        try {
-            const result:ResponseService<any[]> = await AJAX(`${URLPIOAPP}/tiendas/modulo/all`)
-            return result
-        } catch (error) {
-            openVisibleSnackBar(`${error}`, 'error')
-            return generateJsonError(`${error}`, "array")
-        }
-    }
-
-    const getTiposVisitas = async():Promise<ResponseService<any[]>> => {
-        try {
-            const result:ResponseService<any[]> = await AJAX(`${URLPIOAPP}/tipo/visitas/all`)
-            return result
-        } catch (error) {
-            openVisibleSnackBar(`${error}`, 'error')
-            return generateJsonError(`${error}`, 'array')
-        }
-    }
-
-    const postCreateVisita = async(data:object):Promise<ResponseService<any>> => {
-        try {
-            const formData = FormDataGenerate(data)
-            const result:ResponseService<any> = await AJAX(`${URLPIOAPP}/visitas/create`, "POST", formData, true)
-            openVisibleSnackBar(`${result.message}`, 'success')
-            return result
-        } catch (error) {
-            openVisibleSnackBar(`${error}`, 'error')
-            return generateJsonError(error, 'object')
-        }
-    }
+    const theme = useTheme()
+    const { setOpenScreenLoading, setCloseScreenLoading } = globalState()
+    const [ isLodingForm, setIsLoadingForm ] = useState<boolean>(false)
+    const [ isSupervision, SetIsSupervision ] = useState<boolean>(false)
+    const [ tipoVisitas, setTipoVisitas ] = useState([
+        // { label: 'Supervisión', value: 1 },
+        // { label: 'Actualización', value: 2 },
+    ])
+    const [originalTiendas, setOriginalTiendas] = useState<any[]>([])
+    const [ tiendas, setTiendas ] = useState<any[]>([
+        // { label: 'PLAZA GUADALUPE', value: `00005-00004` },
+        // { label: 'AGUACATAN', value: `00007-00005` },
+        // { label: 'VILLA LOBOS 1', value: `00034-00067` },
+        // { label: 'CERINAL 1', value: `00005-00004` },
+        // { label: 'BARBERENA 2', value: `00005-00004` },
+        // { label: 'VILLA CANALES 4', value: `00005-00004` },
+    ])
+    const [isCantidadPersonas , setIsCantidadPersonas] = useState<boolean>(false)
+    const [ fotoCantidadPersonas, setFotoCantidadPersonas ] = useState<any>(null)
+    // const [valueRadioBtn, setValueRadioBtn] = useState('');
+    const { control, handleSubmit, reset, resetField, formState: { errors, isValid } } = useForm({
+        resolver: yupResolver(schemaNwVisitaFormValidate(
+            isCantidadPersonas ? true : false,
+            visitaEmergencia ? true : false
+        )),
+        mode: 'all',
+        shouldUnregister: true
+    })
 
     const orderDataFormVisitas = (dataForm:schemaNwVisitaFormValidateType):object => {
         const objectTienda = dataForm.tienda.split('-')
@@ -110,44 +109,6 @@ export default function SaveVisitas(){
             ...(visitaEmergencia ? { id_visita_emergencia: visitaEmergencia.id_visita } : {})
         }
     }
-
-    const theme = useTheme()
-
-    const { setOpenScreenLoading, setCloseScreenLoading } = globalState()
-
-    const [ isLodingForm, setIsLoadingForm ] = useState<boolean>(false)
-
-    const [ isSupervision, SetIsSupervision ] = useState<boolean>(false)
-
-    const [ tipoVisitas, setTipoVisitas ] = useState([
-        // { label: 'Supervisión', value: 1 },
-        // { label: 'Actualización', value: 2 },
-    ])
-
-    const [originalTiendas, setOriginalTiendas] = useState<any[]>([])
-
-    const [ tiendas, setTiendas ] = useState<any[]>([
-        // { label: 'PLAZA GUADALUPE', value: `00005-00004` },
-        // { label: 'AGUACATAN', value: `00007-00005` },
-        // { label: 'VILLA LOBOS 1', value: `00034-00067` },
-        // { label: 'CERINAL 1', value: `00005-00004` },
-        // { label: 'BARBERENA 2', value: `00005-00004` },
-        // { label: 'VILLA CANALES 4', value: `00005-00004` },
-    ])
-
-    const [isCantidadPersonas , setIsCantidadPersonas] = useState<boolean>(false)
-
-    const [ fotoCantidadPersonas, setFotoCantidadPersonas ] = useState<any>(null)
-
-    // const [valueRadioBtn, setValueRadioBtn] = useState('');
-
-    const { control, handleSubmit, reset, resetField, formState: { errors, isValid } } = useForm({
-        resolver: yupResolver(schemaNwVisitaFormValidate(
-            isCantidadPersonas ? true : false,
-            visitaEmergencia ? true : false
-        )),
-        mode: 'all'
-    })
 
     const clearFormVisitas = () => {
         setIsCantidadPersonas(false)
@@ -222,6 +183,12 @@ export default function SaveVisitas(){
     }
     //funciones para visitas emergencia o visitas programadas
 
+    const onChangeCheckBoxPersonas = (value:boolean) => {
+        setIsCantidadPersonas(value)
+        !value && resetField('cantidad_personas', { defaultValue: '' })
+        !value && setFotoCantidadPersonas(null)
+    }
+
     const init = async() => {
         clearMetadatosPicture()
         await renderAll() 
@@ -230,12 +197,6 @@ export default function SaveVisitas(){
 
     //descomentar para hacer funcionar
     useEffect(() => { init() }, [])
-
-    const onChangeCheckBoxPersonas = (value:boolean) => {
-        setIsCantidadPersonas(value)
-        !value && resetField('cantidad_personas', { defaultValue: '' })
-        !value && setFotoCantidadPersonas(null)
-    }
 
     return (
 

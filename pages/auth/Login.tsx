@@ -198,11 +198,13 @@ export default function Login() {
 
   const init = async () => {
     setLoadingLogin(true)
-    await notificationPermissionGranted()
     //vaidar si el dispositivo tiene huella disponible
     await validBiometricEnable()
     validRememberCredentials()
     setLoadingLogin(false)
+    //Despues cargar todo pedir permisos para notificaciones
+    //pedir permisos para enviar notificaciones
+    await notificationPermissionGranted()
   }
 
   useEffect(() => {

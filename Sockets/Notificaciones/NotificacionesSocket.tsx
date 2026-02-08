@@ -1,4 +1,4 @@
-import { NavigationService } from "helpers/navigator/navigationScreens";
+import { currentRouteName, NavigationService } from "helpers/navigator/navigationScreens";
 import { validateConnectionInternetActive } from "helpers/network/internetHelper";
 import { handleSocketConnection, socketInstance } from "helpers/Socket/SocketHelper";
 import notificationState from "helpers/states/notificationState";
@@ -16,7 +16,7 @@ export const initSocketNotification = async (token:string) => {
 
     //validar conexion a internet
     const resultInternetActive = await validateConnectionInternetActive()
-    if(!resultInternetActive) NavigationService.navigate('InternetFail')
+    if(!resultInternetActive) NavigationService.navigate('InternetFail', { route: currentRouteName })
 
     socket = socketInstance(`${URLPIOAPPSOCKET}/notificaciones`, token)
     handleSocketConnection(socket)

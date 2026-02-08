@@ -46,3 +46,13 @@ export const getTiendaByCodigo = async (params:ParamsTiendaByCodigoType, alertEr
         return generateJsonError(`${error}`, 'array')
     }
 }
+
+export const getTiendas = async():Promise<ResponseService<any[]>> => {
+    try {
+        const result:ResponseService<any[]> = await AJAX(`${URLPIOAPP}/tiendas/modulo/all`)
+        return result
+    } catch (error) {
+        alertsState.getState().openVisibleSnackBar(`${error}`, 'error')
+        return generateJsonError(`${error}`, "array")
+    }
+}
