@@ -88,7 +88,7 @@ export default function DropdownForm({
                         // searchPlaceholderTextColor={theme.colors.onBackground}
                         // searchPlaceholderTextColor
                         backgroundColor='rgba(0,0,0,0.5)'
-                        placeholderStyle={{ color: theme.colors.secondary }}
+                        placeholderStyle={{ color: errorMessage ? theme.colors.error : theme.colors.secondary }}
                         fontFamily='Inter_900Black'
                         // selectedStyle
                         selectedTextStyle={{ color: theme.colors.onBackground }}
@@ -98,8 +98,8 @@ export default function DropdownForm({
                             height: 55, 
                             paddingVertical: 8,
                             paddingHorizontal: 15,
-                            borderBottomWidth: 0.6,
-                            borderColor: theme.colors.secondary,
+                            borderBottomWidth: errorMessage ? 2 : 0.6,
+                            borderColor: errorMessage ? theme.colors.error : theme.colors.secondary,
                             borderTopEndRadius: 4,
                             borderTopStartRadius: 4,
                             ...(disable && {opacity: 0.5})

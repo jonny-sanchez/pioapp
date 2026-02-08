@@ -1,6 +1,6 @@
 import { AuthorizationHeaders } from "constants/Authorization/AuthorizationConstant";
 import { logout } from "helpers/authHelper/authHelper";
-import { NavigationService } from "helpers/navigator/navigationScreens";
+import { currentRouteName, NavigationService } from "helpers/navigator/navigationScreens";
 import { validateConnectionInternetActive } from "helpers/network/internetHelper";
 import { getValueStorage } from "helpers/store/storeApp";
 import { UserSessionType } from "types/auth/UserSessionType";
@@ -31,6 +31,14 @@ export const timeout = function(s:number)
     });
 };
 
+type OptionsAjaxType = {
+    validarInternetConnection?:boolean;
+}
+
+const defaultOptionsAjax:Required<OptionsAjaxType> = {
+    validarInternetConnection: true
+}
+
 export async function AJAX(
     url: string = '',
     method:MethodRequestType = 'GET',
@@ -39,9 +47,11 @@ export async function AJAX(
     blob:boolean = false,
     headers:any = null,
     authorization:AuthHedearsType = 'bearer',
-    timeout:number = 60
+    timeout:number = 60,
+    options:OptionsAjaxType = {}
 ) {
-
+    //default options 
+    const finalOptionsAjax = { ...defaultOptionsAjax, ...options }
     //timeout 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
@@ -52,8 +62,8 @@ export async function AJAX(
         //validar intenert antes de comenzar el fetch
         const resultInternetActive = await validateConnectionInternetActive()
 
-        if(!resultInternetActive) {
-            NavigationService.navigate('InternetFail')
+        if(!resultInternetActive && finalOptionsAjax.validarInternetConnection) {
+            NavigationService.reset('InternetFail', { route: currentRouteName })
             throw new Error("Sin conexión a internet");
         }
 

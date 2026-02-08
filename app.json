@@ -2,7 +2,7 @@
   "expo": {
     "name": "pioapp",
     "slug": "pioapp",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "web": {
       "favicon": "./assets/images/LOGOPINULITO.png",
       "bundler": "metro"

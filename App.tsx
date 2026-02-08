@@ -45,7 +45,7 @@ export default function App() {
     try {
       const result:ResponseService = await AJAX(`${URLPIOAPP}/jwt/valid`, 'POST', {
         tokenText: token
-      })
+      }, false, false, null, 'bearer', 20, { validarInternetConnection: false })
       return result
     } catch (error:any) {
       return generateJsonError(`${ error }`, 'object')
