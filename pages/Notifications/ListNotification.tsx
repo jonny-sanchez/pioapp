@@ -32,7 +32,7 @@ export default function ListNotification () {
     const theme:AppTheme = useTheme() as AppTheme
     const { openVisibleSnackBar } = alertsState()
     const [chargeNotisPrevious, setChargeNotisPrevious] = useState<boolean>(false)
-    const { notificacionesToday, loadingNotificationToday, setloadingNotificationToday } = notificationState()
+    const { notificacionesToday, loadingNotificationToday, setloadingNotificationToday, setNotifications } = notificationState()
     const [notificationSelectActual, setNotificationSelectActual] = useState<NotificacionAppType|null>(null)
     const [responseNotificationsPrevious, setResponseNotificationsPrevious] = useState<ResponseService<NotificacionAppType[]>|null>(null);
     // const [accordionHoy, setAccordionHoy] = useState<boolean>(true);
@@ -42,7 +42,9 @@ export default function ListNotification () {
     const [chipSelect, setChipSelect] = useState<NotisFilterType>('hoy')
     const notisNoLeidasText = notificacionesHoyNoLeidas > 0 ? `(${notificacionesHoyNoLeidas})` : ''
     const notisNoleidasPreviousText = notificacionesPreviousNoLeidas > 0 ? `(${notificacionesPreviousNoLeidas})` : ''
-
+    //validaccion
+    const isHoy = chipSelect === 'hoy'
+    const isAnteriores = chipSelect === 'anteriores'
 
     // const handleToggleAccordionHoy = () => setAccordionHoy(!accordionHoy)
 
@@ -116,7 +118,10 @@ export default function ListNotification () {
 
     useEffect(() => {
         init()
-        return () => disconnectSocketNotification()
+        return () => {
+            setNotifications([])
+            disconnectSocketNotification()
+        }
     }, [])
 
     return (
@@ -144,35 +149,35 @@ export default function ListNotification () {
                                 <View className="w-full flex-row gap-2 mb-8">
                                     <ChipDecoration 
                                         title="Hoy" 
-                                        mode="flat" 
-                                        icon={chipSelect === 'hoy' ? 'check' : ''} 
+                                        mode={isHoy ? 'flat' : 'outlined'} 
+                                        icon={isHoy ? 'check' : ''} 
                                         onPress={() => setChipSelect('hoy')}
-                                        style={{ backgroundColor: theme.colors.surfaceVariant }}
+                                        style={{ ...(isHoy ? { backgroundColor: theme.colors.surfaceVariant } : {}) }}
                                     />
                                     <ChipDecoration 
                                         title="Anteriores" 
-                                        mode="flat" 
-                                        icon={chipSelect === 'anteriores' ? 'check' : ''} 
+                                        mode={isAnteriores ? 'flat' : 'outlined'} 
+                                        icon={isAnteriores ? 'check' : ''} 
                                         onPress={() => setChipSelect('anteriores')}
-                                        style={{ backgroundColor: theme.colors.surfaceVariant }}
+                                        style={{ ...(isAnteriores ? { backgroundColor: theme.colors.surfaceVariant } : {}) }}
                                     />
                                 </View>
                                 <Text  
                                     variant="titleMedium"
                                     style={{ color: theme.colors.primary, marginBottom: 15, }}
                                 >
-                                    { chipSelect === 'hoy' && `Hoy ${ notisNoLeidasText }` }
-                                    { chipSelect === 'anteriores' && `Anteriores ${ notisNoleidasPreviousText }` }
+                                    { isHoy && `Hoy ${ notisNoLeidasText }` }
+                                    { isAnteriores && `Anteriores ${ notisNoleidasPreviousText }` }
                                 </Text>
 
-                                { chipSelect === 'hoy' && 
+                                { isHoy && 
                                     <NotificationLayout 
                                         notifications={notificacionesToday} 
                                         onPressNoti={(item) => handleOpenTogglePortalModal(item, 'hoy')}
                                     /> 
                                 }
 
-                                { chipSelect === 'anteriores' && 
+                                { isAnteriores && 
                                     (
                                         chargeNotisPrevious 
                                             ? 

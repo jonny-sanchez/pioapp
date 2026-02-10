@@ -1,3 +1,16 @@
+export type ArchivosCasoType = {
+    id_archivo: string;        
+    id_caso: string;             
+    s3_bucket: string;
+    s3_key: string;
+    nombre_original: string | null;
+    mime_type: string | null;
+    bytes: number | string;      
+    userCreatedAt: number | string;
+    createdAt: string;           
+    updatedAt: string;           
+}
+
 type ResponseVisitaEmergenciaType = {
     id_visita: number;
     empresa: string;
@@ -19,6 +32,7 @@ type ResponseVisitaEmergenciaType = {
     createdAt: string; 
     updatedAt: string;
     ingreso_visita_valid: boolean;
+    archivos_caso?: ArchivosCasoType[];
 }
 
 export default ResponseVisitaEmergenciaType

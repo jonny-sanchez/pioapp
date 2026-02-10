@@ -1,3 +1,5 @@
+import AnimatedListItem from "components/Animaciones/AnimatedListItem";
+import FlatListVirtualize from "components/List/FlatListVirtualize";
 import { DataTable } from "react-native-paper"
 // import { ConfigFile } from "./DataTableInfo"
 import ConfigFile from "types/tables/ConfigFile"
@@ -19,28 +21,39 @@ export default function RowsTable({
     to,
     onPressRow
 } : RowsTableProps) {
-
+    const dataRender = pagination ? dataSearch.slice(from, to) : dataSearch
     return (
         <>
             {
-                dataSearch.length > 0 ? (pagination ? dataSearch.slice(from, to) : dataSearch).map((item:any, index:any) => (
-                  <DataTable.Row onPress={() => onPressRow && onPressRow(item)}  key={index}>
-                    {
-                      configTable.map(({ data:field, render, numeric }, i)=>(
-                        <DataTable.Cell style={{ paddingVertical: 4, paddingHorizontal: 4 }} key={i} numeric={numeric || false}>{ 
-                          render ? 
-                            render(
-                              (field || '') ? 
-                                item[field || ''] || '' : 
-                                item
-                            ) : 
-                            item[field || ''] || '' 
-                          }
-                        </DataTable.Cell>
-                      ))
-                    }
-                  </DataTable.Row>
-                )) :
+              dataSearch.length > 0 ?
+                <FlatListVirtualize
+                  data={dataRender}
+                  keyExtractor={(_, i) => i.toString()}
+                  scrollEnabled={false}
+                  renderItem={({ item, index }) => (
+                  // dataSearch.length > 0 ? (dataRender).map((item:any, index:any) => (
+                    <AnimatedListItem index={index} key={index}>
+                      <DataTable.Row onPress={() => onPressRow && onPressRow(item)}  key={index}>
+                        {
+                          configTable.map(({ data:field, render, numeric }, i)=>(
+                            <DataTable.Cell style={{ paddingVertical: 4, paddingHorizontal: 4 }} key={i} numeric={numeric || false}>{ 
+                              render ? 
+                                render(
+                                  (field || '') ? 
+                                    item[field || ''] || '' : 
+                                    item
+                                ) : 
+                                item[field || ''] || '' 
+                              }
+                            </DataTable.Cell>
+                          ))
+                        }
+                      </DataTable.Row>
+                    </AnimatedListItem>
+                  // )) 
+                  )}
+                />
+                :
                 <DataTable.Row>
                   <DataTable.Cell style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>No hay resultados</DataTable.Cell>
                 </DataTable.Row>

@@ -1,3 +1,4 @@
+import AnimatedListItem from "components/Animaciones/AnimatedListItem";
 import FlatListVirtualize from "components/List/FlatListVirtualize";
 import ListItemComponent from "components/List/ListItemComponent";
 import ListSubheader from "components/List/ListSubheader";
@@ -30,7 +31,7 @@ export default function NotificationLayout({
                     keyExtractor={(_, i) => i.toString()}
                     scrollEnabled={false}
                     renderItem={({ item, index }: { item: NotificacionAppType; index: number }) => (
-                        <>
+                        <AnimatedListItem index={index}>
                             <ListSubheader label={item.AsuntoNotificacionModel.name_asunto}/>
                                 <View className="w-full flex flex-row">
                                     <View style={{
@@ -39,6 +40,7 @@ export default function NotificationLayout({
                                        ...(item.leido ? {} : { backgroundColor: theme.colors.primary  })
                                     }}></View>
                                     <ListItemComponent 
+                                        descriptionNumberOfLines={1}
                                         onPress={() => onPressNoti(item)}
                                         styleList={{ 
                                             width: '100%',
@@ -51,7 +53,7 @@ export default function NotificationLayout({
                                         rightElements={
                                             <View className="justify-center">
                                                 <Badge 
-                                                    size={15} 
+                                                    size={12} 
                                                     style={{ 
                                                         backgroundColor: 
                                                             item.leido 
@@ -63,7 +65,7 @@ export default function NotificationLayout({
                                         }
                                     />
                                 </View>
-                        </>
+                        </AnimatedListItem>
                     )}
                 />
                 :
