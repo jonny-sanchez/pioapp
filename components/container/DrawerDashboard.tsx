@@ -114,6 +114,7 @@ export default function DrawerDashboard () {
                     logout(false)
                     // setTimeout(() => NavigationService.reset('Login'), 200)
                   }}
+                  icon='logout'
                   label='Cerrar sesion'
                 />
               </View>    

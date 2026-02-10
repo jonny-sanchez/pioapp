@@ -6,7 +6,7 @@ import ModalPortal from "components/Modals/ModalPortal";
 import { NavigationService } from "helpers/navigator/navigationScreens";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
-import { Text, useTheme } from "react-native-paper";
+import { Button, Text, useTheme } from "react-native-paper";
 import { AppTheme } from "types/ThemeTypes";
 import { Linking } from "react-native";
 import { getUbicacionActual } from "helpers/ubicacion/ubicacionHelper";
@@ -15,9 +15,11 @@ import { openWazeNavigation } from "helpers/Waze/WazeHelper";
 import NotificacionAppType from "types/Notificaciones/NotificacionAppType";
 import { generateJsonError, ResponseService } from "types/RequestType";
 import { AJAX, URLPIOAPP } from "helpers/http/ajax";
-import ResponseVisitaEmergenciaType from "types/VisitaEmergencia/ResponseVisitaEmergenciaType";
+import ResponseVisitaEmergenciaType, { ArchivosCasoType } from "types/VisitaEmergencia/ResponseVisitaEmergenciaType";
 import { LatLng } from "react-native-maps";
 import InfoAlert from "components/Alerts/InfoAlert";
+import ToggleContainerAnimated from "components/Animaciones/ToggleContainerAnimated";
+import ImageCarouselPortal from "components/Modals/ImageCarouselPortal";
 
 type ModalDetailNotificationType = {
     portalModal: boolean;
@@ -38,6 +40,10 @@ export default function ModalDetailNotification({
     const [visitaEmergencia, setVisitaEmergencia] = useState<ResponseVisitaEmergenciaType|null>(null)
     const idVisitaEmergencia = notificationSelectActual?.dataPayload?.idVisitaEmergencia ?? '0'
     const [loadingButtonWaze, setLoadingButtonWaze] = useState<boolean>(false)
+    //gurdar archvivos en un state cuando se carga la ruta
+    const [archivosVisitaEmergencia, setArchivosVisitaEmergencia] = useState<ArchivosCasoType[]>([])
+    //varable para controlar el open del carusel
+    const [openCarouselImages, setOpenCarouselImages] = useState<boolean>(false)
 
     //obtner la visita emregencia actual
     const getVisitaEmergencia = async() : Promise<ResponseService<ResponseVisitaEmergenciaType>> => {
@@ -105,10 +111,18 @@ export default function ModalDetailNotification({
         setLoadingTareaSupervisor(true)
         const visitaEmergencia = await getVisitaEmergencia()
         visitaEmergencia.status && setVisitaEmergencia(visitaEmergencia.data as ResponseVisitaEmergenciaType)
+        visitaEmergencia.status && setArchivosVisitaEmergencia(visitaEmergencia.data?.archivos_caso ?? [])
         setLoadingTareaSupervisor(false)
     }
 
+    const cleanHook = () => {
+        setArchivosVisitaEmergencia([])
+        setOpenCarouselImages(false)
+    }
+
     const init = async() => {
+        //limpiar hooke del componente
+        cleanHook()
         //validar si el id del asunto es igual a 2
         isTareaSupervisor && await handleValidVisitaEmergencia()
     }
@@ -189,6 +203,13 @@ export default function ModalDetailNotification({
                 }
             >
                 <View className="w-full my-6">
+                    {/* Modal para carrusel de imagenes */}
+                    <ImageCarouselPortal 
+                        visible={openCarouselImages} 
+                        images={archivosVisitaEmergencia.flatMap(el=> `https://${el.s3_bucket}.s3.us-east-1.amazonaws.com/${el.s3_key}`)} 
+                        onClose={() => setOpenCarouselImages(false)}
+                    />
+
                     <ListItemComponent 
                         title="Titulo" 
                         description={ notificationSelectActual?.title ?? ' -- ' }
@@ -198,6 +219,17 @@ export default function ModalDetailNotification({
                         descriptionNumberOfLines={0}
                         description={ notificationSelectActual?.body ?? ' -- ' }
                     />
+                    <ToggleContainerAnimated visible={archivosVisitaEmergencia.length > 0}>
+                        <View className="mt-5 w-full items-center justify-center">
+                            <Button 
+                                icon={'camera'} 
+                                mode="elevated" 
+                                onPress={() => setOpenCarouselImages(true)}
+                            >
+                                Fotos ({ archivosVisitaEmergencia.length })
+                            </Button>
+                        </View>
+                    </ToggleContainerAnimated>
                 </View> 
             </ModalPortal>
         </>

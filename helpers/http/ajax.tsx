@@ -11,10 +11,10 @@ import MethodRequestType from "types/Request/MethodRequestType";
 
 //local pruva PORT
 // export const URLPIOAPP = `http://10.0.2.2:5000/api`
-// export const URLPIOAPP = `https://1n42gnjd-5001.use2.devtunnels.ms/api`
+export const URLPIOAPP = `https://1n42gnjd-5001.use2.devtunnels.ms/api`
 
 //Produccion
-export const URLPIOAPP = `https://services.sistemaspinulito.com/pioapi`
+// export const URLPIOAPP = `https://services.sistemaspinulito.com/pioapi`
 
 //variables para authentication con basic auth
 // export const BASIC_AUTH_USERNAME = process.env.EXPO_PUBLIC_BASIC_AUTH_USERNAME
