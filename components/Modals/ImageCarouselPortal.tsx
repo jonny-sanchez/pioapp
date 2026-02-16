@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, Dimensions, Image, Pressable } from "react-native";
+import { View, Dimensions, Image, Pressable, ImageResizeMode } from "react-native";
 import Carousel, { Pagination } from "react-native-reanimated-carousel";
 import { Portal, Modal, useTheme, IconButton } from "react-native-paper";
 import { useSharedValue } from "react-native-reanimated";
@@ -8,6 +8,7 @@ import IconButtomForm from "components/form/IconButtomForm";
 import { BlurView } from 'expo-blur';
 import globalState from "helpers/states/globalState";
 import { DownloadImageToGalery } from "helpers/Galery/GaleryHelper";
+import ZoomableImage from "components/Image/ZoomableImage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -15,12 +16,16 @@ type ImageCarouselPortalProps = {
   images: string[];
   visible: boolean;
   onClose: () => void;
+  downloadImages?:boolean;
+  resizeMode?: ImageResizeMode | undefined;
 };
 
 export default function ImageCarouselPortal({
   images,
   visible,
-  onClose
+  onClose,
+  downloadImages = false,
+  resizeMode = 'contain'
 }: ImageCarouselPortalProps) {
     const theme = useTheme() as AppTheme  
     const [index, setIndex] = useState(0);
@@ -129,27 +134,33 @@ export default function ImageCarouselPortal({
                   position: 'relative'
                 }}
               >
-                <IconButtomForm 
-                    disabled={loadingIndex === itemIndex}
-                    loading={loadingIndex === itemIndex}
-                    icon="download" 
-                    size={30}
-                    style={{ position: 'absolute', zIndex: 1, top: 10, right: 10 }}
-                    onPress={async () => {
-                        setLoadingIndex(itemIndex);
-                        await DownloadImageToGalery(item)
-                        setLoadingIndex(null);
+                {
+                  downloadImages && (
+                    <IconButtomForm 
+                      disabled={loadingIndex === itemIndex}
+                      loading={loadingIndex === itemIndex}
+                      icon="download" 
+                      size={30}
+                      style={{ position: 'absolute', zIndex: 1, top: 10, right: 10 }}
+                      onPress={async () => {
+                          setLoadingIndex(itemIndex);
+                          await DownloadImageToGalery(item)
+                          setLoadingIndex(null);
+                      }}
+                  />
+                  )
+                }
+                <ZoomableImage>
+                  <Image
+                    source={{ uri: item }}
+                    style={{
+                      width: "90%",
+                      height: "90%",
+                      borderRadius: 2.5
                     }}
-                />
-                <Image
-                  source={{ uri: item }}
-                  style={{
-                    width: "90%",
-                    height: "90%",
-                    borderRadius: 2.5
-                  }}
-                  resizeMode="cover"
-                />
+                    resizeMode={resizeMode}
+                  />
+                </ZoomableImage>
               </View>
             )}
           />

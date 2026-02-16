@@ -1,5 +1,8 @@
+import { getArticulos } from "Apis/ArticulosRuta/ArticulosRutaApi";
+import AnimatedListItem from "components/Animaciones/AnimatedListItem";
 import CardTitle from "components/Cards/CardTitle";
 import ScrollViewContainer from "components/container/ScrollViewContainer";
+import FlatListVirtualize from "components/List/FlatListVirtualize";
 import ListItemComponent from "components/List/ListItemComponent";
 import ModalizeComponent from "components/Modals/ModalizeComponent";
 import ListArticulosDetalleSkeleton from "components/Skeletons/ListArticulosDetalleSkeleton";
@@ -26,17 +29,6 @@ export default function ModalizeDetalleArticulosLayout({
     const [totalCantidadArticulos, setTotalCantidadArticulos] = useState<number>(0)
     const [isAtTop, setIsAtTop] = useState(true);
 
-    const getArticulos = async (id_pedido: number | null, serie:string|null):Promise<ResponseService<ArticuloRutaType[]>> => {
-        try {
-            if(!id_pedido || !serie) return generateJsonError(`id Pedido o Serie no enviada`, 'array')
-            const result:ResponseService<ArticuloRutaType[]> = await AJAX(`${ URLPIOAPP }/articulos/ruta/list?id_pedido=${ id_pedido }&serie=${serie}`)
-            return result
-        } catch (error) {
-            openVisibleSnackBar(`${error}`, 'error')
-            return generateJsonError(`${error}`, "array")
-        }
-    }
-
     const calcTotalArticulosRuta = ():number => {
         let total:number = 0
         articulosRuta.forEach(({ cantidad })=> total += cantidad)
@@ -46,10 +38,15 @@ export default function ModalizeDetalleArticulosLayout({
     const renderItemsArticulos = async() => {
         const id_pedido:number|null = rutaDetalle?.id_pedido || null
         const serie:string|null = rutaDetalle?.serie || null
+        if(!id_pedido || !serie) return
         setLoadingSkeletetonArticulos(true)
         const resultArticulos = await getArticulos(id_pedido, serie)
         setArticulosRuta(resultArticulos.data as ArticuloRutaType[])
         setLoadingSkeletetonArticulos(false)
+    }
+
+    const clearHook = () => {
+        setIsAtTop(true)
     }
 
     useEffect(() => {
@@ -66,6 +63,7 @@ export default function ModalizeDetalleArticulosLayout({
             <ModalizeComponent
                 panGestureEnabled={isAtTop}
                 closeOnOverlayTap={true}
+                onOpen={clearHook}
                 scrollViewProps={{
                     onScroll: (e) => {
                         const y = e.nativeEvent.contentOffset.y;
@@ -87,22 +85,31 @@ export default function ModalizeDetalleArticulosLayout({
                         loadingSkeletetonArticulos ?
                         <ListArticulosDetalleSkeleton/> :
                         <View>
-                            <CardTitle icon="truck" title={`${rutaDetalle?.serie}`} subtitle={`${rutaDetalle?.id_pedido}`} style={{ width: '100%' }}/>
-                            { 
-                                articulosRuta.map((el, index) => (
-                                    <ListItemComponent 
-                                        key={index}
-                                        styleList={{ width: '100%' }}
-                                        title={`${el.nombre_articulo}`} 
-                                        description={`${el.codigo_articulo} ${el.description}`}
-                                        rightElements={ 
-                                            <>
-                                                <Text>{ el?.cantidad || 0 }</Text>
-                                            </> 
-                                        }
-                                    />
-                                )) 
-                            }
+                            <CardTitle 
+                                icon="truck" 
+                                title={`${rutaDetalle?.serie}`} 
+                                subtitle={`${rutaDetalle?.id_pedido}`} 
+                                style={{ width: '100%' }}
+                            />
+                            <FlatListVirtualize
+                                data={articulosRuta}
+                                keyExtractor={(_, i) => i.toString()}
+                                scrollEnabled={false}
+                                renderItem={({ item, index }: { item: ArticuloRutaType; index: number }) => (
+                                    <AnimatedListItem key={index} index={index}>
+                                        <ListItemComponent 
+                                            styleList={{ width: '100%' }}
+                                            title={`${item.nombre_articulo}`} 
+                                            description={`${item.codigo_articulo} ${item.description}`}
+                                            rightElements={ 
+                                                <>
+                                                    <Text>{ item?.cantidad || 0 }</Text>
+                                                </> 
+                                            }
+                                        />
+                                    </AnimatedListItem>
+                                )}
+                            />
                         </View>
                     }
                 </View>

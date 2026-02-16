@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { StyleProp, ViewStyle } from "react-native";
+import { GestureResponderEvent, Pressable, StyleProp, ViewStyle } from "react-native";
 import { Avatar } from "react-native-paper";
 import Animated, {
   useSharedValue,
@@ -15,6 +15,7 @@ type AvatarIconType = {
     style?: StyleProp<ViewStyle>;
     color?: string;
     trigger?: any;
+    onPress?: ((event: GestureResponderEvent) => void) | null | undefined
 }
 
 export default function AvatarIcon({
@@ -22,7 +23,8 @@ export default function AvatarIcon({
     size = 40,
     style,
     color,
-    trigger
+    trigger,
+    onPress
 }: AvatarIconType) {
 
     const scale = useSharedValue(1);
@@ -57,7 +59,9 @@ export default function AvatarIcon({
 
     return (
         <Animated.View style={[animatedStyle]}>
-            <Avatar.Icon icon={icon} size={size} color={color} style={style}/>
+            <Pressable onPress={onPress}>
+                <Avatar.Icon icon={icon} size={size} color={color} style={style}/>
+            </Pressable>
         </Animated.View>
     );
 }

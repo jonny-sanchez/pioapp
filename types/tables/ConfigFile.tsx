@@ -5,4 +5,6 @@ export default interface ConfigFile {
   render?: any; 
   numeric?: boolean | undefined;
   renderEncabezado?: any;
+  onPressCell?: (data:any) => void | undefined;
+  numericHeader?: boolean;
 }

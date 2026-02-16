@@ -23,7 +23,7 @@ export default function SkeletonSaveVisitas({
             <View className="gap-3.5 mt-5 mb-5" style={[styleContent, { backgroundColor: theme.colors.background, paddingBottom: 20 }]}>
                 <Skeleton colorMode={colorMode} height={55} width={'100%'}/>
                 <Skeleton colorMode={colorMode} height={55} width={'100%'}/>
-                <Skeleton colorMode={colorMode} height={180} width={'100%'}/>
+                <Skeleton colorMode={colorMode} height={200} width={'100%'}/>
                 <Skeleton colorMode={colorMode} height={55} width={'100%'}/>
                 <View className="mt-4"><Skeleton colorMode={colorMode} height={55} width={'100%'}/></View>
             </View>

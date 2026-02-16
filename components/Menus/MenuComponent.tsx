@@ -1,4 +1,5 @@
-import { StyleProp, View, ViewStyle } from "react-native";
+import { useEffect } from "react";
+import { BackHandler, StyleProp, View, ViewStyle } from "react-native";
 import { Button, Divider, Menu } from "react-native-paper";
 
 type MenuComponentType = {
@@ -19,6 +20,23 @@ export default function MenuComponent({
     children,
     styleContainer
 } : MenuComponentType) {
+
+    const onBackPress = () => {
+      if (visible) {
+        // solo cambia el estado → la animación ya se ejecuta sola
+        onDismiss?.()  
+        return true; // bloquea navegación atrás
+      }
+      return false;
+    }
+
+    useEffect(() => {
+        const backHandler = BackHandler.addEventListener(
+            'hardwareBackPress',
+            onBackPress
+          )
+          return () => backHandler.remove()
+    }, [visible])
 
     return (
         <>

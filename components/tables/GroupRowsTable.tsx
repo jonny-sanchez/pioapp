@@ -48,8 +48,8 @@ export default function GroupRowsTable({
                         items.map((el, index) => (
                           <DataTable.Row onPress={() => onPressRow && onPressRow(el)} key={index}>
                             {
-                              configTable.map(({ data:field, render, numeric }, i)=>(
-                                <DataTable.Cell style={{ paddingVertical: 4, paddingHorizontal: 4 }} key={i} numeric={numeric || false}>{ 
+                              configTable.map(({ data:field, render, numeric, onPressCell }, i)=>(
+                                <DataTable.Cell onPress={onPressCell ? () => onPressCell(el) : undefined} style={{ paddingVertical: 4, paddingHorizontal: 4 }} key={i} numeric={numeric || false}>{ 
                                   render ? 
                                     render(
                                       (field || '') ? 

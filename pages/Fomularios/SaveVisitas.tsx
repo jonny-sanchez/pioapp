@@ -318,7 +318,7 @@ export default function SaveVisitas(){
                                 multiline={true}
                             />
 
-                            <View className="w-full mt-3 mb-6">
+                            <View className="w-full mt-3 mb-10">
                                 <ButtonForm 
                                     icon="content-save"
                                     loading={isLodingForm} 

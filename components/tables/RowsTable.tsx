@@ -35,8 +35,8 @@ export default function RowsTable({
                     <AnimatedListItem index={index} key={index}>
                       <DataTable.Row onPress={() => onPressRow && onPressRow(item)}  key={index}>
                         {
-                          configTable.map(({ data:field, render, numeric }, i)=>(
-                            <DataTable.Cell style={{ paddingVertical: 4, paddingHorizontal: 4 }} key={i} numeric={numeric || false}>{ 
+                          configTable.map(({ data:field, render, numeric, onPressCell }, i)=>(
+                            <DataTable.Cell onPress={onPressCell ? () => onPressCell(item) : undefined} style={{ paddingVertical: 4, paddingHorizontal: 4 }} key={i} numeric={numeric || false}>{ 
                               render ? 
                                 render(
                                   (field || '') ? 
