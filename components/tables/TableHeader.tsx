@@ -13,9 +13,9 @@ export default function TableHeader({
     return (
         <DataTable.Header>
             { 
-              configTable.map(({ name, renderEncabezado }, index) => (
+              configTable.map(({ name, renderEncabezado, numericHeader }, index) => (
                 // sortDirection='descending'
-                <DataTable.Title key={index} style={{ paddingHorizontal: 1 }} numeric={false}>{ 
+                <DataTable.Title key={index} style={{ paddingHorizontal: 1 }} numeric={numericHeader}>{ 
                     renderEncabezado ? renderEncabezado() : name 
                 }</DataTable.Title>
               )) 

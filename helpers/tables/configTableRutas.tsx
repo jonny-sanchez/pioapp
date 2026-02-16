@@ -5,12 +5,14 @@ import RutasListType from "types/Rutas/RutasListType"
 import ConfigFile from "types/tables/ConfigFile"
 import AvatarIcon from "components/Avatars/AvatarIcon"
 import { AppTheme } from "types/ThemeTypes"
+import { IconButton } from "react-native-paper"
 
 const configTableRutas = (
     theme: AppTheme,
     // reloadRutasController: () => Promise<any>,
     // reloadRutas: boolean,
-    onPressBtnWaze: (ruta:RutasListType) => void
+    onPressBtnWaze: (ruta:RutasListType) => void,
+    onPressRecepcion: () => void
 ) => [
     {
         data: 'no_ruta',
@@ -23,20 +25,41 @@ const configTableRutas = (
     {
         data: null,
         name: 'Estado',
-        render: (data:RutasListType) => (
-            <AvatarIcon 
-                icon={data.recepccionada != 0 ? 'truck-check' : 'truck-delivery'} 
-                style={{ 
-                    backgroundColor: data.recepccionada != 0 ? theme.colors.success : theme.colors.warning, 
-                }}
-                size={30}
-                trigger={data?.animated??undefined}
-            />
-        )
+        // numericHeader: true,
+        // onPressCell: (data:RutasListType) => { console.log(data) },
+        render: (data:RutasListType) => {
+            const isRecepcionada = data.recepccionada != 0
+            return (
+                <View className="flex-row gap-1 items-center">
+                    <AvatarIcon 
+                        icon={isRecepcionada ? 'truck-check' : 'truck-delivery'} 
+                        style={{ 
+                            backgroundColor: isRecepcionada ? theme.colors.success : theme.colors.warning, 
+                        }}
+                        size={33}
+                        trigger={data?.animated??undefined}
+                        // onPress={() => { console.log(data) }}
+                    />
+                    {/* { 
+                        isRecepcionada &&
+                            <IconButton 
+                                icon={'chevron-up'}  
+                                onPress={onPressRecepcion}
+                                mode="outlined"
+                                style={{ margin: 0 }}
+                                size={12}
+                                animated
+                            />
+                    } */}
+                </View>
+            )
+        }
     },
     {
         data: null,
         name: 'Acciones',
+        // numericHeader: true,
+        // numeric: true,
         render: (data:RutasListType) => ( 
             <View className="flex flex-row gap-1">
                 {/* qrcode */}

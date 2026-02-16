@@ -31,7 +31,7 @@ export default function NotificationLayout({
                     keyExtractor={(_, i) => i.toString()}
                     scrollEnabled={false}
                     renderItem={({ item, index }: { item: NotificacionAppType; index: number }) => (
-                        <AnimatedListItem index={index}>
+                        <AnimatedListItem key={index} index={index}>
                             <ListSubheader label={item.AsuntoNotificacionModel.name_asunto}/>
                                 <View className="w-full flex flex-row">
                                     <View style={{
@@ -40,7 +40,7 @@ export default function NotificationLayout({
                                        ...(item.leido ? {} : { backgroundColor: theme.colors.primary  })
                                     }}></View>
                                     <ListItemComponent 
-                                        descriptionNumberOfLines={1}
+                                        // descriptionNumberOfLines={1}
                                         onPress={() => onPressNoti(item)}
                                         styleList={{ 
                                             width: '100%',

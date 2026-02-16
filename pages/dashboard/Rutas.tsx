@@ -34,11 +34,12 @@ import { onOpenModalize } from "helpers/Modalize/ModalizeHelper"
 import { getLocation, getUbicacionActual } from "helpers/ubicacion/ubicacionHelper"
 import { getTiendaByCodigo, TiendaModuloType } from "Apis/TiendasModulo/TiendasModuloApi"
 import { LatLng } from "react-native-maps"
+import ModalizeDetalleRecepcionLayout from "pages/Layouts/Rutas/ModalizeDetalleRecepcionLayout"
+import { getRutas, getTiendasFilter } from "Apis/RutasView/RutasViewApi"
 
 export default function Rutas() {
 
     const theme:AppTheme = useTheme() as AppTheme
-
     const { openVisibleSnackBar } = alertsState()
     const { setOpenScreenLoading, setCloseScreenLoading } = globalState()
     const [queryParamsRutas, setQueryParamsRutas] = useState<QueryParamsRutasType>({
@@ -55,12 +56,10 @@ export default function Rutas() {
     const offsetY = useRef(0);
     const modalizeRefDetalleArticulos = useRef<Modalize>(null)
     const modalizeRefMapView = useRef<Modalize>(null)
+    //referencia para modalize de detalle recepcion
+    const modalizeRefDetalleRecepcion = useRef<Modalize>(null)
     const scrollChipRef = useRef<ScrollView>(null)
-        
-    const onOpenModalizeDetalleArticulos = () => modalizeRefDetalleArticulos.current?.open()
-    
     // const onCloseModalizeDetalleArticulos = () => modalizeRefDetalleArticulos.current?.close()
-
     const { setRutaDetalle } = detalleArticulosState()
     const { control, handleSubmit, reset, resetField, formState: { errors }, watch } = useForm({
             resolver: yupResolver(schemaListRutasForm),
@@ -72,32 +71,10 @@ export default function Rutas() {
     const [rutaNav, setRutaNav] = useState<TiendaModuloType>()
     const [location, setLocation] = useState<LatLng>()
 
-    const getRutas = async():Promise<ResponseService<RutasListType[]>> => {
-        try {
-            const response:ResponseService<RutasListType[]> = await AJAX(
-                `${ URLPIOAPP }/rutas/view/list?fecha_entrega=${queryParamsRutas.fecha_entrega}&empresa=${queryParamsRutas?.empresa||''}&tienda=${queryParamsRutas?.tienda||''}`
-            )
-            return response
-        } catch (error) {
-            openVisibleSnackBar(`${error}`, 'error')
-            return generateJsonError(`${error}`, "array")
-        }
-    }
-
-    const getTiendasFilter = async():Promise<ResponseService<TiendasRuta[]>> => {
-        try {
-            const response:ResponseService<TiendasRuta[]> = await AJAX(
-                `${ URLPIOAPP }/rutas/view/tiendas/rutas?fecha_entrega=${queryParamsRutas.fecha_entrega}`
-            )
-            return response
-        } catch (error) {
-            openVisibleSnackBar(`${error}`, 'error')
-            return generateJsonError(`${error}`, 'array')
-        }
-    }
+    const onOpenModalizeDetalleArticulos = () => modalizeRefDetalleArticulos.current?.open()
 
     const stateHandleSetRutas = async() => {
-        const result = await getRutas()
+        const result = await getRutas(queryParamsRutas)
         //recepcion... 1 es ya recepcionada y 0 no recepcionada
         // console.log(result)
         setRutas(result.data as RutasListType[])
@@ -112,29 +89,14 @@ export default function Rutas() {
         setCloseScreenLoading()
     }
 
-    // const reloadRutasController = async ():Promise<any> => {
-    //     setReloadRutas(true)
-
-    //     await stateHandleSetRutas()
-
-    //     setReloadRutas(false)
-    // }
-
     const onFocusDropdownTiendas = async() => {
         if(!queryParamsRutas.fecha_entrega) return
         setLoadingTiendasRuta(true)
-        const result = await getTiendasFilter()
+        const result = await getTiendasFilter(queryParamsRutas)
         const dataMapOptions:Option[] = result.data?.flatMap(el => ({ value: `${el.empresa}-${el.tienda}`, label: `${el.tienda_nombre}` })) as Option[]
         setOptionsTiendaRuta(dataMapOptions)
         setLoadingTiendasRuta(false)
     }
-
-    // const handlePressFabFilter = () => {
-    //     reset()
-    //     setRutas([])
-    //     setOptionsTiendaRuta([])
-    //     setQueryParamsRutas({ fecha_entrega: '', empresa: '', tienda: '' })
-    // }
 
     const cleanDataRuta = () => {
         reset()
@@ -168,6 +130,11 @@ export default function Rutas() {
         }
     }
 
+    //funciones para modalize 
+    const onPressRecepcion = () => {
+        onOpenModalize(modalizeRefDetalleRecepcion)
+    }
+
     useEffect(() => {
         const fecha_entrega = valueDateFilterRuta ? formatDate(new Date(valueDateFilterRuta)) : null
         const arrayValueTienda:string[] = valueUbicacionesRuta?.split('-') || []
@@ -195,6 +162,9 @@ export default function Rutas() {
             />
             <ModalizeDetalleArticulosLayout
                 modalizeRef={modalizeRefDetalleArticulos}
+            />
+            <ModalizeDetalleRecepcionLayout
+                modalizeRefDetalleRecepcion={modalizeRefDetalleRecepcion}
             />
 
             {/* <FabFloating 
@@ -268,7 +238,8 @@ export default function Rutas() {
                                     theme,
                                     // reloadRutasController,
                                     // reloadRutas
-                                    onPressBtnWaze
+                                    onPressBtnWaze,
+                                    onPressRecepcion
                                 )}
                                 data={rutas}
                                 groupField="tienda_nombre"

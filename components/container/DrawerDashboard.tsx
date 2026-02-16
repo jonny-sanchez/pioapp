@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Modal, Portal, Text, useTheme, Avatar, Drawer } from 'react-native-paper';
 import globalState from 'helpers/states/globalState';
-import { View, Animated, Dimensions, StyleSheet, TouchableWithoutFeedback, ScrollView  } from 'react-native';
+import { View, Animated, Dimensions, StyleSheet, TouchableWithoutFeedback, ScrollView, BackHandler  } from 'react-native';
 import ButtonForm from 'components/form/ButtonForm';
 // import bottomNavigation from 'helpers/navigator/bottomNavigator';
 // import { NavigationService, currentRouteName } from 'helpers/navigator/navigationScreens';
@@ -17,20 +17,22 @@ import DrawerSkeleton from 'components/Skeletons/DrawerSkeleton';
 export default function DrawerDashboard () {
 
     const { drawer, setCloseDrawer, indexNavigation, loadingMenuInit } = globalState()
-    
     const { routerMenu } = menuRouterState()
-
     const [ visible, setVisible ] = useState<boolean>(drawer)
-
     const screenWidth = Dimensions.get('window').width
-
     const translateX = useRef(new Animated.Value(screenWidth)).current
-
     const theme = useTheme()
-
     const userSession = getValueStorage('user')
-
     // const router = useRoute()
+
+    const onBackPress = () => {
+      if (drawer) {
+        // solo cambia el estado → la animación ya se ejecuta sola
+        setCloseDrawer();  
+        return true; // bloquea navegación atrás
+      }
+      return false;
+    }
 
     useEffect(() => {
       drawer && setVisible(drawer)
@@ -40,6 +42,14 @@ export default function DrawerDashboard () {
         useNativeDriver: true,
       }).start(() => { !drawer && setVisible(drawer) })
     }, [drawer])
+
+    useEffect(() => {
+      const backHandler = BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress
+      )
+      return () => backHandler.remove()
+    }, [drawer]);
 
     if(!visible) return null
 
