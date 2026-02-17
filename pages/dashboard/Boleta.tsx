@@ -24,6 +24,8 @@ import { getAllTipoBoleta } from "Apis/TipoBoleta/TipoBoletaApi"
 import { yupResolver } from "@hookform/resolvers/yup"
 import schemaBoletaFilter from "helpers/validatesForm/schemaBoletaFilter"
 import DropdownPeriodosLoading from "pages/Boleta/Layouts/DropdownPeriodosLoading"
+import { getBoleta } from "Apis/BoletaConsulta/BoletaConsultaApi"
+import { firmarBoleta, verificarFirmaBoleta } from "Apis/FirmaBoleta/FirmaBoletaApi"
 
 export default function Boleta() {
 
@@ -87,36 +89,6 @@ export default function Boleta() {
         }
     }    
 
-    const getPeriodos = async (): Promise<ResponseService<PeriodoType[]>> => {
-        try {
-            const result: ResponseService<PeriodoType[]> = await AJAX(`${URLPIOAPP}/nomina/periodos/ultimos-pagados`, 'GET')
-            return result
-        } catch (error: any) {
-            openVisibleSnackBar(`${error}`, 'error')
-            return generateJsonError(`${error}`, 'array')
-        }
-    }
-
-    const verificarFirmaBoleta = async (periodoId: number, tipo:number): Promise<ResponseService<VerificacionFirmaResponse>> => {
-        try {
-            const result: ResponseService<VerificacionFirmaResponse> = await AJAX(`${URLPIOAPP}/nomina/firma-boleta/existe?id_periodo=${periodoId}&tipo=${tipo}`, 'GET')
-            return result
-        } catch (error: any) {
-            openVisibleSnackBar(`Error al verificar firma: ${error}`, 'error')
-            return generateJsonError(`${error}`, 'object')
-        }
-    }
-
-    const getBoleta = async (periodoId: number, tipo:number): Promise<ResponseService<BoletaType>> => {
-        try {
-            const result: ResponseService<BoletaType> = await AJAX(`${URLPIOAPP}/nomina/boleta/detalle-completo?id_periodo=${periodoId}&tipo=${tipo}`, 'GET')
-            return result
-        } catch (error: any) {
-            openVisibleSnackBar(`Error al obtener la boleta: ${error}`, 'error')
-            return generateJsonError(`${error}`, 'object')
-        }
-    }
-
     // Función para capturar datos de geolocalización e IP
     const capturarDatosDispositivo = async (): Promise<{ longitude: number | null, latitude: number | null, ip: string | null }> => {
         let longitude: number | null = null;
@@ -135,39 +107,14 @@ export default function Boleta() {
 
             // Capturar IP del dispositivo
             ip = await getDeviceIPAddress();
+            // if(!ip) throw new Error(`Error al obtener la ip.`);
         } catch (error) {
-            openVisibleSnackBar('Error capturando datos del dispositivo', 'error');
+            // openVisibleSnackBar('Error capturando datos del dispositivo', 'error');
+            throw error
         }
 
         return { longitude, latitude, ip };
     };
-
-    const firmarBoleta = async (periodoId: number, tipo:number, gpsLongitude?: number, gpsLatitude?: number, ipDispositivo?: string): Promise<ResponseService<FirmaExitosaResponse>> => {
-        try {
-            const requestBody = {
-                id_periodo: periodoId,
-                tipo: tipo,
-                phone_gps_longitude: gpsLongitude || null,
-                phone_gps_latitude: gpsLatitude || null,
-                ip_dispositivo: ipDispositivo || null
-            };
-            // console.log(requestBody)
-            const result: ResponseService<FirmaExitosaResponse> = await AJAX(`${URLPIOAPP}/nomina/firma-boleta/firmar`, 'POST', requestBody)
-            return result
-        } catch (error: any) {
-            openVisibleSnackBar(`Error al firmar la boleta: ${error}`, 'error')
-            return generateJsonError(`${error}`, 'object')
-        }
-    }
-
-    const loadPeriodos = async () => {
-        setOpenScreenLoading()
-        const resultPeriodos = await getPeriodos()
-        if (resultPeriodos.status && resultPeriodos.data) {
-            setPeriodo(resultPeriodos.data)
-        }
-        setCloseScreenLoading()
-    }
 
     const onSubmit = async (data: any) => {
         if (!data.periodo) {
@@ -233,6 +180,53 @@ export default function Boleta() {
         setSelectedBoleta(null)
     }
 
+    /** FUNCION PARA FIRMAR BOLETA */
+    // const handleConfirmFirma = async () => {
+    //     if (!pendingPeriodoId) return
+
+    //     setShowFirmaDialog(false)
+    //     setOpenScreenLoading()
+    //     setIsProcessingSignature(true)
+
+    //     try {
+    //         const resultBoleta = await getBoleta(pendingPeriodoId.idPeriodo, pendingPeriodoId.tipo)
+            
+    //         if (resultBoleta.status && resultBoleta.data) {
+    //             let boletaFinal = normalizeBoleta(resultBoleta.data)
+
+    //             openVisibleSnackBar('Iniciando proceso de firma...', 'warning')
+
+    //             const { longitude, latitude, ip } = await capturarDatosDispositivo();
+
+    //             openVisibleSnackBar('Procesando firma...', 'warning')
+    //             const resultFirma = await firmarBoleta(pendingPeriodoId.idPeriodo, pendingPeriodoId.tipo, longitude || undefined, latitude || undefined, ip || undefined)
+
+    //             if (resultFirma.status && resultFirma.data) {
+    //                 const firmaData = resultFirma.data
+    //                 boletaFinal = {
+    //                     ...boletaFinal,
+    //                     firma: {
+    //                         idFirmaBoleta: firmaData.id_firma_boleta_pago,
+    //                         fechaFirma: firmaData.fecha_firma,
+    //                         valido: true
+    //                     }
+    //                 }
+
+    //                 openVisibleSnackBar('Boleta firmada exitosamente', 'success')
+    //                 setBoleta(boletaFinal)
+    //             } else {
+    //                 openVisibleSnackBar('Error al firmar la boleta', 'error')
+    //             }
+    //         }
+    //     } catch (error) {
+    //         openVisibleSnackBar('Error en el proceso de firma', 'error')
+    //     } finally {
+    //         setIsProcessingSignature(false)
+    //         setCloseScreenLoading()
+    //         setPendingPeriodoId(null)
+    //     }
+    // }
+
     const handleConfirmFirma = async () => {
         if (!pendingPeriodoId) return
 
@@ -242,37 +236,26 @@ export default function Boleta() {
 
         try {
             const resultBoleta = await getBoleta(pendingPeriodoId.idPeriodo, pendingPeriodoId.tipo)
-            
-
-            if (resultBoleta.status && resultBoleta.data) {
-                let boletaFinal = normalizeBoleta(resultBoleta.data)
-
-                openVisibleSnackBar('Iniciando proceso de firma...', 'warning')
-
-                const { longitude, latitude, ip } = await capturarDatosDispositivo();
-
-                openVisibleSnackBar('Procesando firma...', 'warning')
-                const resultFirma = await firmarBoleta(pendingPeriodoId.idPeriodo, pendingPeriodoId.tipo, longitude || undefined, latitude || undefined, ip || undefined)
-
-                if (resultFirma.status && resultFirma.data) {
-                    const firmaData = resultFirma.data
-                    boletaFinal = {
-                        ...boletaFinal,
-                        firma: {
-                            idFirmaBoleta: firmaData.id_firma_boleta_pago,
-                            fechaFirma: firmaData.fecha_firma,
-                            valido: true
-                        }
-                    }
-
-                    openVisibleSnackBar('Boleta firmada exitosamente', 'success')
-                    setBoleta(boletaFinal)
-                } else {
-                    openVisibleSnackBar('Error al firmar la boleta', 'error')
+            if (!(resultBoleta.status && resultBoleta.data)) throw new Error(`${resultBoleta?.message ?? 'Error al encontrar la boleta.'}`);
+            let boletaFinal = normalizeBoleta(resultBoleta.data)
+            openVisibleSnackBar('Iniciando proceso de firma...', 'warning')
+            const { longitude, latitude, ip } = await capturarDatosDispositivo();
+            openVisibleSnackBar('Procesando firma...', 'warning')
+            const resultFirma = await firmarBoleta(pendingPeriodoId.idPeriodo, pendingPeriodoId.tipo, longitude || undefined, latitude || undefined, ip || undefined)
+            if (!(resultFirma.status && resultFirma.data)) throw new Error(`${resultFirma?.message ?? "Error al firmar la boleta."}`);
+            const firmaData = resultFirma.data
+            boletaFinal = {
+                ...boletaFinal,
+                firma: {
+                    idFirmaBoleta: firmaData.id_firma_boleta_pago,
+                    fechaFirma: firmaData.fecha_firma,
+                    valido: true
                 }
             }
+            openVisibleSnackBar('Boleta firmada exitosamente', 'success')
+            setBoleta(boletaFinal)
         } catch (error) {
-            openVisibleSnackBar('Error en el proceso de firma', 'error')
+            openVisibleSnackBar(`${error}`, 'error')
         } finally {
             setIsProcessingSignature(false)
             setCloseScreenLoading()
@@ -299,9 +282,9 @@ export default function Boleta() {
         setBoleta(null)
     }
 
-    useEffect(() => {
-        // loadPeriodos()
-    }, [])
+    // useEffect(() => {
+    //     // loadPeriodos()
+    // }, [])
 
     return (
         <>
