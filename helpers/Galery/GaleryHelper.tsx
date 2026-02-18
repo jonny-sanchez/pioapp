@@ -1,7 +1,7 @@
 import { NativeModules, Platform } from 'react-native';
 import RNFS from 'react-native-fs';
 import * as FileSystem from 'expo-file-system';
-import * as MediaLibrary from 'expo-media-library';
+// import * as MediaLibrary from 'expo-media-library';
 // import { Alert, Platform } from "react-native";
 import alertsState from 'helpers/states/alertsState';
 
@@ -53,30 +53,49 @@ export const base64GetRef = async (refQr:any,) => {
     return `data:image/png;base64,${base64}`
 }
 
+// export const DownloadImageToGalery = async (uri: string) => {
+//   try {
+//     // Pedir permisos de galería
+//     const { status } = await MediaLibrary.requestPermissionsAsync();
+//     if (status !== 'granted') {
+//         alertsState.getState().openVisibleSnackBar(`Permiso denegado. Se necesita acceso a la galería`, 'error')
+//         return;
+//     }
+
+//     const fileName = uri.split('/').pop() || `image_${Date.now()}.jpg`;
+//     const fileUri = FileSystem.documentDirectory + fileName;
+
+//     // Descargar imagen
+//     const downloadResult = await FileSystem.downloadAsync(uri, fileUri);
+
+//     // Guardar en galería
+//     const asset = await MediaLibrary.createAssetAsync(downloadResult.uri);
+
+//     // (Opcional) Crear álbum
+//     // await MediaLibrary.createAlbumAsync("MiApp", asset, false);
+
+//     alertsState.getState().openVisibleSnackBar(`Descargado, Imagen guardada en la galería`, 'success')
+
+//   } catch (error) {
+//     alertsState.getState().openVisibleSnackBar(`${error}`, 'error')
+//   }
+// };
+
 export const DownloadImageToGalery = async (uri: string) => {
   try {
-    // Pedir permisos de galería
-    const { status } = await MediaLibrary.requestPermissionsAsync();
-    if (status !== 'granted') {
-        alertsState.getState().openVisibleSnackBar(`Permiso denegado. Se necesita acceso a la galería`, 'error')
-        return;
-    }
-
     const fileName = uri.split('/').pop() || `image_${Date.now()}.jpg`;
+
     const fileUri = FileSystem.documentDirectory + fileName;
 
-    // Descargar imagen
-    const downloadResult = await FileSystem.downloadAsync(uri, fileUri);
+    await FileSystem.downloadAsync(uri, fileUri);
 
-    // Guardar en galería
-    const asset = await MediaLibrary.createAssetAsync(downloadResult.uri);
+    alertsState
+      .getState()
+      .openVisibleSnackBar(`Imagen descargada`, 'success');
 
-    // (Opcional) Crear álbum
-    // await MediaLibrary.createAlbumAsync("MiApp", asset, false);
-
-    alertsState.getState().openVisibleSnackBar(`Descargado, Imagen guardada en la galería`, 'success')
+    return fileUri;
 
   } catch (error) {
-    alertsState.getState().openVisibleSnackBar(`${error}`, 'error')
+    alertsState.getState().openVisibleSnackBar(`${error}`, 'error');
   }
 };
