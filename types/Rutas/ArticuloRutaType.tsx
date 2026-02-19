@@ -5,6 +5,7 @@ type ArticuloRutaType = {
     nombre_articulo: string,
     description: string,
     cantidad: number;
+    cantidad_recibida?: number;
     serie?: string;
 }
 
