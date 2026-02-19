@@ -1,4 +1,4 @@
-import { getArticulos } from "Apis/ArticulosRuta/ArticulosRutaApi";
+import { getArticulos, getArticulosRecepcion } from "Apis/ArticulosRuta/ArticulosRutaApi";
 import AnimatedListItem from "components/Animaciones/AnimatedListItem";
 import CardTitle from "components/Cards/CardTitle";
 import ScrollViewContainer from "components/container/ScrollViewContainer";
@@ -27,12 +27,18 @@ export default function ModalizeDetalleArticulosLayout({
     const  { rutaDetalle, loadingSkeletetonArticulos, setLoadingSkeletetonArticulos } = detalleArticulosState()
     const [articulosRuta, setArticulosRuta] = useState<ArticuloRutaType[]>([]);
     const [totalCantidadArticulos, setTotalCantidadArticulos] = useState<number>(0)
+    const [totalCantidadRecibida, setTotalCantidadRecibida] = useState<number>(0)
     const [isAtTop, setIsAtTop] = useState(true);
 
-    const calcTotalArticulosRuta = ():number => {
+    const calcTotalArticulosRuta = () => {
         let total:number = 0
-        articulosRuta.forEach(({ cantidad })=> total += cantidad)
-        return total
+        let totalRecibida:number = 0
+        articulosRuta.forEach(({ cantidad, cantidad_recibida })=> {
+            total += cantidad
+            totalRecibida += (cantidad_recibida || 0)
+        })
+        setTotalCantidadArticulos(total)
+        setTotalCantidadRecibida(totalRecibida)
     }
 
     const renderItemsArticulos = async() => {
@@ -40,8 +46,22 @@ export default function ModalizeDetalleArticulosLayout({
         const serie:string|null = rutaDetalle?.serie || null
         if(!id_pedido || !serie) return
         setLoadingSkeletetonArticulos(true)
-        const resultArticulos = await getArticulos(id_pedido, serie)
-        setArticulosRuta(resultArticulos.data as ArticuloRutaType[])
+  
+        const [resultArticulos, resultRecepcion] = await Promise.all([
+            getArticulos(id_pedido, serie),
+            getArticulosRecepcion(id_pedido, serie)
+        ])
+        const articulosMerged = (resultArticulos.data as ArticuloRutaType[]).map((art) => {
+            const received = (resultRecepcion.data as ArticuloRutaType[])?.find(
+                (rec) => rec.codigo_articulo === art.codigo_articulo
+            );
+            return {
+                ...art,
+                cantidad_recibida: received?.cantidad || 0
+            };
+        });
+
+        setArticulosRuta(articulosMerged)
         setLoadingSkeletetonArticulos(false)
     }
 
@@ -54,8 +74,7 @@ export default function ModalizeDetalleArticulosLayout({
     }, [rutaDetalle])
 
     useEffect(() => {
-        const total:number = calcTotalArticulosRuta()
-        setTotalCantidadArticulos(total)
+        calcTotalArticulosRuta()
     }, [articulosRuta])
 
     return (
@@ -75,8 +94,8 @@ export default function ModalizeDetalleArticulosLayout({
                 title="Detalle de ruta"
                 footerComponent={
                     <View className="w-full flex flex-row items-center justify-between"> 
-                        <Text>Total:</Text>
-                        <Text>{ loadingSkeletetonArticulos ? '...cargando' : `${totalCantidadArticulos}`}</Text>
+                        <Text>Total Recibido/Enviado:</Text>
+                        <Text>{ loadingSkeletetonArticulos ? '...cargando' : `${totalCantidadRecibida} / ${totalCantidadArticulos}`}</Text>
                     </View>
                 }
             >
@@ -103,7 +122,11 @@ export default function ModalizeDetalleArticulosLayout({
                                             description={`${item.codigo_articulo} ${item.description}`}
                                             rightElements={ 
                                                 <>
-                                                    <Text>{ item?.cantidad || 0 }</Text>
+                                                    <Text 
+                                                        className={`text-base font-bold ${ (item?.cantidad_recibida || 0) < item.cantidad ? 'text-red-500' : 'text-gray-700' } `}
+                                                    >
+                                                        { item?.cantidad_recibida || 0 } / { item?.cantidad || 0 }
+                                                    </Text>
                                                 </> 
                                             }
                                         />
