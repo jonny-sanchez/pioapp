@@ -16,10 +16,12 @@ import { useState } from "react";
 
 type PickerFileProps = {
     disabled?: boolean;
+    location?: boolean;
 }
 
 export default function PickerFile({
-    disabled = false
+    disabled = false,
+    location = true
 } : PickerFileProps){
 
     const theme = useTheme() as AppTheme
@@ -28,37 +30,88 @@ export default function PickerFile({
     const { metadatosPicture, setMetadatosPicture, clearMetadatosPicture } = fotografyState()
     const [isOpenCarrousel, setIsOpenCorrousel] = useState<boolean>(false)
 
+    // const getImgCamera = async () => {
+    //     try {
+    //         setOpenScreenLoading()
+    //         const cameraPermisos = await permissionCamera()
+    //         if(!cameraPermisos) throw new Error(`Ooops. ocurrio un error con los permisos de camara.`);
+    //         const locationPermisos = await locationPermission()
+    //         if(!locationPermisos) throw new Error(`Ooops. ocurrio un error con los permisos de ubicacion.`);
+    //         const resultImg:any = await openCamera()
+    //         if(!resultImg) throw new Error(`Ooops. ocurrio un error al obtener la imagen.`);
+    //         const resultLocation:any = await getLocation()
+    //         if(!resultImg || !resultLocation) throw new Error(`Ooops. ocurrio un error al obtener los datos de imagen.`);
+    //         openVisibleSnackBar(`Optimizando imagen...`, 'normal')
+    //         const resultImageOptimizaded = await ImageOptimizerService.optimize(resultImg?.uri)
+    //         closeVisibleSnackBar()
+    //         setMetadatosPicture(
+    //             resultImageOptimizaded.uri,
+    //             // resultImg?.uri || '',
+    //             //fecha orginal cuando se tomo la foto {DateTimeOriginal}
+    //             //para ubicacion usar {GPSLongitude} y {GPSLatitude}
+    //             resultImg?.exif || null,
+    //             //para mostrar ubicacion usar {longitude} y {latitude}
+    //             resultLocation?.coords || null,
+    //             // resultImg?.mimeType || '',
+    //             resultImageOptimizaded.mimeType,
+    //             resultImg?.uri?.split('/').pop() || ''
+    //         )
+    //     } catch (error) {
+    //         return openVisibleSnackBar(`${error}`, 'error')
+    //     } finally {
+    //         setCloseScreenLoading()
+    //     }
+    // }
+
     const getImgCamera = async () => {
-        try {
-            setOpenScreenLoading()
-            const cameraPermisos = await permissionCamera()
-            if(!cameraPermisos) throw new Error(`Ooops. ocurrio un error con los permisos de camara.`);
-            const locationPermisos = await locationPermission()
-            if(!locationPermisos) throw new Error(`Ooops. ocurrio un error con los permisos de ubicacion.`);
-            const resultImg:any = await openCamera()
-            if(!resultImg) throw new Error(`Ooops. ocurrio un error al obtener la imagen.`);
-            const resultLocation:any = await getLocation()
-            if(!resultImg || !resultLocation) throw new Error(`Ooops. ocurrio un error al obtener los datos de imagen.`);
-            openVisibleSnackBar(`Optimizando imagen...`, 'normal')
-            const resultImageOptimizaded = await ImageOptimizerService.optimize(resultImg?.uri)
-            closeVisibleSnackBar()
-            setMetadatosPicture(
-                resultImageOptimizaded.uri,
-                // resultImg?.uri || '',
-                //fecha orginal cuando se tomo la foto {DateTimeOriginal}
-                //para ubicacion usar {GPSLongitude} y {GPSLatitude}
-                resultImg?.exif || null,
-                //para mostrar ubicacion usar {longitude} y {latitude}
-                resultLocation?.coords || null,
-                // resultImg?.mimeType || '',
-                resultImageOptimizaded.mimeType,
-                resultImg?.uri?.split('/').pop() || ''
-            )
-        } catch (error) {
-            return openVisibleSnackBar(`${error}`, 'error')
-        } finally {
-            setCloseScreenLoading()
+      try {
+        setOpenScreenLoading()
+
+        const cameraPermisos = await permissionCamera()
+        if (!cameraPermisos) {
+            throw new Error(`Ooops. ocurrió un error con los permisos de cámara.`)
         }
+
+        //declarar fuera para que exista siempre
+        let resultLocation: any = null
+
+        if (location) {
+            const locationPermisos = await locationPermission()
+            if (!locationPermisos) {
+                throw new Error(`Ooops. ocurrió un error con los permisos de ubicación.`)
+            }
+        }
+
+        const resultImg: any = await openCamera()
+        if (!resultImg) {
+            throw new Error(`Ooops. ocurrió un error al obtener la imagen.`)
+        }
+
+        // obtener ubicación solo si está habilitado
+        if (location) {
+            resultLocation = await getLocation()
+            if(!resultLocation) throw new Error(`Ooops. ocurrio un error al obtener datos de ubicacion.`);
+        }
+
+        openVisibleSnackBar(`Optimizando imagen...`, 'normal')
+
+        const resultImageOptimizaded = await ImageOptimizerService.optimize(resultImg?.uri)
+
+        closeVisibleSnackBar()
+
+        setMetadatosPicture(
+            resultImageOptimizaded.uri,
+            resultImg?.exif || null,
+            location ? resultLocation?.coords || null : null,
+            resultImageOptimizaded.mimeType,
+            resultImg?.uri?.split('/').pop() || ''
+        )
+
+      } catch (error) {
+          openVisibleSnackBar(`${error}`, 'error')
+      } finally {
+          setCloseScreenLoading()
+      }
     }
 
     return (
