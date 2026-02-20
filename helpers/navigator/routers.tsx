@@ -1,4 +1,7 @@
 import Login from "pages/auth/Login"
+import UserDeactivated from "pages/auth/UserDeactivated"
+import FirstTimePassword from "pages/auth/FirstTimePassword"
+import ForgotPassword from "pages/auth/ForgotPassword"
 // import Inicio from "pages/dashboard/Inicio"
 import SaveVisitas from "pages/Fomularios/SaveVisitas"
 import ScannnerQr from "pages/dashboard/ScannnerQr"
@@ -107,6 +110,30 @@ const routers = [
         hidden: false,
         icon: '',
         title: 'Sin conexion'
+    },
+    {
+        name: 'UserDeactivated',
+        component: UserDeactivated,
+        default: false,
+        hidden: true,
+        icon: '',
+        title: 'Acceso Denegado'
+    },
+    {
+        name: 'FirstTimePassword',
+        component: FirstTimePassword,
+        default: false,
+        hidden: true,
+        icon: '',
+        title: 'Cambiar Contraseña'
+    },
+    {
+        name: 'ForgotPassword',
+        component: ForgotPassword,
+        default: false,
+        hidden: true,
+        icon: '',
+        title: 'Recuperar Contraseña'
     },
     {
         name: 'InvitacionConvivio',
