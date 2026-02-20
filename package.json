@@ -20,6 +20,7 @@
     "@react-navigation/native": "^7.1.17",
     "@react-navigation/stack": "^7.4.8",
     "expo": "53.0.22",
+    "expo-av": "~15.1.7",
     "expo-blur": "~14.1.5",
     "expo-build-properties": "^0.14.8",
     "expo-camera": "~16.1.11",
@@ -35,6 +36,7 @@
     "expo-location": "~18.1.6",
     "expo-notifications": "~0.31.4",
     "expo-status-bar": "~2.2.3",
+    "expo-video": "~2.2.2",
     "moti": "^0.30.0",
     "nativewind": "latest",
     "react": "19.0.0",
@@ -64,9 +66,7 @@
     "rn-fetch-blob": "^0.12.0",
     "socket.io-client": "^4.8.1",
     "yup": "^1.7.0",
-    "zustand": "^5.0.8",
-    "expo-av": "~15.1.7",
-    "expo-video": "~2.2.2"
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

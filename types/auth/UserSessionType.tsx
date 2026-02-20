@@ -16,4 +16,6 @@ export type UserSessionType = {
   updatedAt?: string;
   userCreatedAt?: string | null;
   userUpdatedAt?: string | null;
+  baja?: boolean;
+  is_temporal_password?: boolean;
 };

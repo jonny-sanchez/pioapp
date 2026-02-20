@@ -3,7 +3,7 @@ import { Controller } from "react-hook-form"
 import { View, Platform } from "react-native"
 import DatePicker from 'react-native-date-picker'
 import { TextInput, HelperText, useTheme } from "react-native-paper";
-import { formatDate } from "helpers/fechas/fechasHelper";
+import { formatDate, formatDateDDMMYYYY } from "helpers/fechas/fechasHelper";
 import globalState from "helpers/states/globalState";
 
 type DatePickerFormProps= {
@@ -52,7 +52,7 @@ export default function DatePickerForm({
                                     mode="flat"
                                     disabled={disabled}
                                     label="Selecciona fecha"
-                                    value={value ? formatDate(value) : ''}
+                                    value={value ? formatDateDDMMYYYY(value) : ''}
                                     onFocus={() => setOpen(true)} 
                                     showSoftInputOnFocus={false} 
                                     onBlur={onBlur}

@@ -101,9 +101,17 @@ export default function Login() {
       dataFcm.exponentPushToken
     )
     setLoadingLogin(false)
-    login.status && NavigationService.reset('Home')
-    login.status && setValueStorage('user', login.data)
-    if(login.status && data.recordar_btn) setValueStorage('credentialsLogin', { user: data.codigo })
+    if (login.status) {
+      if (login.data?.is_temporal_password) {
+        NavigationService.reset('FirstTimePassword', { codigo: login.data.codigoEmpleado })
+      } else if (login.data?.baja) {
+        NavigationService.reset('UserDeactivated')
+      } else {
+        NavigationService.reset('Home')
+        setValueStorage('user', login.data)
+        if(data.recordar_btn) setValueStorage('credentialsLogin', { user: data.codigo })
+      }
+    }
   }
 
   const onChangeCheckBoxRemember = (value:boolean) => {
@@ -183,8 +191,14 @@ export default function Login() {
         dataFcm.idDevice, 
         dataFcm.exponentPushToken
       )
-      login.status && NavigationService.reset('Home')
-      login.status && setValueStorage('user', login.data)
+      if (login.status) {
+        if (login.data?.baja) {
+          NavigationService.reset('UserDeactivated')
+        } else {
+          NavigationService.reset('Home')
+          setValueStorage('user', login.data)
+        }
+      }
     }
     setCloseScreenLoading()
   }
@@ -265,6 +279,15 @@ export default function Login() {
             loading={loadingLogin}
             onPress={handleSubmit(submitFormLogin)} 
             label='Ingresar'/>
+        </View>
+
+        <View className='w-full mt-3 flex-row justify-center items-center'>
+          <SurfaceTapButton 
+            title='¿Olvidaste tu contraseña?'
+            onPress={() => NavigationService.navigate('ForgotPassword')}
+            disabled={loadingLogin}
+            icon='lock-question'
+          />
         </View>
 
         <View className='w-full mt-3 flex-row justify-center items-center flex-wrap' style={{ gap: 5 }}>

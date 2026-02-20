@@ -11,7 +11,7 @@ export default function FormAdaptiveKeyBoard({
 
     return (
         <KeyboardAwareScrollView 
-            contentContainerStyle={{ flex: 1 }}
+            contentContainerStyle={{ flexGrow: 1 }}
             // enableOnAndroid={true}    
             keyboardShouldPersistTaps="handled" 
             // extraScrollHeight={60}        
